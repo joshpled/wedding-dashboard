@@ -332,7 +332,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
   <section class="panel" id="p-runsheet" hidden>
     <div class="sec">
-      <div class="sec-h"><h2>Run of show</h2><span class="hint">Contracted window is 5:00 – 10:30 PM.</span></div>
+      <div class="sec-h"><h2>Suggested timeline</h2><span class="hint">From Invitation Only. Rows in red conflict with something contracted.</span></div>
       <div class="card"><table><thead><tr><th style="width:110px">Time</th><th>What happens</th><th style="width:38%">Where / who</th></tr></thead><tbody id="runBody"></tbody></table></div>
     </div>
     <div class="sec">
@@ -432,10 +432,15 @@ const FLAGS = [
     'The revised confirmation is dated 6 August and due back today at 4:00 PM ET. Everything on it is now locked in your favour — the additional hour, all five hors d’oeuvres, the filet and fried chicken stations, vendor meals at 8, the vegan plate at 3.',
     'After the signature nothing can be removed. Additions are still fine.'] },
 
+  { lvl:'hot', h:'The timeline books 8 hours of photography. The contract is 5.', p:[
+    'Loraine’s suggested timeline has Richard Bell starting at <strong>2:30 PM</strong> and ending at formal closure, <strong>10:30 PM</strong> — eight hours, with a question mark next to it both times.',
+    'Invoice 17H1742217 says <strong>5 hours of coverage</strong> with 2 photographers. That is a three-hour gap. Either buy the extra hours from Rich Bell or decide what he misses — a 5:30 PM start would cover ceremony through cake but nothing of getting ready.',
+    'Settle this before the timeline goes out to vendors.'] },
+
   { lvl:'warn', h:'The Snyder rental order still needs work', p:[
     'It is a quote, not a booking. It needs a signed CC authorisation, a <strong>50% deposit of about $1,164</strong> and the seating diagram on file.',
     'It also still carries two 90x156 linens for the gelato stations, which are gone. Linen finishes get settled with Loraine on <strong>Friday 7 August</strong> — get the re-quote straight after.',
-    'One thing to check in the re-quote: the 7/30 needs sheet wants two 108-inch rounds for the sweetheart and cake tables. The quote has one, cake only.'] },
+    'Two more for the re-quote: the 7/30 needs sheet wants two 108-inch rounds for the sweetheart and cake tables, and the quote has one, cake only. And the timeline has off-site vendors returning at <strong>10:45 PM</strong> for strike while the quote books collection at 10:00 – 10:15.'] },
 
   { lvl:'warn', h:'Nothing on the menu is dairy free', p:[
     'Two guests need it. The filet comes with yukon fondue, the fried chicken with three-cheese mac, and the ravioli is ricotta and goat cheese.',
@@ -454,6 +459,8 @@ const FLAGS = [
 const DECISIONS = [
   { q:'Linen finishes', s:'Black poly vs black Panama, and whether the gold matte satin guest linens go on the order', impact:'Roughly +$450 for the Panama upgrade', by:'Fri 7 Aug' },
   { q:'Snyder re-quote', s:'Gelato linens out, finishes in, sweetheart linen confirmed — then sign and deposit', impact:'~$2,327 order, $1,164 to secure', by:'10 Aug' },
+  { q:'Photography hours', s:'Contract is 5 hours; the timeline assumes 8 from 2:30 to 10:30', impact:'Three hours to buy, or three hours of coverage to give up', by:'ASAP' },
+  { q:'Snyder collection time', s:'Quote says 10:00 – 10:15 PM, the timeline says 10:45 strike', impact:'None if corrected now', by:'10 Aug' },
   { q:'Bar configuration', s:'Two setups at $200 plus one extra bartender at $175, both TBD on final layout', impact:'±$575', by:'20 Aug' },
   { q:'Dairy-free plate', s:'Take the butternut squash to 5, or ask for a separate plate for the two guests', impact:'≈ +$100', by:'26 Aug' },
   { q:'Vendor meals — 3 TBD', s:'Videographer, ceremony musician and Loraine’s assistant are the likely three', impact:'Already paid for at 8', by:'26 Aug' },
@@ -512,20 +519,36 @@ const MENU_NOTES = [
 ];
 
 const RUNSHEET = [
-  { t:'9:00 AM',  e:'Snyder delivers rentals', who:'Delivery window 9:00 – 11:00 AM' },
-  { t:'4:30 PM',  e:'Vendor access, setup and early arrivals', who:'Popcorn display set at the concession stand' },
-  { t:'5:00 PM',  e:'Ceremony begins', who:'Cinema · Father Will · Palmetto Strings' },
-  { t:'5:30 PM',  e:'Cocktail hour, passed hors d’oeuvres, portraits', who:'Stars Lounge · Richard Bell' },
-  { t:'6:30 PM',  e:'Guests transition to reception', who:'Ballroom' },
-  { t:'6:45 PM',  e:'Grand entrance and first dance', who:'DJ Eclipze · Jacob on sound' },
-  { t:'7:00 PM',  e:'Stations open', who:'Three petite-plate stations, 90 minutes' },
-  { t:'7:30 PM',  e:'Vendor meals', who:'8 covered on the BEO' },
-  { t:'7:45 PM',  e:'Toasts and speeches', who:'Passed cava' },
-  { t:'8:00 PM',  e:'Parent dances, dance floor opens', who:'DJ Eclipze' },
-  { t:'8:15 PM',  e:'Cake cutting and dessert', who:'PPHG cuts and serves' },
-  { t:'9:45 PM',  e:'Last call and last dance', who:'Bar closes' },
-  { t:'10:00 PM', e:'Grand exit', who:'Snyder collects rentals 10:00 – 10:15 PM' },
-  { t:'10:30 PM', e:'Contracted end · breakdown and load-out', who:'Security covers 2 hours past' }
+  { t:'9:00 AM',  e:'Venue opens' },
+  { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
+  { t:'11:00 AM', e:'Snyder drops off rentals', w:'Quote lists a 9:00 – 11:00 AM window' },
+  { t:'1:00 PM',  e:'Florist delivers and sets up', w:'Amanda' },
+  { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
+  { t:'2:30 PM',  e:'Photography begins', w:'Timeline assumes 8 hours; the contract is 5', flag:true },
+  { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
+  { t:'3:30 PM',  e:'Sound tech and piano arrive', w:'Jacob Scaife · Palmetto Strings' },
+  { t:'3:45 PM',  e:'Couple arrival', w:'Optional venue reveal' },
+  { t:'4:00 PM',  e:'Wedding party arrival' },
+  { t:'4:30 PM',  e:'Preludes and guest arrival', w:'Popcorn at the concession stand in the lobby' },
+  { t:'5:00 PM',  e:'Ceremony', w:'In the Theatre · Father Will' },
+  { t:'5:30 PM',  e:'Cocktail hour', w:'Timeline says lobby; the BEO stages it in Stars Lounge', flag:true,
+    sub:['Cava passed straight after the ceremony','All five hors d’oeuvres passed','Drinks of choice — Joshua: water and white wine · Gabriel: TBD'] },
+  { t:'6:30 PM',  e:'Reception opens', w:'In the Ballroom — move guests, find seating' },
+  { t:'6:45 PM',  e:'Formalities',
+    sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
+  { t:'7:00 PM',  e:'Dinner stations open', w:'Three petite-plate stations, 90 minutes' },
+  { t:'7:30 PM',  e:'Vendor meals', w:'Lobby, tentative. 8 covered on the BEO.' },
+  { t:'7:45 PM',  e:'PPHG passes champagne' },
+  { t:'7:55 PM',  e:'Roasts and toasts' },
+  { t:'8:15 PM',  e:'Cutting of the cake', w:'PPHG cuts and serves' },
+  { t:'8:30 PM',  e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
+  { t:'10:15 PM', e:'Informal last call for alcohol' },
+  { t:'10:20 PM', e:'Last song of the night' },
+  { t:'10:25 PM', e:'Prepare for departure', w:'If applicable' },
+  { t:'10:30 PM', e:'Formal event closure',
+    sub:['Photography ends — 8 hours from 2:30','Guests depart the American Theater','PPHG staff and on-site vendors break down'] },
+  { t:'10:45 PM', e:'Off-site vendors return for strike', w:'Snyder is currently booked to collect at 10:00 – 10:15', flag:true },
+  { t:'12:00 AM', e:'Venue closes' }
 ];
 
 const SETTLED = [
@@ -729,7 +752,11 @@ function menu(){
 
 function runsheet(){
   $('#runBody').innerHTML = RUNSHEET.map(r=>
-    `<tr><td class="num" style="white-space:nowrap">${r.t}</td><td><strong>${r.e}</strong></td><td>${r.who}</td></tr>`).join('');
+    `<tr${r.flag?' style="background:var(--rust-lo)"':''}>
+      <td class="num" style="white-space:nowrap${r.flag?';color:var(--rust);font-weight:600':''}">${r.t}</td>
+      <td><strong${r.flag?' style="color:var(--rust)"':''}>${r.e}</strong>
+        ${r.sub?`<ul style="margin:6px 0 0;padding-left:18px;color:var(--ink-2);font-size:13.5px;line-height:1.7">${r.sub.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}</td>
+      <td${r.flag?' style="color:var(--rust)"':''}>${r.w||''}</td></tr>`).join('');
   $('#settledList').innerHTML = SETTLED.map(x=>`<li>${x}</li>`).join('');
 }
 
