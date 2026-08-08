@@ -446,10 +446,14 @@ const FLAGS = [
     'Two guests need it. The filet comes with yukon fondue, the fried chicken with three-cheese mac, and the ravioli is ricotta and goat cheese.',
     'The Glazed Butternut Squash is dairy free as well as vegan, but it is only on the order at qty 3 — exactly the vegan count. Ask Olivia to take it to 5, or to plate something else for the two.'] },
 
-  { lvl:'warn', h:'Three loose ends on the BEO', p:[
-    '<strong>Vendor meals</strong> are booked at 8, listed as 1 AV, 2 photo, 1 DJ, 1 planner and <strong>3 TBD</strong>. Name the last three so nobody goes hungry.',
-    '<strong>Bar configuration</strong> — two setups at $200 and one extra bartender at $175 are still marked TBD on final layout.',
-    '<strong>Gabriel’s drink of choice</strong> is still blank.'] },
+  { lvl:'warn', h:'The vendor meal headcount does not add up', p:[
+    'The 8 August BEO lists <strong>1 AV, 2 photo, 1 DJ, 2 planner and 3 TBD</strong>. That is nine people. It bills eight at $25.',
+    'Name the three unknowns — videographer, ceremony musician and Loraine’s second body are the likely candidates — and get the quantity moved to 9.'] },
+
+  { lvl:'warn', h:'The BEO’s own vendor list is empty', p:[
+    'Photographer, videographer, rentals, lighting, transportation, send-off, floral, cake, officiant, ceremony musicians and entertainment are <strong>all blank</strong> on page 5. So is the rehearsal time.',
+    'The getting-ready section reads <strong>0:00PM Grooms Arrive</strong> and <strong>0:00PM First Look</strong>. PPHG has no idea where you are getting ready or when. Fill this in so their staff and security are staged correctly.',
+    'Also still open: bar configuration is TBD on final layout, gold chivari chair and table counts are TBD, and <strong>Gabriel’s drink of choice</strong> is still blank.'] },
 
   { lvl:'warn', h:'The end of August is heavy', p:[
     '7 August: $2,910 to Invitation Only. Around 10 August: about $1,164 to secure the rentals. 23 August: $5,100 across photography and the DJ. 26 August: $16,227 to PPHG.',
@@ -463,7 +467,9 @@ const DECISIONS = [
   { q:'Snyder collection time', s:'Quote says 10:00 – 10:15 PM, the timeline says 10:45 strike', impact:'None if corrected now', by:'10 Aug' },
   { q:'Bar configuration', s:'Two setups at $200 plus one extra bartender at $175, both TBD on final layout', impact:'±$575', by:'20 Aug' },
   { q:'Dairy-free plate', s:'Take the butternut squash to 5, or ask for a separate plate for the two guests', impact:'≈ +$100', by:'26 Aug' },
-  { q:'Vendor meals — 3 TBD', s:'Videographer, ceremony musician and Loraine’s assistant are the likely three', impact:'Already paid for at 8', by:'26 Aug' },
+  { q:'Vendor meals — 3 TBD', s:'BEO lists nine people but bills eight. Name the three and add the ninth cover.', impact:'≈ +$34 all-in', by:'12 Aug' },
+  { q:'Getting-ready location', s:'BEO shows 0:00PM for grooms arrival and first look — no location given', impact:'None, but PPHG needs it', by:'12 Aug' },
+  { q:'Rehearsal time', s:'Blank on the BEO. Subject to venue scheduling, so earlier is better.', impact:'None', by:'15 Aug' },
   { q:'Gabriel’s drink of choice', s:'Still blank on the BEO', impact:'None', by:'26 Aug' },
   { q:'Jacob’s AV deposit', s:'Paid, amount not recorded anywhere', impact:'$500 total', by:'8 Aug' }
 ];
@@ -479,7 +485,9 @@ const CLOSED = [
   'Security at 18 hours, two guards',
   'Gelato bar removed',
   'Cake confirmed with Publix — two tiers, cut and served by PPHG',
-  'Childcare — not being offered, all six families notified'
+  'Childcare — not being offered, all six families notified',
+  'Stars Lounge restored at $500 — cocktail hour confirmed there',
+  'Setup access from 9:00 AM the day of the event'
 ];
 
 const MENU = [
@@ -515,7 +523,11 @@ const MENU_NOTES = [
   'Dinner wines poured tableside: Pinot Grigio and Pinot Noir.',
   'Joshua’s drink of choice: water and white wine. Gabriel’s: still to be chosen.',
   'Three station attendants and two additional servers on the order.',
-  'Catering equipment rental is estimated at $100 per station and trues up to actual.'
+  'Catering equipment rental is estimated at $100 per station and trues up to actual.',
+  'PPHG supplies in-house china and silver: 140 salad plates, 140 pasta bowls, 70 dinner forks, 170 salad forks, 70 dinner knives, 100 salad knives.',
+  'Gold chivari chairs and table counts are still marked TBD on the BEO.',
+  'Anything PPHG does not own — linen, décor — comes from Snyder at your expense.',
+  'Setup can begin at 9:00 AM. Earlier access needs approval a month out and may require a parking buyout.'
 ];
 
 const RUNSHEET = [
@@ -531,7 +543,7 @@ const RUNSHEET = [
   { t:'4:00 PM',  e:'Wedding party arrival' },
   { t:'4:30 PM',  e:'Preludes and guest arrival', w:'Popcorn at the concession stand in the lobby' },
   { t:'5:00 PM',  e:'Ceremony', w:'In the Theatre · Father Will' },
-  { t:'5:30 PM',  e:'Cocktail hour', w:'Timeline says lobby; the BEO stages it in Stars Lounge', flag:true,
+  { t:'5:30 PM',  e:'Cocktail hour', w:'Stars Lounge — confirmed on the 8 Aug BEO, default Stars layout',
     sub:['Cava passed straight after the ceremony','All five hors d’oeuvres passed','Drinks of choice — Joshua: water and white wine · Gabriel: TBD'] },
   { t:'6:30 PM',  e:'Reception opens', w:'In the Ballroom — move guests, find seating' },
   { t:'6:45 PM',  e:'Formalities',
@@ -548,7 +560,7 @@ const RUNSHEET = [
   { t:'10:30 PM', e:'Formal event closure',
     sub:['Photography ends — 8 hours from 2:30','Guests depart the American Theater','PPHG staff and on-site vendors break down'] },
   { t:'10:45 PM', e:'Off-site vendors return for strike', w:'Snyder is currently booked to collect at 10:00 – 10:15', flag:true },
-  { t:'12:00 AM', e:'Venue closes' }
+  { t:'12:00 AM', e:'Venue closes', w:'PPHG’s own BEO timeline says breakdown concludes 12:30 AM' }
 ];
 
 const SETTLED = [
@@ -673,14 +685,20 @@ function vendors(){
   $('#vgrid').innerHTML = D.vendors.map(v=>{
     const o = owed(v), pd = paidFor(v.id);
     const pill = v.status==='done' ? '<span class="pill paid">Settled</span>'
-      : v.total==null ? '<span class="pill tbd">No number yet</span>'
+      : v.total==null ? (pd>0 ? '<span class="pill alt">Paid, not quoted</span>' : '<span class="pill tbd">No number yet</span>')
       : o<=0 ? '<span class="pill paid">Paid in full</span>' : '<span class="pill due">Balance due</span>';
     const when = v.due_date ? `<span>Due ${fmtD(v.due_date)}</span><span>${daysTo(v.due_date)} days</span>`
       : (v.total!=null && o>0 ? '<span>No due date on file</span>' : '<span>—</span>');
     return `<article class="v">
       <div class="top"><div><h3>${esc(v.name)}</h3><div class="cat">${esc(v.category||'')}</div></div>${pill}</div>
-      ${v.total!=null ? `<dl><dt>Contracted</dt><dd>${money(v.total)}</dd><dt>Paid</dt><dd>${money(pd)}</dd>
-        <dt>Outstanding</dt><dd class="${o>0?'owe':''}">${money(o)}</dd></dl>` : ''}
+      ${v.total!=null
+        ? `<dl><dt>Contracted</dt><dd>${money(v.total)}</dd><dt>Paid</dt><dd>${money(pd)}</dd>
+             <dt>Outstanding</dt><dd class="${o>0?'owe':''}">${money(o)}</dd></dl>`
+        : (pd > 0
+           ? `<dl><dt>Contracted</dt><dd style="color:var(--ink-3)">not quoted</dd>
+                <dt>Paid</dt><dd>${money(pd)}</dd>
+                <dt>Outstanding</dt><dd style="color:var(--ink-3)">unknown</dd></dl>`
+           : '')}
       <div class="when">${when}</div>
       ${v.note ? `<div class="note">${esc(v.note)}</div>` : ''}
       <div class="act"><button class="btn ghost sm" data-pay="${v.id}" data-name="${esc(v.name)}">Record payment</button></div>
@@ -695,7 +713,8 @@ function payments(){
     `<tr><td class="num">${fmtD(p.paid_on)}</td><td>${esc(name(p.vendor_id))}</td>
      <td>${esc(p.method||'')}${p.entered_by_name && p.entered_by_name!=='seed' ? ` <span style="color:var(--ink-3)">· ${esc(p.entered_by_name)}</span>` : ''}</td>
      <td class="n">${money(p.amount)}</td>
-     <td style="text-align:right"><button class="btn ghost sm" data-editpay="${p.id}">Correct</button></td></tr>`
+     <td style="text-align:right;white-space:nowrap"><button class="btn ghost sm" data-editpay="${p.id}">Correct</button>
+       <button class="btn ghost sm" data-delpay="${p.id}" style="margin-left:5px;color:var(--rust)">Delete</button></td></tr>`
   ).join('') + `<tr><td colspan="3"><strong>Total paid to date</strong></td><td class="n"><strong>${money(rows.reduce((a,p)=>a+Number(p.amount),0))}</strong></td><td></td></tr>`;
 }
 
@@ -867,6 +886,15 @@ document.addEventListener('change', async e=>{
 document.addEventListener('click', async e=>{
   const dt = e.target.closest('[data-deltask]');
   if (dt){ await sb.from('tasks').delete().eq('id', dt.dataset.deltask); await load(); tasks(); return; }
+  const dp = e.target.closest('[data-delpay]');
+  if (dp){
+    const row = D.payments.find(x => String(x.id) === dp.dataset.delpay); if (!row) return;
+    const vn = (D.vendors.find(v=>v.id===row.vendor_id)||{}).name || row.vendor_id;
+    const ok = confirm(`Delete this payment?\n\n${money(row.amount)} to ${vn}\n${fmtD(row.paid_on)}${row.method?' · '+row.method:''}\n\nThis cannot be undone. If the amount is just wrong, use Correct instead.`);
+    if (!ok) return;
+    await sb.from('payments').delete().eq('id', row.id);
+    await load(); renderAll(); return;
+  }
   const ep = e.target.closest('[data-editpay]');
   if (ep){
     const row = D.payments.find(x => String(x.id) === ep.dataset.editpay); if (!row) return;
@@ -887,14 +915,37 @@ document.addEventListener('click', async e=>{
   }
 });
 
+let saving = false;
 $('#payDlg').addEventListener('close', async function(){
   const editId = this.dataset.editId; delete this.dataset.editId;
-  if (this.returnValue !== 'save') return;
+  if (this.returnValue !== 'save' || saving) return;
   const amount = parseFloat($('#payAmt').value); if (isNaN(amount)) return;
   const row = { vendor_id:this.dataset.vendor, paid_on:$('#payDate').value, amount,
                 method:$('#payMethod').value || null, entered_by_name: me };
-  if (editId) await sb.from('payments').update(row).eq('id', editId);
-  else        await sb.from('payments').insert(row);
+
+  if (!editId){
+    const near = D.payments.filter(p => p.vendor_id===row.vendor_id && Number(p.amount)===amount);
+    const exact = near.find(p => p.paid_on===row.paid_on);
+    if (exact){
+      const vn = (D.vendors.find(v=>v.id===row.vendor_id)||{}).name || '';
+      if (!confirm(`Looks like this is already recorded.\n\n${money(amount)} to ${vn} on ${fmtD(row.paid_on)} is already on the board.\n\nRecord it a second time anyway?`)) return;
+    } else if (near.length){
+      const vn = (D.vendors.find(v=>v.id===row.vendor_id)||{}).name || '';
+      if (!confirm(`A payment of ${money(amount)} to ${vn} already exists, dated ${fmtD(near[0].paid_on)}.\n\nAdd this one as well?`)) return;
+    }
+  }
+
+  saving = true;
+  try {
+    const res = editId
+      ? await sb.from('payments').update(row).eq('id', editId)
+      : await sb.from('payments').insert(row);
+    if (res.error){
+      alert(res.error.code === '23505'
+        ? 'That exact payment is already on the board — same vendor, date, amount and method. Nothing was added.'
+        : 'Could not save that payment: ' + res.error.message);
+    }
+  } finally { saving = false; }
   await load(); renderAll();
 });
 

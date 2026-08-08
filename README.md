@@ -80,10 +80,18 @@ their phone.
   Tasks added later delete normally.
 - `payments` is the source of truth for "paid". Vendor totals never store a
   paid figure — it's summed from payments, so the math can't drift.
-- Payments cannot be deleted. There is no delete policy on the table and a
-  `before delete` trigger raises regardless, so neither the app nor a stray
-  API call can drop one. Wrong entries get corrected in place; an entry that
-  never happened gets set to 0. The UI offers **Correct**, not a delete.
+- Payments can be corrected or deleted, but a delete needs an explicit
+  confirmation naming the vendor, amount and date. **Correct** is offered
+  first, because a wrong amount is far more common than a payment that never
+  happened.
+- A unique index on `(vendor_id, paid_on, amount, method)` blocks exact
+  duplicates at the database. The browser also warns before saving a payment
+  that looks like one already on the board — same vendor and amount, any
+  date — and a `saving` flag stops a double submit. If you genuinely need two
+  identical payments on the same day, differentiate the method field.
+- Vendors with no contracted total still show what has been paid against
+  them, labelled "not quoted", so a payment can never vanish from view just
+  because nobody has priced the vendor yet.
 - `vendors.total` is null for anything unquoted. Those render as
   "No number yet" rather than zero, so they don't quietly disappear from
   the budget.
