@@ -419,11 +419,11 @@ const MILESTONES = [
     detail:'Once signed nothing can be removed — only added.' },
   { date:'2026-08-07', title:'Invitation Only balance', amount:2909.75, detail:'Invoice 00498. Zelle avoids the 3% fee.' },
   { date:'2026-08-07', title:'Linen finishes confirmed with Loraine', amount:null, detail:'Drives the Snyder re-quote.' },
-  { date:'2026-08-15', title:'Snyder linen deposit', amount:640.05, detail:'50% of quote #350401-2, plus the CCRA on file.' },
+  { date:'2026-08-13', title:'Last day to change the linen order', amount:null, detail:'Nothing can be altered within three weeks of the 3 September pick-up.' },
   { date:'2026-08-23', title:'Richard Bell Photography balance', amount:2800, detail:'Invoice 17H1742217.' },
   { date:'2026-08-23', title:'Dream Day Charleston balance', amount:2300, detail:'A mailed check must be postmarked by this date.' },
   { date:'2026-08-26', title:'PPHG final payment', amount:16227.17, detail:'Largest single payment of the wedding.' },
-  { date:'2026-09-04', title:'Collect linens from Snyder', amount:null, detail:'3875 Meeting St, counter open 9AM – 4PM. Items held on the pick-up date only.' },
+  { date:'2026-09-03', title:'Collect linens from Snyder', amount:null, detail:'3875 Meeting St, counter open 9AM – 4PM. Items held on the pick-up date only.' },
   { date:'2026-09-05', title:'Rehearsal walk-through and BBQ', amount:null, detail:'Loraine runs the rehearsal.' },
   { date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
   { date:'2026-09-08', title:'Return linens to Snyder', amount:null, detail:'Required by the customer pick-up terms.' }
@@ -438,22 +438,22 @@ const FLAGS = [
     'Richard Bell is confirmed at <strong>5 hours from 4:30 PM</strong>, so coverage runs to <strong>9:30 PM</strong>. The dance floor opens at 8:30, last song is 10:20 and the grand exit is at 10:00.',
     'That is the right call on cost, but it means <strong>no photos of the exit</strong>. If you want that shot, either buy an extra hour or move the send-off earlier and stage it before he leaves.'] },
 
-  { lvl:'hot', h:'The new Snyder quote is customer pick-up, not delivery', p:[
-    'Quote #350401-2 has <strong>$0.00 for delivery and pick-up</strong>. Someone has to collect 30 linens from 3875 Meeting St on <strong>Friday 4 September</strong> between 9AM and 4PM, and return them on <strong>Tuesday 8 September</strong>.',
-    'Snyder’s own note: make sure the items fit in your vehicle, and items are held on the pick-up date only. Nobody is assigned to either run, and Tuesday is after most people will have gone home.',
-    'It is still a quote. It needs the CCRA on file and a <strong>50% deposit of $640.05</strong> to secure.'] },
+  { lvl:'hot', h:'Linen changes close on 13 August', p:[
+    'Order #349216-14 is confirmed and paid at <strong>$1,629</strong>. The order carries Snyder’s standard term: <strong>linens may not be altered within three weeks of the delivery date</strong>. Pick-up is 3 September, so that window shuts <strong>tomorrow</strong>.',
+    'One thing to settle before it does: the <strong>cake table linen</strong>. The linens-only quote had a 108-inch black majestic for the cake table. It is not on the confirmed order. Either PPHG dresses that table or it goes bare.',
+    'Also note the 5 wheat matte satin sweetheart linens are marked <strong>specialty, not in stock</strong> — they have to be ordered in. Worth confirming they land before the 3rd.'] },
 
-  { lvl:'hot', h:'The new quote is linens only. Where are the glassware and napkins?', p:[
-    'The earlier #349216 covered glassware, linens and napkins for $2,327. This one is <strong>linens only, $1,280</strong> — seven line items, thirty pieces, no glass and no napkins.',
-    'The BEO lists PPHG’s in-house china and silver but no glassware, while the place setting calls for a water glass, a wine glass and a napkin. Either PPHG covers those in-house or they have fallen off the order entirely. Confirm before you sign anything.'] },
+  { lvl:'warn', h:'Two people still have to drive to North Charleston', p:[
+    'The order is customer pick-up. Someone collects 30-odd linens and 100 napkins from 3875 Meeting St on <strong>Thursday 3 September</strong>, 9AM – 4PM, and someone returns them on <strong>Tuesday 8 September</strong>.',
+    'The Thursday run has a name on it. The Tuesday return does not, and by then most people will have flown home. Snyder also asks that you check the load fits the vehicle.'] },
 
   { lvl:'warn', h:'Nothing on the menu is dairy free', p:[
     'Two guests need it. The filet comes with yukon fondue, the fried chicken with three-cheese mac, and the ravioli is ricotta and goat cheese.',
     'The Glazed Butternut Squash is dairy free as well as vegan, but it is only on the order at qty 3 — exactly the vegan count. Ask Olivia to take it to 5, or to plate something else for the two.'] },
 
-  { lvl:'warn', h:'The vendor meal headcount does not add up', p:[
-    'The 8 August BEO lists <strong>1 AV, 2 photo, 1 DJ, 2 planner and 3 TBD</strong>. That is nine people. It bills eight at $25.',
-    'Name the three unknowns — videographer, ceremony musician and Loraine’s second body are the likely candidates — and get the quantity moved to 9.'] },
+  { lvl:'warn', h:'Name the last three vendor meals', p:[
+    'The BEO lists <strong>1 AV, 2 photo, 1 DJ, 2 planner and 3 TBD</strong> — nine people — but bills eight. With the videographer eating as a guest rather than a vendor, the count lands back at eight and the billing is right.',
+    'Tell Olivia who the three unknowns are so nobody turns up without a plate. The ceremony musician and Loraine’s second body cover two of them.'] },
 
   { lvl:'warn', h:'The BEO’s own vendor list is empty', p:[
     'Photographer, videographer, rentals, lighting, transportation, send-off, floral, cake, officiant, ceremony musicians and entertainment are <strong>all blank</strong> on page 5. So is the rehearsal time.',
@@ -466,8 +466,8 @@ const FLAGS = [
 ];
 
 const DECISIONS = [
-  { q:'Linen pick-up and return', s:'Nobody assigned to the Friday collection or the Tuesday return', impact:'None if handled, a real problem if not', by:'15 Aug' },
-  { q:'Glassware and napkins', s:'Dropped between the two Snyder quotes — confirm PPHG covers them', impact:'Unknown until confirmed', by:'12 Aug' },
+  { q:'Linen return run', s:'Nobody assigned to the Tuesday 8 September return to North Charleston', impact:'None if handled, a real problem if not', by:'15 Aug' },
+  { q:'Cake table linen', s:'On the earlier quote, missing from the confirmed order. Changes close 13 August.', impact:'≈ $24 if added in time', by:'13 Aug' },
   { q:'Grand exit photos', s:'Coverage ends 9:30 PM, the exit is at 10:00', impact:'An extra hour, or move the send-off earlier', by:'15 Aug' },
   { q:'Bar configuration', s:'Two setups at $200 plus one extra bartender at $175, both TBD on final layout', impact:'±$575', by:'20 Aug' },
   { q:'Dairy-free plate', s:'Take the butternut squash to 5, or ask for a separate plate for the two guests', impact:'≈ +$100', by:'26 Aug' },
@@ -496,7 +496,11 @@ const CLOSED = [
   'Wedding party arrives at the venue at 4:00 PM',
   'Linen finishes chosen — wheat and brassy gold matte satin, black majestic',
   'Gelato linens off the rental order',
-  'Sweetheart table linen confirmed on the order'
+  'Sweetheart table linen confirmed on the order',
+  'Snyder order confirmed and paid — linens and napkins, $1,629',
+  'All glassware coming from PPHG in-house — nothing rented',
+  'Florals with Stephen, arranged and delivered by Amanda Cubello',
+  'Videography with Anthony Rivera at Blue Box Digital — attending as a guest'
 ];
 
 const MENU = [
@@ -523,7 +527,7 @@ const MENU = [
   { c:'Cake', t:'8:15 PM', items:[
     { n:'Publix — two tiers', d:'Cut and served by the PPHG team. Baker supplies the stand and any anniversary-tier box; delivery must be same day.', tags:['Confirmed'], q:1, p:0 } ] },
   { c:'Vendor meals', t:'7:30 PM · one hour after stations open', items:[
-    { n:'Stations, two plates max', d:'1 AV · 2 photo · 1 DJ · 1 planner · 3 TBD', q:8, p:25 } ] }
+    { n:'Stations, two plates max', d:'1 AV · 2 photo · 1 DJ · 2 planner · 3 TBD. The videographer is counted as a guest.', q:8, p:25 } ] }
 ];
 
 const MENU_NOTES = [
@@ -533,18 +537,18 @@ const MENU_NOTES = [
   'Joshua’s drink of choice: water and white wine. Gabriel’s: still to be chosen.',
   'Three station attendants and two additional servers on the order.',
   'Catering equipment rental is estimated at $100 per station and trues up to actual.',
-  'PPHG supplies in-house china and silver: 140 salad plates, 140 pasta bowls, 70 dinner forks, 170 salad forks, 70 dinner knives, 100 salad knives.',
+  'PPHG supplies all china, silver and glassware in-house: 140 salad plates, 140 pasta bowls, 70 dinner forks, 170 salad forks, 70 dinner knives, 100 salad knives, plus the water and wine glasses.',
   'Gold chivari chairs and table counts are still marked TBD on the BEO.',
-  'Anything PPHG does not own — linen, décor — comes from Snyder at your expense.',
+  'Linens and napkins come from Snyder. Everything else on the table is PPHG’s.',
   'Setup can begin at 9:00 AM. Earlier access needs approval a month out and may require a parking buyout.'
 ];
 
 const RUNSHEET = [
-  { t:'Fri 4 Sep', e:'Collect linens from Snyder', w:'3875 Meeting St · counter open 9AM – 4PM · returned Tue 8 Sep', flag:true },
+  { t:'Thu 3 Sep', e:'Collect linens from Snyder', w:'3875 Meeting St · counter open 9AM – 4PM · returned Tue 8 Sep', flag:true },
   { t:'9:00 AM',  e:'Venue opens' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
-  { t:'11:00 AM', e:'Linens on site and set', w:'No Snyder delivery — someone brings them from Friday’s pick-up' },
-  { t:'1:00 PM',  e:'Florist delivers and sets up', w:'Amanda' },
+  { t:'11:00 AM', e:'Linens on site and set', w:'No Snyder delivery — brought from Thursday’s pick-up' },
+  { t:'1:00 PM',  e:'Florist delivers and sets up', w:'Amanda Cubello, arranging for Stephen' },
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
   { t:'3:30 PM',  e:'Sound tech and piano arrive', w:'Jacob Scaife · Palmetto Strings' },
@@ -559,7 +563,7 @@ const RUNSHEET = [
   { t:'6:45 PM',  e:'Formalities',
     sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
   { t:'7:00 PM',  e:'Dinner stations open', w:'Three petite-plate stations, 90 minutes' },
-  { t:'7:30 PM',  e:'Vendor meals', w:'Lobby, tentative. 8 covered on the BEO.' },
+  { t:'7:30 PM',  e:'Vendor meals', w:'Lobby, tentative. 8 covered — videographer eats as a guest.' },
   { t:'7:45 PM',  e:'PPHG passes champagne' },
   { t:'7:55 PM',  e:'Roasts and toasts' },
   { t:'8:15 PM',  e:'Cutting of the cake', w:'PPHG cuts and serves' },
@@ -594,9 +598,10 @@ const PEOPLE = [
   { r:'Ceremony music', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com' },
   { r:'AV tech', n:'Jacob Scaife', e:'jscaife912@gmail.com', t:'804.387.5783' },
   { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216' },
-  { r:'Officiant', n:'Father Will', t:'+1 (336) 340-8183' },
-  { r:'Videography', n:'Anthony Rivera', x:'No contact on file' },
-  { r:'Florals', n:'Amanda', x:'No contact on file' },
+  { r:'Officiant', n:'Father Will', t:'336.340.8183' },
+  { r:'Florist', n:'Stephen', t:'301.549.8622', x:'Arrangements and delivery by Amanda Cubello' },
+  { r:'Florals · arranging and delivery', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
+  { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest, not a vendor' },
   { r:'Cake and rehearsal dinner', n:'Barbara', e:'warriorbjtaylor@hotmail.com' }
 ];
 
@@ -804,7 +809,7 @@ function guestRoster(){
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Plated at', 77, 'Each petite station on the BEO.'],
     ['Restrictions', flagged.length, 'Across four dietary groups.'],
-    ['Vendor meals', 8, 'Separate from the guest count.']
+    ['Vendor meals', 8, 'Separate from the count. The videographer eats as a guest.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
   $('#dietGrid').innerHTML = Object.entries(DIET_META).map(([key,m])=>{
