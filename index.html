@@ -423,7 +423,8 @@ const MILESTONES = [
   { date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
   { date:'2026-08-26', title:'PPHG final guest count and final payment', amount:16742.17, detail:'Largest single payment of the wedding.' },
   { date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
-  { date:'2026-09-05', title:'Rehearsal walk-through and BBQ', amount:null, detail:'Loraine runs the rehearsal.' },
+  { date:'2026-09-05', title:'Rehearsal, 2:00 PM', amount:null, detail:'The American Theater, 446 King Street. Loraine runs it.' },
+  { date:'2026-09-05', title:'Pool party, 4:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes from the venue.' },
   { date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
   { date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
 ];
@@ -444,6 +445,10 @@ const FLAGS = [
   { lvl:'hot', h:'The Snyder quote expires on 20 August', p:[
     'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>. The quote lapses on 20 August.',
     'Two things make this worse than a normal deadline. The 5 wheat matte satin sweetheart linens are a <strong>specialty order, not in stock</strong> — they have to be brought in. And nothing on the order can be altered within three weeks of the 3 September pick-up.'] },
+
+  { lvl:'warn', h:'Saturday moves everyone across the bridge', p:[
+    'Rehearsal is <strong>2:00 PM at The American Theater</strong>, 446 King Street. The pool party is <strong>4:00 to 9:00 PM at Restore at Carolina Park</strong>, 1588 Bloom St, Mt Pleasant.',
+    'That is roughly <strong>25 minutes</strong> apart over the Ravenel Bridge, and it is a Saturday of Labor Day weekend. Two hours is enough, but tell people both addresses up front so nobody follows the wrong car.'] },
 
   { lvl:'warn', h:'Loose ends with a cost attached', p:[
     '<strong>Palmetto Strings</strong> — $650 outstanding with no due date on file. Lauren has not been asked.',
@@ -466,7 +471,6 @@ const DECISIONS = [
   { q:'Father Will’s honorarium', s:'Nothing agreed', impact:'Unknown', by:'15 Aug' },
   { q:'Videography scope', s:'Anthony is booked but deliverables and cost are unconfirmed', impact:'Unknown', by:'15 Aug' },
   { q:'Floral scope', s:'Stephen and Amanda are booked, nothing quoted', impact:'Unknown', by:'15 Aug' },
-  { q:'Rehearsal dinner', s:'Address and headcount still unconfirmed', impact:'Barbara handling', by:'15 Aug' },
   { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'20 Aug' }
 ];
 
@@ -491,7 +495,9 @@ const CLOSED = [
   'Florals with Stephen, arranged and delivered by Amanda Cubello',
   'Videography with Anthony Rivera at Blue Box Digital — attending as a guest',
   'Setup access from 9:00 AM the day of the event',
-  'All 69 RSVPs in and accounted for'
+  'All 69 RSVPs in and accounted for',
+  'Rehearsal set for 2:00 PM Saturday at the venue',
+  'Pool party set for 4:00 – 9:00 PM Saturday at Restore at Carolina Park'
 ];
 
 const MENU = [
@@ -536,6 +542,8 @@ const MENU_NOTES = [
 
 const RUNSHEET = [
   { t:'Thu 3 Sep', e:'Invitation Only collects the linens', w:'Snyder, 3875 Meeting St · returned Tue 8 Sep' },
+  { t:'Sat 2:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · run by Loraine' },
+  { t:'Sat 4–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant · <a href="https://maps.app.goo.gl/9sbx3BhfSvYbhJpV8" target="_blank" rel="noopener">open in Maps</a>' },
   { t:'9:00 AM',  e:'Venue opens' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
   { t:'11:00 AM', e:'Linens on site and set', w:'Brought in by Invitation Only from Thursday’s pick-up' },
@@ -593,7 +601,8 @@ const PEOPLE = [
   { r:'Florist', n:'Stephen', t:'301.549.8622', x:'Arrangements and delivery by Amanda Cubello' },
   { r:'Florals · arranging and delivery', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
   { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest, not a vendor' },
-  { r:'Cake and rehearsal dinner', n:'Barbara', e:'warriorbjtaylor@hotmail.com' }
+  { r:'Cake and pool party', n:'Barbara', e:'warriorbjtaylor@hotmail.com' },
+  { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 4:00 – 9:00 PM' }
 ];
 
 /* ---------- helpers ---------- */

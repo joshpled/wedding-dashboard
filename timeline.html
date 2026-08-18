@@ -41,6 +41,8 @@ header .rule{height:2px;background:var(--brass-line);margin:20px 0 0}
 .row .t{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--brass);padding-top:1px;white-space:nowrap}
 .row .e{font-weight:700;font-size:16.5px;line-height:1.35}
 .row .w{font-size:14px;color:var(--ink-2);margin-top:3px;line-height:1.5}
+.row .w a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-line)}
+.row .w a:hover{border-bottom-color:var(--brass)}
 .row ul{margin:8px 0 0;padding-left:19px;color:var(--ink-2);font-size:14.5px;line-height:1.75}
 .row.key{background:var(--brass-lo);margin:0 -14px;padding:15px 14px;border-radius:var(--r);border-bottom-color:transparent}
 .row.key .e{color:var(--brass)}
@@ -99,6 +101,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
     <div><div class="k">Ceremony</div><div class="v">5:00 PM</div></div>
     <div><div class="k">Reception</div><div class="v">6:30 PM</div></div>
     <div><div class="k">Event ends</div><div class="v">10:30 PM</div></div>
+    <div><div class="k">Rehearsal</div><div class="v">Sat 2:00 PM</div></div>
     <div><div class="k">Guests</div><div class="v">80</div></div>
   </div>
 
@@ -112,6 +115,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
   <div class="note">
     <h3>Worth knowing</h3>
     <ul>
+      <li>Rehearsal is Saturday at 2:00 PM at the venue. The pool party follows from 4:00 to 9:00 at Restore at Carolina Park in Mt Pleasant — allow about 25 minutes to get there.</li>
       <li>Setup can begin at 9:00 AM. Anything earlier needs venue approval.</li>
       <li>Cocktail hour is in Stars Lounge, default Stars layout.</li>
       <li>Photography runs 4:30 to 9:30 PM — anything you want photographed happens before then.</li>
@@ -134,8 +138,8 @@ const DAYS = [
     { t:'9AM – 4PM', e:'Linens collected from Snyder', w:'Invitation Only · 3875 Meeting St, North Charleston' }
   ]},
   { d:'Saturday 5 September', rows:[
-    { t:'TBC', e:'Rehearsal walk-through', w:'Run by Loraine Cook · time to be confirmed with the venue' },
-    { t:'Evening', e:'Rehearsal dinner — BBQ', w:'Address to be confirmed' }
+    { t:'2:00', e:'Rehearsal', w:'The American Theater · 446 King Street, Charleston · run by Loraine Cook', key:true },
+    { t:'4:00', e:'Pool party', w:'Until 9:00 PM · Restore at Carolina Park, 1588 Bloom St, Mt Pleasant SC 29466 · <a href="https://maps.app.goo.gl/9sbx3BhfSvYbhJpV8" target="_blank" rel="noopener">open in Maps</a>', key:true }
   ]},
   { d:'Sunday 6 September · the day', rows:[
     { t:'9:00', e:'Venue opens', w:'Earliest permitted setup' },
