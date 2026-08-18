@@ -419,6 +419,7 @@ const MILESTONES = [
   { date:'2026-08-12', title:'Markel certificate of insurance to PPHG', amount:null, detail:'They need to be named as additional insured.' },
   { date:'2026-08-12', title:'Getting-ready location and times to Olivia', amount:null, detail:'The BEO still shows 0:00PM for grooms arrival and first look.' },
   { date:'2026-08-15', title:'Rehearsal time confirmed with the venue', amount:null, detail:'Still blank on the BEO, and subject to venue scheduling.' },
+  { date:'2026-08-20', title:'Snyder quote expires', amount:814.50, detail:'50% deposit plus the CCRA, or the linen order lapses.' },
   { date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
   { date:'2026-08-26', title:'PPHG final guest count and final payment', amount:16742.17, detail:'Largest single payment of the wedding.' },
   { date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
@@ -440,6 +441,10 @@ const FLAGS = [
     'The BEO lists 1 AV, 2 photo, 1 DJ, 2 planner and <strong>3 TBD</strong>, billed at eight covers. With Anthony eating as a guest, eight is the right number — but nobody has said who the three are.',
     'The ceremony musician and Loraine’s second body account for two. Name the third.'] },
 
+  { lvl:'hot', h:'The Snyder quote expires on 20 August', p:[
+    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>. The quote lapses on 20 August.',
+    'Two things make this worse than a normal deadline. The 5 wheat matte satin sweetheart linens are a <strong>specialty order, not in stock</strong> — they have to be brought in. And nothing on the order can be altered within three weeks of the 3 September pick-up.'] },
+
   { lvl:'warn', h:'Loose ends with a cost attached', p:[
     '<strong>Palmetto Strings</strong> — $650 outstanding with no due date on file. Lauren has not been asked.',
     '<strong>Jacob’s AV deposit</strong> — paid, but the amount is not recorded anywhere, so his true balance is unknown.',
@@ -452,6 +457,7 @@ const FLAGS = [
 ];
 
 const DECISIONS = [
+  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses', impact:'$1,629 order at risk', by:'20 Aug' },
   { q:'Gabriel’s drink of choice', s:'Still blank on the BEO', impact:'None', by:'26 Aug' },
   { q:'Vendor meals — 3 TBD', s:'Ceremony musician and Loraine’s second body cover two. Name the third.', impact:'Already billed at 8', by:'15 Aug' },
   { q:'Send-off', s:'Sparklers, petals, or nothing — and it has to happen before 9:30 if you want it photographed', impact:'Unknown until chosen', by:'20 Aug' },
@@ -480,7 +486,6 @@ const CLOSED = [
   'Childcare — not being offered, all six families notified',
   'Photography at 5 hours, 4:30 – 9:30 PM. No exit coverage, by choice.',
   'Wedding party arrives at the venue at 4:00 PM',
-  'Snyder order confirmed and paid — linens and napkins, $1,629',
   'All glassware coming from PPHG in-house — nothing rented',
   'Linen pick-up and return handled by Invitation Only',
   'Florals with Stephen, arranged and delivered by Amanda Cubello',
