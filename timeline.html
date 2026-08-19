@@ -50,6 +50,21 @@ header .rule{height:2px;background:var(--brass-line);margin:20px 0 0}
 
 .card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:22px 24px;box-shadow:0 1px 2px rgba(17,20,24,.04), 0 10px 26px -18px rgba(17,20,24,.18)}
 
+.photo{margin-top:34px}
+.photo h2{font-size:14px;letter-spacing:.18em;margin-bottom:4px}
+.photo .lede{font-size:14px;color:var(--ink-2);margin:0 0 16px;line-height:1.55}
+.prow{display:grid;grid-template-columns:118px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid var(--rule-2);align-items:start}
+.prow:last-child{border-bottom:0}
+.prow .t{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--moss);white-space:nowrap;padding-top:2px}
+.prow .e{font-weight:700;font-size:15.5px;line-height:1.35}
+.prow .w{font-size:13.5px;color:var(--ink-2);margin-top:3px;line-height:1.5}
+.prow.tbc .t{color:var(--ink-3)}
+.tbc-tag{display:inline-block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line);margin-left:7px;vertical-align:2px}
+.bookend{background:var(--moss-lo);border:1px solid var(--moss-line);border-radius:var(--r);padding:13px 16px;margin-bottom:16px;display:flex;gap:22px;flex-wrap:wrap;justify-content:center;text-align:center}
+.bookend div{min-width:96px}
+.bookend .k{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:10.5px;color:var(--moss);font-weight:700}
+.bookend .v{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;margin-top:2px;color:var(--ink)}
+
 .who{margin-top:34px}
 .who h2{font-size:14px;letter-spacing:.18em;margin-bottom:14px}
 .wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:11px}
@@ -73,7 +88,8 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
   .wrap{max-width:100%;padding:0}
   .print{display:none}
   .card,.w1{box-shadow:none;border-color:#ccc}
-  .row{break-inside:avoid;padding:9px 0}
+  .row,.prow{break-inside:avoid;padding:9px 0}
+  .photo{break-before:page}
   .daymark{break-after:avoid}
   header{padding-top:0}
   .note{break-inside:avoid}
@@ -107,6 +123,18 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
 
   <div class="card" id="sheet"></div>
 
+  <div class="photo">
+    <h2>Photography</h2>
+    <p class="lede">Richard Bell Photography · 2 photographers · 5 hours contracted.
+      Coverage is a fixed window, so anything you want photographed has to sit inside it.</p>
+    <div class="bookend">
+      <div><div class="k">Arrives</div><div class="v">4:30 PM</div></div>
+      <div><div class="k">Coverage</div><div class="v">5 hours</div></div>
+      <div><div class="k">Ends</div><div class="v">9:30 PM</div></div>
+    </div>
+    <div class="card" id="photoSheet"></div>
+  </div>
+
   <div class="who">
     <h2>On the day</h2>
     <div class="wgrid" id="who"></div>
@@ -117,8 +145,9 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
     <ul>
       <li>Rehearsal is Saturday at 2:00 PM at the venue. The pool party follows from 4:00 to 9:00 at Restore at Carolina Park in Mt Pleasant — allow about 25 minutes to get there.</li>
       <li>Setup can begin at 9:00 AM. Anything earlier needs venue approval.</li>
-      <li>Cocktail hour is in Stars Lounge, default Stars layout.</li>
-      <li>Photography runs 4:30 to 9:30 PM — anything you want photographed happens before then.</li>
+      <li>Stars Lounge is the getting-ready room until the ceremony, then flips to cocktail hour. Anything personal needs clearing out before 5:00.</li>
+      <li>Straight after the ceremony everyone stays in the Cinema for an all-guest photo. Someone has to announce it, or the room empties.</li>
+      <li>Photography runs 4:30 to 9:30 PM, starting with getting ready at the theater. No send-off coverage — the photographer leaves at 9:30.</li>
       <li>All amplified music concludes at 10:30 PM and the bar closes at the same time.</li>
       <li>Venue closes at midnight. PPHG breakdown concludes by 12:30 AM.</li>
     </ul>
@@ -151,11 +180,12 @@ const DAYS = [
     { t:'3:30', e:'Sound tech and piano arrive', w:'Jacob Scaife · Palmetto Strings' },
     { t:'3:45', e:'Couple arrival', w:'Optional venue reveal' },
     { t:'4:00', e:'Wedding party arrives at the venue' },
-    { t:'4:30', e:'Photography begins', w:'Richard Bell · 2 photographers, 5 hours' },
+    { t:'4:30', e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready · Richard Bell begins coverage' },
     { t:'4:30', e:'Doors open, guests arrive', w:'Preludes playing · popcorn at the concession stand in the lobby' },
     { t:'5:00', e:'Ceremony', w:'In the Cinema · Father Will officiating · up to 30 minutes', key:true },
-    { t:'5:30', e:'Cocktail hour', w:'Stars Lounge', key:true,
-      sub:['Cava passed straight after the ceremony','Five passed hors d’oeuvres','Bar opens — wine, beer and non-alcoholic'] },
+    { t:'5:30', e:'All-guest photo in the Cinema', w:'Everyone stays seated straight after the ceremony — about ten minutes' },
+    { t:'5:40', e:'Cocktail hour', w:'Stars Lounge · flipped from the getting-ready room during the ceremony', key:true,
+      sub:['Cava passed as guests arrive','Five passed hors d’oeuvres','Bar opens — wine, beer and non-alcoholic'] },
     { t:'6:30', e:'Guests move to the Ballroom', w:'Find seating' },
     { t:'6:45', e:'Formalities',
       sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
@@ -165,10 +195,10 @@ const DAYS = [
     { t:'7:55', e:'Roasts and toasts' },
     { t:'8:15', e:'Cake cutting', w:'PPHG cuts and serves · Publix, two tiers' },
     { t:'8:30', e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
-    { t:'9:30', e:'Photography ends', w:'5 hours from 4:30' },
+    { t:'9:30', e:'Photographer departs', w:'End of the contracted 5 hours' },
     { t:'10:15', e:'Informal last call' },
     { t:'10:20', e:'Last song of the night' },
-    { t:'10:25', e:'Prepare for departure' },
+    { t:'10:25', e:'Prepare for departure', w:'No formal send-off' },
     { t:'10:30', e:'Event closes', w:'Amplified music ends, bar closes, guests depart', key:true,
       sub:['PPHG staff and on-site vendors break down'] },
     { t:'10:45', e:'Off-site vendors return for strike', w:'Linens boxed for Tuesday’s return' },
@@ -177,6 +207,24 @@ const DAYS = [
   { d:'Tuesday 8 September', rows:[
     { t:'—', e:'Linens returned to Snyder', w:'Invitation Only' }
   ]}
+];
+
+const PHOTO = [
+  { t:'4:30', e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready, so this is finishing touches and detail shots. Both photographers on site.',
+    sub:['Details gathered in advance: rings, invitation suite, shoes, florals','Guests arrive from 4:30 too — the lobby is the public route, Stars Lounge is not'] },
+  { t:'4:50', e:'Guest arrivals and preludes', w:'Candids in the lobby, popcorn at the concession stand, preludes playing.' },
+  { t:'5:00 – 5:30', e:'Ceremony', w:'In the Cinema. Two angles — one at the front for faces, one at the back for the room.' },
+  { t:'5:30 – 5:40', e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony. This has to be announced from the front or half the room walks out.' },
+  { t:'5:40 – 5:55', e:'Couple portraits in the Cinema', w:'Guests released to cocktail hour. The room is still dressed and now empty.' },
+  { t:'5:55 – 6:30', e:'Family and wedding party portraits', w:'In or near Stars Lounge while cocktail hour runs.',
+    sub:['Family formals — bring a written list in shooting order','Wedding party','Anything left of the couple set'] },
+  { t:'6:30', e:'Ballroom detail shots', w:'Photographed before guests move in. Tables, florals, cake, sweetheart table.' },
+  { t:'6:45', e:'Entrances', w:'Wedding party introduced, then the couple. Both photographers on the door — one wide, one tight.' },
+  { t:'6:50 – 7:00', e:'First dance and parent dances', w:'Then welcome, thank you and the blessing.' },
+  { t:'7:00 – 7:45', e:'Dinner and candids', w:'Stations open. Table shots and guest candids while people are seated and findable.' },
+  { t:'7:45 – 8:15', e:'Champagne, toasts and cake', w:'Champagne passed 7:45, roasts and toasts 7:55, cake cutting 8:15.' },
+  { t:'8:30 – 9:30', e:'Open dance floor', w:'Final hour. Dancing, candids, whatever the night turns into.' },
+  { t:'9:30', e:'Photographer departs', w:'End of the contracted five hours. No send-off coverage — the party runs on to 10:30.' }
 ];
 
 const WHO = [
@@ -203,6 +251,14 @@ document.getElementById('sheet').innerHTML = DAYS.map(d => `
       ${r.sub ? `<ul>${r.sub.map(x=>`<li>${x}</li>`).join('')}</ul>` : ''}
     </div></div>`).join('')}
 `).join('');
+
+document.getElementById('photoSheet').innerHTML = PHOTO.map(r => `
+  <div class="prow ${r.tbc?'tbc':''}">
+    <div class="t">${r.t}</div>
+    <div><div class="e">${r.e}${r.tbc?'<span class="tbc-tag">needs a time</span>':''}</div>
+      ${r.w ? `<div class="w">${r.w}</div>` : ''}
+      ${r.sub ? `<ul>${r.sub.map(x=>`<li>${x}</li>`).join('')}</ul>` : ''}
+    </div></div>`).join('');
 
 document.getElementById('who').innerHTML = WHO.map(w => `
   <div class="w1">

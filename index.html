@@ -457,15 +457,20 @@ const FLAGS = [
     '<strong>Anthony Rivera</strong> — scope, deliverables and cost all unconfirmed.',
     '<strong>Florals</strong> — Stephen and Amanda are booked but nothing is quoted.'] },
 
-  { lvl:'warn', h:'The send-off has not been decided', p:[
-    'Sparklers, petals, or nothing. It affects what the venue and Loraine need to stage, and photography ends at 9:30 PM — so anything you want photographed has to happen before then.'] }
+  { lvl:'warn', h:'Stars Lounge has to do two jobs an hour apart', p:[
+    'You are getting ready there from <strong>4:30</strong>, arriving about 80% ready. Cocktail hour is staged in the same room from <strong>5:40</strong>.',
+    'That gives PPHG the ceremony half-hour to flip it, and it means anything personal — garment bags, bags, shoes — has to be out of there before 5:00. Confirm the turnaround with Olivia and tell Loraine so someone owns clearing the room.'] },
+
+  { lvl:'warn', h:'The all-guest photo needs announcing or it will not happen', p:[
+    'Straight after the ceremony everyone stays in the Cinema for a photo with all 80 guests. Left to themselves, half the room stands up and walks toward the bar.',
+    'Have Father Will say it at the close of the ceremony, or the DJ over the room. It also pushes cocktail hour service to about <strong>5:40</strong> — Olivia should know so food and drink are not sitting out for ten minutes.'] }
 ];
 
 const DECISIONS = [
   { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses', impact:'$1,629 order at risk', by:'20 Aug' },
   { q:'Gabriel’s drink of choice', s:'Still blank on the BEO', impact:'None', by:'26 Aug' },
   { q:'Vendor meals — 3 TBD', s:'Ceremony musician and Loraine’s second body cover two. Name the third.', impact:'Already billed at 8', by:'15 Aug' },
-  { q:'Send-off', s:'Sparklers, petals, or nothing — and it has to happen before 9:30 if you want it photographed', impact:'Unknown until chosen', by:'20 Aug' },
+  { q:'Family formal list', s:'Needed in shooting order — the portrait window is 5:55 to 6:30', impact:'None, but it protects the reception', by:'25 Aug' },
   { q:'Palmetto Strings balance', s:'$650 outstanding, no due date on file', impact:'$650', by:'15 Aug' },
   { q:'Jacob’s AV deposit', s:'Paid, amount never recorded', impact:'$500 total', by:'15 Aug' },
   { q:'Father Will’s honorarium', s:'Nothing agreed', impact:'Unknown', by:'15 Aug' },
@@ -488,7 +493,8 @@ const CLOSED = [
   'Gelato bar removed',
   'Cake confirmed with Publix — two tiers, cut and served by PPHG',
   'Childcare — not being offered, all six families notified',
-  'Photography at 5 hours, 4:30 – 9:30 PM. No exit coverage, by choice.',
+  'Photography at 5 hours, 4:30 – 9:30 PM — getting ready in Stars Lounge, all-guest photo and couple portraits in the Cinema, family during cocktail hour',
+  'No send-off — photographer leaves at 9:30 and the party runs to 10:30',
   'Wedding party arrives at the venue at 4:00 PM',
   'All glassware coming from PPHG in-house — nothing rented',
   'Linen pick-up and return handled by Invitation Only',
@@ -554,9 +560,11 @@ const RUNSHEET = [
   { t:'3:45 PM',  e:'Couple arrival', w:'Optional venue reveal' },
   { t:'4:00 PM',  e:'Wedding party arrives at the venue' },
   { t:'4:30 PM',  e:'Photography begins', w:'Richard Bell · 5 hours confirmed, runs to 9:30 PM' },
+  { t:'4:30 PM',  e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready · Richard Bell begins coverage' },
   { t:'4:30 PM',  e:'Preludes and guest arrival', w:'Popcorn at the concession stand in the lobby' },
   { t:'5:00 PM',  e:'Ceremony', w:'In the Theatre · Father Will' },
-  { t:'5:30 PM',  e:'Cocktail hour', w:'Stars Lounge — confirmed on the 8 Aug BEO, default Stars layout',
+  { t:'5:30 PM',  e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony — about ten minutes' },
+  { t:'5:40 PM',  e:'Cocktail hour', w:'Stars Lounge, flipped from the getting-ready room · family portraits here',
     sub:['Cava passed straight after the ceremony','All five hors d’oeuvres passed','Drinks of choice — Joshua: water and white wine · Gabriel: TBD'] },
   { t:'6:30 PM',  e:'Reception opens', w:'In the Ballroom — move guests, find seating' },
   { t:'6:45 PM',  e:'Formalities',
@@ -567,10 +575,10 @@ const RUNSHEET = [
   { t:'7:55 PM',  e:'Roasts and toasts' },
   { t:'8:15 PM',  e:'Cutting of the cake', w:'PPHG cuts and serves' },
   { t:'8:30 PM',  e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
-  { t:'9:30 PM',  e:'Photography ends', w:'5 hours from 4:30. No exit coverage, by choice.' },
+  { t:'9:30 PM',  e:'Photographer departs', w:'End of the contracted 5 hours. No send-off.' },
   { t:'10:15 PM', e:'Informal last call for alcohol' },
   { t:'10:20 PM', e:'Last song of the night' },
-  { t:'10:25 PM', e:'Prepare for departure', w:'If applicable' },
+  { t:'10:25 PM', e:'Prepare for departure', w:'No formal send-off' },
   { t:'10:30 PM', e:'Formal event closure',
     sub:['Photography ends — 8 hours from 2:30','Guests depart the American Theater','PPHG staff and on-site vendors break down'] },
   { t:'10:45 PM', e:'Off-site vendors return for strike', w:'Linens boxed for Invitation Only to return Tuesday' },
