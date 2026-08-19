@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wedding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111418; --ink-2:#3D434D; --ink-3:#565D68;
+  --paper:#FAF9F6; --card:#FFFFFF; --rule:#D5D0C6; --rule-2:#EAE7E0;
+  --brass:#6E5520; --brass-lo:#FAF3E2; --brass-line:#D8C08A;
+  --rust:#8A2F1C;  --rust-lo:#FDEEEA;  --rust-line:#E8B4A6;
+  --moss:#26492F;  --moss-lo:#E9F2EB;  --moss-line:#A9C7B1;
+  --plum:#4A3560;  --plum-lo:#F2EEF7;  --plum-line:#C3B2D6;
+  --shadow:0 1px 2px rgba(17,20,24,.04), 0 10px 26px -18px rgba(17,20,24,.18);
+  --r:4px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px 96px}
+h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
+a{color:var(--brass)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+header.top{padding:44px 0 0}
+.title{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:2px solid var(--brass-line);padding-bottom:14px}
+.title h1{font-size:clamp(40px,8vw,76px);font-weight:700;letter-spacing:.14em;line-height:.9}
+.title .meta{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--ink-3);text-align:right;line-height:1.9}
+.title .meta b{color:var(--ink);font-weight:600}
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-top:0;border-radius:0 0 var(--r) var(--r);overflow:hidden}
+.tally div{background:var(--card);padding:14px 16px}
+.tally .k{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:11px;color:var(--ink-3);font-weight:600}
+.tally .v{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
+.tally .v.due{color:var(--rust)} .tally .v.days{color:var(--brass)} .tally .v.paid{color:var(--moss)}
+
+nav{display:flex;gap:2px;flex-wrap:wrap;margin:26px 0 24px;border-bottom:1px solid var(--rule)}
+nav button{background:none;border:0;padding:9px 14px 11px;color:var(--ink-3);font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:14.5px;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav button:hover{color:var(--ink)}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brass)}
+nav .badge{display:inline-block;margin-left:6px;font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--rule-2);color:var(--ink-2);border:1px solid var(--rule);border-radius:9px;padding:0 6px;letter-spacing:0;font-weight:600}
+nav .badge.hot{background:var(--rust-lo);color:var(--rust);border-color:var(--rust-line)}
+
+.panel[hidden]{display:none}
+.sec{margin-bottom:34px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sec-h h2{font-size:15px;letter-spacing:.16em}
+.sec-h .hint{font-size:13px;color:var(--ink-2)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow)}
+.card:has(table){overflow-x:auto}
+.card table{min-width:520px}
+.pad{padding:18px 20px}
+
+.bar{height:10px;background:var(--rule-2);border-radius:99px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:13px;font-size:13px;color:var(--ink-2)}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:12px}
+.v{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.v .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.v h3{font-size:14.5px;letter-spacing:.05em}
+.v .cat{font-size:12px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-family:"Barlow Condensed",sans-serif;font-weight:600;margin-top:2px}
+.v dl{margin:13px 0 0;display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:14px}
+.v dt{color:var(--ink-3)}
+.v dd{margin:0;text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.v dd.owe{color:var(--rust);font-weight:600}
+.v .when{margin-top:12px;padding-top:10px;border-top:1px solid var(--rule-2);font-size:13px;color:var(--ink-2);display:flex;justify-content:space-between;gap:8px}
+.v .note{margin-top:9px;font-size:13px;color:var(--ink-2);line-height:1.5}
+.v .act{margin-top:12px}
+
+.contact{gap:0}
+.contact h3{font-size:16px;letter-spacing:.03em;margin-top:3px;line-height:1.25;text-transform:none;font-family:"Public Sans",sans-serif;font-weight:700;overflow-wrap:anywhere}
+.contact .cat{margin-top:0}
+.contact .org{font-size:13px;color:var(--ink-2);margin-top:3px;line-height:1.45;overflow-wrap:anywhere}
+.contact .clines{margin-top:11px;padding-top:10px;border-top:1px solid var(--rule-2);display:flex;flex-direction:column;gap:5px}
+.cline{font-size:14px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;text-decoration:none;color:var(--brass);display:block}
+a.cline:hover{text-decoration:underline}
+.cline.muted{color:var(--ink-3);font-style:italic}
+
+.pill{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:11px;padding:3px 9px;border-radius:99px;white-space:nowrap;font-weight:700;display:inline-block}
+.pill.paid{background:var(--moss-lo);color:var(--moss);border:1px solid var(--moss-line)}
+.pill.due{background:var(--rust-lo);color:var(--rust);border:1px solid var(--rust-line)}
+.pill.tbd{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line)}
+.pill.alt{background:var(--plum-lo);color:var(--plum);border:1px solid var(--plum-line)}
+
+.tl{position:relative;padding-left:24px}
+.tl:before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:var(--rule)}
+.tl-i{position:relative;padding:0 0 22px}
+.tl-i:before{content:"";position:absolute;left:-23px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--brass-lo);border:2px solid var(--brass-line)}
+.tl-i.hot:before{background:var(--rust-lo);border-color:var(--rust)}
+.tl-i.past:before{background:var(--rule-2);border-color:var(--rule)}
+.tl-i .d{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:var(--ink-3);font-weight:600}
+.tl-i.hot .d{color:var(--rust)}
+.tl-i .t{font-weight:600;margin-top:2px}
+.tl-i .m{font-size:14px;color:var(--ink-2);margin-top:2px}
+.tl-i .amt{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--rust)}
+
+.task{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;border-bottom:1px solid var(--rule-2)}
+.task:last-child{border-bottom:0}
+.task input[type=checkbox]{margin:3px 0 0;width:17px;height:17px;accent-color:var(--moss);flex:0 0 auto;cursor:pointer}
+.task .body{flex:1;min-width:0}
+.task.done .title{text-decoration:line-through;color:var(--ink-3)}
+.task .meta{font-size:12px;color:var(--ink-3);margin-top:3px;display:flex;gap:14px;flex-wrap:wrap;font-family:"Barlow Condensed",sans-serif;letter-spacing:.09em;text-transform:uppercase;font-weight:600}
+.task .meta .od{color:var(--rust)}
+.task .x{background:none;border:0;color:var(--ink-3);font-size:17px;line-height:1;padding:2px 5px;border-radius:3px}
+.task .x:hover{color:var(--rust);background:var(--rust-lo)}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--rule);background:#FCFBF9}
+input,select{border:1px solid var(--rule);border-radius:var(--r);padding:8px 10px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+input[name=title]{flex:1;min-width:200px}
+.btn{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line);border-radius:var(--r);padding:9px 16px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:14px;font-weight:700}
+.btn:hover{background:#F4E9CE;color:#5A4416;border-color:#C7AA6C}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--ink-2);border:1px solid var(--rule)}
+.btn.ghost:hover{background:var(--rule-2);color:var(--ink)}
+.btn.sm{padding:6px 11px;font-size:12.5px}
+
+.flag{border-left:4px solid var(--rust);background:var(--rust-lo);padding:15px 18px;border-radius:0 var(--r) var(--r) 0;margin-bottom:12px}
+.flag.warn{border-color:var(--brass);background:var(--brass-lo)}
+.flag.ok{border-color:var(--moss);background:var(--moss-lo)}
+.flag h3{font-size:14px;letter-spacing:.08em;margin-bottom:6px;color:var(--ink)}
+.flag p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.55}
+.flag p+p{margin-top:8px}
+.flag strong{color:var(--ink)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-size:12px;color:var(--ink-3);text-align:left;font-weight:700;padding:10px 14px;border-bottom:1px solid var(--rule)}
+td{padding:10px 14px;border-bottom:1px solid var(--rule-2);vertical-align:top;color:var(--ink-2);overflow-wrap:anywhere;word-break:break-word}
+td strong{color:var(--ink)}
+tr:last-child td{border-bottom:0}
+td.n{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--rule)}
+.calc div{background:var(--card);padding:15px 16px}
+.calc .k{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--ink-3);font-weight:600}
+.calc .v{font-family:"IBM Plex Mono",monospace;font-size:22px;margin-top:4px}
+.calc .n{font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.5}
+
+/* ---- Guests ---- */
+.dietgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.dcard{border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px;background:var(--card);box-shadow:var(--shadow);border-top:4px solid var(--rule)}
+.dcard.vegan{border-top-color:var(--moss)} .dcard.gluten{border-top-color:var(--brass)}
+.dcard.dairy{border-top-color:var(--plum)} .dcard.nut{border-top-color:var(--rust)}
+.dcard .cnt{font-family:"IBM Plex Mono",monospace;font-size:38px;line-height:1;font-weight:500}
+.dcard.vegan .cnt{color:var(--moss)} .dcard.gluten .cnt{color:var(--brass)}
+.dcard.dairy .cnt{color:var(--plum)} .dcard.nut .cnt{color:var(--rust)}
+.dcard .lbl{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:12.5px;font-weight:700;margin-top:6px}
+.dcard ul{margin:10px 0 0;padding:10px 0 0;list-style:none;border-top:1px solid var(--rule-2);font-size:14px;color:var(--ink-2);line-height:1.75}
+.dcard .srv{margin-top:10px;font-size:12.5px;color:var(--ink-3);font-style:italic;line-height:1.45}
+
+.roster{display:flex;flex-wrap:wrap;gap:7px}
+.g{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--rule-2);background:#FDFCFA;border-radius:99px;padding:6px 13px;font-size:14px;color:var(--ink-2)}
+.g.flagged{border-color:var(--brass-line);background:var(--brass-lo);color:var(--ink)}
+.g .tag{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.09em;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:#fff;border:1px solid var(--rule)}
+.g.veg .tag{color:var(--moss);border-color:var(--moss-line)}
+.g.glu .tag{color:var(--brass);border-color:var(--brass-line)}
+.g.dai .tag{color:var(--plum);border-color:var(--plum-line)}
+.g.nut .tag{color:var(--rust);border-color:var(--rust-line)}
+.rfilter{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.rfilter input{flex:1;min-width:180px;max-width:280px}
+
+/* ---- Menu ---- */
+.course{margin-bottom:26px}
+.course-h{display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--brass-line);margin-bottom:14px;flex-wrap:wrap}
+.course-h h3{font-size:15px;letter-spacing:.18em;color:var(--brass)}
+.course-h .tm{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:12px;color:var(--ink-3);font-weight:600}
+.dish{padding:12px 0;border-bottom:1px solid var(--rule-2);display:flex;gap:16px;justify-content:space-between;align-items:flex-start}
+.dish:last-child{border-bottom:0}
+.dish .nmm{font-weight:700;font-size:15.5px}
+.dish .dsc{font-size:14px;color:var(--ink-2);margin-top:2px;line-height:1.5}
+.dish .tags{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.dish .qty{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink-3);white-space:nowrap;text-align:right}
+.dish .qty b{display:block;color:var(--ink);font-weight:500;font-size:15px}
+
+/* ---- Docs ---- */
+.drop{border:2px dashed var(--brass-line);background:var(--brass-lo);border-radius:var(--r);padding:34px 20px;text-align:center}
+.drop.over{background:#F4E9CE;border-color:var(--brass)}
+.drop p{margin:0 0 14px;color:var(--ink-2);font-size:14.5px}
+.doc{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--rule-2)}
+.doc:last-child{border-bottom:0}
+.doc .ic{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:11.5px;letter-spacing:.08em;color:var(--brass);background:var(--brass-lo);border:1px solid var(--brass-line);border-radius:3px;padding:5px 8px;min-width:52px;text-align:center}
+.doc .dn{flex:1;min-width:0;overflow-wrap:anywhere}
+.doc .dn a{font-weight:600;text-decoration:none;color:var(--ink)}
+.doc .dn a:hover{color:var(--brass);text-decoration:underline}
+.doc .dr{background:none;border:0;color:var(--ink-3);font-size:13px;padding:4px 8px;border-radius:3px;
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;font-weight:700;white-space:nowrap}
+.doc .dr:hover{color:var(--brass);background:var(--brass-lo)}
+.doc .dm{font-size:12px;color:var(--ink-3);margin-top:2px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.09em;font-weight:600}
+
+.gate{max-width:460px;margin:13vh auto;padding:0 20px;text-align:center}
+body.gated{background:#FFFDF8}
+.gate .card{padding:38px 30px 32px;border-color:#E8E2D4;box-shadow:0 1px 2px rgba(17,20,24,.03), 0 18px 44px -30px rgba(110,85,32,.30)}
+.gate h1{font-size:clamp(44px,11vw,62px);letter-spacing:.17em;font-weight:700;color:#9A7B34;line-height:1}
+.gate .date{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.2em;font-size:12px;color:var(--ink-3);font-weight:600;margin-top:12px}
+.gate .rule{height:1px;background:var(--rule-2);margin:24px 0}
+.gate p{color:var(--ink-2);font-size:15px;margin:0 0 20px;line-height:1.6}
+.gate form{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.gate input{flex:1;min-width:220px;text-align:left;padding:11px 13px;font-size:15px;border-color:#E0DACB;background:#FFFEFB}
+.gate .msg{margin-top:18px;font-size:14px;padding:12px 14px;border-radius:var(--r);text-align:left}
+.gate .msg.err{background:var(--rust-lo);color:var(--rust);border:1px solid var(--rust-line)}
+
+.lock{max-width:400px;margin:26px auto;text-align:center}
+.lock .card{padding:32px 28px}
+.lock .ic{font-size:30px;line-height:1}
+.lock h3{font-size:14px;letter-spacing:.16em;margin:12px 0 8px}
+.lock p{color:var(--ink-2);font-size:14px;margin:0 0 18px;line-height:1.55}
+.lock form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lock input{flex:1;min-width:170px;text-align:left}
+.lock .err{margin-top:14px;font-size:13.5px;color:var(--rust)}
+
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-2);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.who{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-weight:600}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);margin-right:7px}
+
+dialog{border:1px solid var(--rule);border-radius:var(--r);padding:0;box-shadow:0 24px 60px -22px rgba(17,20,24,.28);max-width:340px;width:92vw}
+dialog::backdrop{background:rgba(90,86,78,.22)}
+dialog .dh{padding:16px 18px 0} dialog h3{font-size:14px;letter-spacing:.1em}
+dialog .db{padding:14px 18px;display:grid;gap:9px}
+dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--rule-2)}
+
+@media (max-width:640px){
+  header.top{padding-top:26px}
+  .title{border-bottom-width:1px}
+  .title .meta{text-align:left}
+  .wrap{padding:0 14px 70px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate" hidden>
+  <div class="card">
+    <h1>Wedding</h1>
+    <div class="date">6 September 2026 · Charleston</div>
+    <div class="rule"></div>
+    <p>Type your name so the board can show who changed what.<br>No password, no link to wait for.</p>
+    <form id="gateForm">
+      <input type="text" id="gateName" placeholder="Your name" required autocomplete="given-name" maxlength="40">
+      <button class="btn" type="submit">Open the board</button>
+    </form>
+    <div id="gateMsg"></div>
+  </div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div class="title">
+      <h1>Wedding</h1>
+      <div class="meta"><b>Sunday 6 September 2026</b><br>The American Theater · Charleston<br>5:00 – 10:30 PM</div>
+    </div>
+    <div class="tally">
+      <div><div class="k">Days out</div><div class="v days num" id="tDays">—</div></div>
+      <div><div class="k">Open tasks</div><div class="v num" id="tTasks">—</div></div>
+      <div class="mny" hidden><div class="k">Contracted</div><div class="v num" id="tTotal">—</div></div>
+      <div class="mny" hidden><div class="k">Paid</div><div class="v paid num" id="tPaid">—</div></div>
+      <div class="mny" hidden><div class="k">Outstanding</div><div class="v due num" id="tDue">—</div></div>
+      <div class="mny" hidden><div class="k">Due in 30 days</div><div class="v due num" id="tSoon">—</div></div>
+    </div>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" data-tab="money" aria-selected="false">Money</button>
+    <button role="tab" data-tab="alerts" aria-selected="true">Alerts<span class="badge hot" id="bAlerts">0</span></button>
+    <button role="tab" data-tab="dates" aria-selected="false">Deadlines<span class="badge hot" id="bDates">0</span></button>
+    <button role="tab" data-tab="tasks" aria-selected="false">Tasks<span class="badge" id="bTasks">0</span></button>
+    <button role="tab" data-tab="menu" aria-selected="false">Menu</button>
+    <button role="tab" data-tab="runsheet" aria-selected="false">Day of</button>
+    <button role="tab" data-tab="guests" aria-selected="false">Guests<span class="badge" id="bGuests">0</span></button>
+    <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
+    <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
+  </nav>
+
+  <section class="panel" id="p-money" hidden>
+    <div class="lock" id="moneyLock">
+      <div class="card">
+        <div class="ic">&#128274;</div>
+        <h3>Money is private</h3>
+        <p>Vendor totals, balances and payment history. Enter the passphrase to view.</p>
+        <form id="lockForm">
+          <input type="password" id="lockPw" placeholder="Passphrase" autocomplete="off">
+          <button class="btn" type="submit">Unlock</button>
+        </form>
+        <div class="err" id="lockErr"></div>
+      </div>
+    </div>
+
+    <div id="moneyBody" hidden>
+    <div class="sec"><div class="card pad">
+      <div class="bar" id="moneyBar"></div>
+      <div class="legend">
+        <span><b style="background:var(--moss)"></b>Paid <span class="num" id="lgPaid"></span></span>
+        <span><b style="background:var(--rust)"></b>Due within 30 days <span class="num" id="lgSoon"></span></span>
+        <span><b style="background:var(--brass)"></b>Due later <span class="num" id="lgLater"></span></span>
+      </div>
+    </div></div>
+    <div class="sec">
+      <div class="sec-h"><h2>Vendors</h2><span class="hint">Contracted amounts. Anyone can log a payment.</span></div>
+      <div class="vgrid" id="vgrid"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Payments made</h2><span class="hint">Payments can’t be deleted. Got one wrong? Correct it — set it to 0 if it never happened.</span></div>
+      <div class="card"><table><thead><tr><th>Date</th><th>Vendor</th><th>Method</th><th style="text-align:right">Amount</th><th></th></tr></thead><tbody id="payBody"></tbody></table></div>
+    </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-alerts">
+    <div class="sec">
+      <div class="sec-h"><h2>Needs attention</h2></div>
+      <div id="flags"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Open decisions</h2><span class="hint">Each one moves a number or a deadline.</span></div>
+      <div class="card"><table><thead><tr><th style="width:24%">Decision</th><th>Where it stands</th><th style="width:20%">Cost impact</th><th style="width:12%">Needed by</th></tr></thead><tbody id="decBody"></tbody></table></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Closed out</h2><span class="hint">Settled by the 6 August menu confirmation.</span></div>
+      <div class="card pad" id="closedBox"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-dates" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Critical path</h2><span class="hint">Everything with a hard date.</span></div>
+      <div class="card pad"><div class="tl" id="timeline"></div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-tasks" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Open</h2><span class="hint">Check it off and everyone sees it.</span></div>
+      <div class="card"><div id="taskOpen"></div>
+        <div class="addrow">
+          <input name="title" id="ntTitle" placeholder="Add a task…">
+          <select id="ntOwner"></select>
+          <input type="date" id="ntDue">
+          <button class="btn" id="ntAdd">Add task</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-h"><h2>Done</h2></div><div class="card"><div id="taskDone"></div></div></div>
+  </section>
+
+  <section class="panel" id="p-menu" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Confirmed menu</h2><span class="hint">Menu confirmation E30749, revised 6 August. 80 guaranteed guests.</span></div>
+      <div class="card pad" id="menuBox"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Service notes</h2></div>
+      <div class="card pad" id="menuNotes"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-runsheet" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Suggested timeline</h2><span class="hint">From Invitation Only. Rows in red conflict with something contracted.</span></div>
+      <div class="card"><table><thead><tr><th style="width:110px">Time</th><th>What happens</th><th style="width:38%">Where / who</th></tr></thead><tbody id="runBody"></tbody></table></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Service decisions</h2></div>
+      <div class="card pad"><ul id="settledList" style="margin:0;padding-left:20px;color:var(--ink-2);line-height:1.9"></ul></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-guests" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>The count</h2></div>
+      <div class="card"><div class="calc" id="countCalc"></div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Dietary restrictions</h2><span class="hint">PPHG needs these with table and seat numbers by 26 August.</span></div>
+      <div class="dietgrid" id="dietGrid"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Confirmed guests</h2><span class="hint">All 69 accounted for.</span></div>
+      <div class="rfilter">
+        <input type="search" id="gSearch" placeholder="Find a guest…">
+        <button class="btn ghost sm" data-gf="all">Everyone</button>
+        <button class="btn ghost sm" data-gf="diet">Restrictions only</button>
+      </div>
+      <div class="roster" id="roster"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-docs" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Upload</h2><span class="hint">Contracts, invoices, diagrams. 25 MB per file.</span></div>
+      <div class="drop" id="drop">
+        <p>Drag files here, or pick them from your device.<br>Everyone with the board link can read what you upload.</p>
+        <input type="file" id="fileIn" multiple hidden>
+        <button class="btn" id="pickBtn">Choose files</button>
+        <div id="upMsg" style="margin-top:14px;font-size:14px;color:var(--ink-2)"></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>On file</h2><span class="hint">Rename changes the display name only — the stored file keeps its own. Clear the box to revert. Uploads can’t be deleted from here.</span></div>
+      <div class="card"><div id="docList"></div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-people" hidden>
+    <div class="sec"><div class="sec-h"><h2>Who to call</h2></div><div class="vgrid" id="peopleBody"></div></div>
+  </section>
+
+  <footer>
+    <span class="who"><span class="dot"></span><span id="whoMsg">—</span></span>
+    <span><button class="btn ghost" id="switchName">Not you?</button></span>
+  </footer>
+</div>
+
+<dialog id="payDlg">
+  <form method="dialog">
+    <div class="dh"><h3 id="payTitle">Record a payment</h3></div>
+    <div class="db">
+      <input type="date" id="payDate" required>
+      <input type="number" step="0.01" id="payAmt" placeholder="Amount" required>
+      <input type="text" id="payMethod" placeholder="Method — Zelle, check, Amex…">
+    </div>
+    <div class="df">
+      <button class="btn ghost" value="cancel">Cancel</button>
+      <button class="btn" value="save" id="paySave">Save payment</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = 'https://ixtynzfktgfwjwlvdaho.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Y1DyL0oNks-QYefEMXvVkg_-EU-RRWC';
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const BUCKET = 'documents';
+
+const WEDDING_DATE = new Date('2026-09-06T17:00:00-04:00');
+const OWNERS = ['Josh','Gabriel','Josh & Gabriel','Barbara','Josh & Barbara','Loraine'];
+
+const GUESTS = [{"n": "Ally Allard-Smith", "k": null, "d": "", "p": false}, {"n": "Amanda Cubello", "k": null, "d": "", "p": false}, {"n": "Angie Bostinto", "k": null, "d": "", "p": false}, {"n": "Annie Dillon", "k": null, "d": "", "p": false}, {"n": "Anthony Rivera", "k": null, "d": "", "p": false}, {"n": "Armando Rivera", "k": "Vegan", "d": "Vegan", "p": false}, {"n": "Ashanti Williams", "k": "Nut allergy", "d": "Almonds", "p": false}, {"n": "Barbara Taylor", "k": null, "d": "", "p": false}, {"n": "Becky Smith", "k": null, "d": "", "p": false}, {"n": "Belinda Smith", "k": null, "d": "", "p": false}, {"n": "Blair Perry", "k": null, "d": "", "p": false}, {"n": "Calvin Lathan", "k": null, "d": "", "p": false}, {"n": "Catherine Gluodenis", "k": null, "d": "", "p": false}, {"n": "Chase Lee", "k": null, "d": "Dairy (Odessa and Loretta)", "p": true}, {"n": "Chris Fagone", "k": null, "d": "", "p": false}, {"n": "Cindy Miller", "k": null, "d": "", "p": false}, {"n": "Czej Potynska", "k": null, "d": "", "p": false}, {"n": "Dillan Borges", "k": null, "d": "", "p": false}, {"n": "Edwin Mejia", "k": null, "d": "", "p": false}, {"n": "Edwin Rivera", "k": null, "d": "", "p": false}, {"n": "Emily Sergo", "k": null, "d": "", "p": false}, {"n": "Gabriel Taylor", "k": null, "d": "", "p": false}, {"n": "Gianna Coronado", "k": null, "d": "", "p": false}, {"n": "Guest (unnamed)", "k": null, "d": "", "p": false}, {"n": "Imara Ashton Miles", "k": "Gluten free", "d": "Gluten free if available", "p": false}, {"n": "Janna Leigh Ryon", "k": null, "d": "", "p": false}, {"n": "Jesus Perez", "k": null, "d": "", "p": false}, {"n": "Johnathan Jimison", "k": null, "d": "", "p": false}, {"n": "Josh Mason", "k": null, "d": "", "p": false}, {"n": "Joshua Perez Leduc", "k": null, "d": "", "p": false}, {"n": "Katherine Thomas", "k": null, "d": "", "p": false}, {"n": "Kathie Schirf", "k": null, "d": "", "p": false}, {"n": "Ken Miller", "k": null, "d": "", "p": false}, {"n": "Kris Cubello", "k": null, "d": "", "p": false}, {"n": "Kristen Fitzpatrick", "k": null, "d": "", "p": false}, {"n": "Laura Schofield", "k": null, "d": "", "p": false}, {"n": "Lera Zamaraeva", "k": null, "d": "", "p": false}, {"n": "Loretta", "k": "Dairy free", "d": "Dairy (Odessa and Loretta)", "p": false}, {"n": "Lorrie Goff", "k": null, "d": "", "p": false}, {"n": "MC", "k": null, "d": "Dairy (Odessa and Loretta)", "p": true}, {"n": "Madison Wright", "k": "Nut allergy", "d": "Almonds", "p": false}, {"n": "Mario Sanclemente", "k": null, "d": "", "p": false}, {"n": "Mario Sanclemente", "k": null, "d": "", "p": false}, {"n": "Maritza Sanchez", "k": null, "d": "", "p": false}, {"n": "Melody Flores", "k": null, "d": "", "p": false}, {"n": "Mikhaila Young", "k": null, "d": "", "p": false}, {"n": "Morgan Fagone", "k": null, "d": "", "p": false}, {"n": "Myrtelina Leduc", "k": null, "d": "", "p": false}, {"n": "Noelle Leinwol", "k": null, "d": "", "p": false}, {"n": "Odessa", "k": "Dairy free", "d": "Dairy (Odessa and Loretta)", "p": false}, {"n": "Oliver Gonzalez", "k": "Vegan", "d": "Vegan", "p": false}, {"n": "Ren Wilson", "k": "Gluten free", "d": "Gluten", "p": false}, {"n": "Reva Thompson", "k": null, "d": "", "p": false}, {"n": "Sam Caps", "k": "Gluten free", "d": "Gluten", "p": false}, {"n": "Sergio Dijiani", "k": null, "d": "", "p": false}, {"n": "Shani Prewitt", "k": null, "d": "", "p": false}, {"n": "Sheila Rivera", "k": "Vegan", "d": "Vegan", "p": false}, {"n": "Skip Schirf", "k": null, "d": "", "p": false}, {"n": "Sonia Leduc", "k": null, "d": "", "p": false}, {"n": "Sophia Sanclemente", "k": null, "d": "", "p": false}, {"n": "Stephani Mason", "k": null, "d": "", "p": false}, {"n": "Thomas Gluodenis", "k": null, "d": "", "p": false}, {"n": "Tomasita Negron", "k": null, "d": "", "p": false}, {"n": "Will Buck", "k": null, "d": "", "p": false}, {"n": "Zach Rivera", "k": null, "d": "", "p": false}, {"n": "Zoe BF", "k": null, "d": "", "p": false}, {"n": "Zoe Rivera", "k": null, "d": "", "p": false}, {"n": "Zulma Leduc", "k": null, "d": "", "p": false}, {"n": "Zulmarie Lee", "k": null, "d": "Dairy (Odessa and Loretta)", "p": true}];
+
+const MILESTONES = [
+  { date:'2026-08-07', title:'Invitation Only balance', amount:2909.75, detail:'Invoice 00498. Zelle avoids the 3% fee.' },
+  { date:'2026-08-12', title:'Markel certificate of insurance to PPHG', amount:null, detail:'They need to be named as additional insured.' },
+  { date:'2026-08-12', title:'Getting-ready location and times to Olivia', amount:null, detail:'The BEO still shows 0:00PM for grooms arrival and first look.' },
+  { date:'2026-08-15', title:'Rehearsal time confirmed with the venue', amount:null, detail:'Still blank on the BEO, and subject to venue scheduling.' },
+  { date:'2026-08-20', title:'Snyder quote expires', amount:814.50, detail:'50% deposit plus the CCRA, or the linen order lapses.' },
+  { date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
+  { date:'2026-08-26', title:'PPHG final guest count and final payment', amount:17109.37, detail:'Largest single payment of the wedding.' },
+  { date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
+  { date:'2026-09-05', title:'Rehearsal, 1:00 PM', amount:null, detail:'The American Theater, 446 King Street. The BEO says 1:00 — you have circulated 2:00.' },
+  { date:'2026-09-05', title:'Pool party, 4:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes from the venue.' },
+  { date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
+  { date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
+];
+
+const FLAGS = [
+  { lvl:'hot', h:'The rehearsal is booked for 1:00 PM, not 2:00', p:[
+    'The 19 August BEO reads <strong>REHEARSAL TIME: 9/5 @ 1PM</strong>. Everything you have circulated says 2:00.',
+    'PPHG also notes rehearsal times are always subject to venue scheduling, so theirs is probably the real one. Confirm which it is and correct it everywhere before the wedding party books flights around the wrong hour.'] },
+
+  { lvl:'hot', h:'Vendor meals were cut from 8 to 6', p:[
+    'The order now reads <strong>2 photo, 1 DJ, 3 planner</strong> — six covers. Anthony coming off as a guest accounts for one, but the <strong>AV line has gone too</strong>, and the ceremony musicians were never on it.',
+    'Jacob is on site from 3:30 to past 10:30. Lauren and the "Friends of Grooms" are there through the ceremony. At six covers, none of them eats.',
+    'Decide who genuinely needs feeding and get the quantity right before the 26th. Each cover is $25 plus service and tax.'] },
+
+  { lvl:'warn', h:'Everything now points at 26 August', p:[
+    'Final guest count and <strong>$17,109.37</strong> to PPHG, both due that day. It is the largest single payment of the wedding and the last date anything about the catering can move.',
+    'The <strong>seating chart</strong> has to land before it — PPHG needs table and seat numbers against every dietary restriction.'] },
+
+  { lvl:'warn', h:'The Snyder quote expires on 20 August', p:[
+    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>. The quote lapses tomorrow.',
+    'The BEO now depends on it: the place setting reads <strong>Black Napkin (Snyder)</strong>. No linen order, no napkins.'] },
+
+  { lvl:'warn', h:'Stars Lounge has to do two jobs an hour apart', p:[
+    'PPHG has you arriving at <strong>3:45</strong> for final touches in Stars Lounge. Cocktail hour is staged in the same room from 5:40.',
+    'They have set it with 3 lowboys, 3 cocktail tables and 9 chairs. Anything personal has to be clear before 5:00 — confirm the turnaround with Olivia and give Loraine someone to own it.'] },
+
+  { lvl:'warn', h:'Four vendor slots are still blank on their paperwork', p:[
+    'Photographer, rentals, cake, officiant, musicians, entertainment and AV are all filled in now. Still empty: <strong>videographer, lighting, transportation, getaway send-off and floral</strong>.',
+    'Floral is the one that matters — Stephen and Amanda Cubello are delivering at 1:00 PM and PPHG has no record of them. The others are genuinely nil, so tell Olivia that rather than leaving her guessing.'] },
+
+  { lvl:'warn', h:'Loose ends with a cost attached', p:[
+    '<strong>Palmetto Strings</strong> — $650 outstanding with no due date on file.',
+    '<strong>Jacob’s AV deposit</strong> — paid, but the amount is not recorded anywhere.',
+    '<strong>Father Will</strong> — no honorarium agreed.',
+    '<strong>Anthony Rivera</strong> — scope, deliverables and cost all unconfirmed.',
+    '<strong>Florals</strong> — Stephen and Amanda are booked but nothing is quoted.',
+    '<strong>Gabriel’s drink of choice</strong> — still blank after four revisions.'] }
+];
+
+const DECISIONS = [
+  { q:'Rehearsal time', s:'BEO says 1:00 PM, you have told people 2:00', impact:'None, but it has to be right', by:'20 Aug' },
+  { q:'Vendor meal count', s:'Cut to 6. Jacob and the ceremony musicians have no plate.', impact:'≈ $34 all-in per cover added', by:'24 Aug' },
+  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses — and the BEO now names Snyder for the napkins', impact:'$1,629 order at risk', by:'20 Aug' },
+  { q:'Beer package', s:'Upgraded from Reserve to Grand Cru — Mich Ultra, Stella and Westbrook IPA', impact:'+$320 plus fees', by:'21 Aug' },
+  { q:'Ceremony musicians', s:'BEO lists "Palmetto Strings + Friends of Grooms" — who are the friends?', impact:'Possible extra vendor meals', by:'24 Aug' },
+  { q:'Gabriel’s drink of choice', s:'Still blank on the BEO', impact:'None', by:'26 Aug' },
+  { q:'Family formal list', s:'Needed in shooting order — the portrait window is 5:55 to 6:30', impact:'None, but it protects the reception', by:'25 Aug' },
+  { q:'Palmetto Strings balance', s:'$650 outstanding, no due date on file', impact:'$650', by:'22 Aug' },
+  { q:'Jacob’s AV deposit', s:'Paid, amount never recorded', impact:'$500 total', by:'22 Aug' },
+  { q:'Father Will’s honorarium', s:'Nothing agreed', impact:'Unknown', by:'22 Aug' },
+  { q:'Videography scope', s:'Anthony is booked but deliverables and cost are unconfirmed', impact:'Unknown', by:'22 Aug' },
+  { q:'Floral scope', s:'Stephen and Amanda are booked, nothing quoted, and PPHG has no record of them', impact:'Unknown', by:'24 Aug' },
+  { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'26 Aug' }
+];
+
+const CLOSED = [
+  'Menu confirmed and signed with PPHG',
+  'Guest count locked at 80 — contractual, regardless of who attends',
+  'Additional venue hour restored, event runs 5:00 – 10:30 PM',
+  'Stars Lounge restored at $500 — cocktail hour confirmed there',
+  'All five hors d’oeuvres at 50 pieces each — 250 total',
+  'Petite Filet and Buttermilk Fried Chicken confirmed as the stations',
+  'Vegan plate on the order at 3',
+  'Dairy-free — two children, their mother has it covered',
+  'Vendor meals on the order at 8',
+  'Security at 18 hours, two guards',
+  'Gelato bar removed',
+  'Cake confirmed with Publix — two tiers, cut and served by PPHG',
+  'Childcare — not being offered, all six families notified',
+  'Photography at 5 hours, 4:30 – 9:30 PM — getting ready in Stars Lounge, all-guest photo and couple portraits in the Cinema, family during cocktail hour',
+  'No send-off — photographer leaves at 9:30 and the party runs to 10:30',
+  'Wedding party arrives at the venue at 4:00 PM',
+  'All glassware from PPHG — 275 champagne coupes, 360 wine glasses, 324 highballs',
+  'Ballroom set: 80 gold chivari chairs, 10 guest tables, sweetheart and cake tables, 3 station tables, 2 bars',
+  'Stars Lounge set: 3 lowboys, 3 cocktail tables, 9 chairs',
+  'PPHG providing bar and station signs',
+  'Linen pick-up and return handled by Invitation Only',
+  'Florals with Stephen, arranged and delivered by Amanda Cubello',
+  'Videography with Anthony Rivera at Blue Box Digital — attending as a guest',
+  'Setup access from 9:00 AM the day of the event',
+  'All 69 RSVPs in and accounted for',
+  'Rehearsal set for 2:00 PM Saturday at the venue',
+  'Pool party set for 4:00 – 9:00 PM Saturday at Restore at Carolina Park'
+];
+
+const MENU = [
+  { c:'Displays', t:'4:30 PM · Concession stand', items:[
+    { n:'Buttered Popcorn', d:'PPHG provides a 2oz bag per guest', q:80, p:6 } ] },
+  { c:'Cocktail hour', t:'5:30 PM · Stars Lounge · passed', items:[
+    { n:'J.I. Tomato Pie', d:'basil oil', tags:['Vegetarian'], q:50, p:4.50 },
+    { n:'Chicken + Waffle', d:'mini belgian waffle, fried chicken, hot honey glaze, tomato remoulade', q:50, p:4.50 },
+    { n:'Bacon Wrapped Shrimp', d:'chile lime crema', tags:['Gluten free'], q:50, p:6.50 },
+    { n:'Lobster Hushpuppy', d:'honey butter', q:50, p:5.50 },
+    { n:'Deviled Egg', d:'pimento cheese, crispy prosciutto', q:50, p:4.00 } ] },
+  { c:'Bar', t:'5:30 PM · five hours · hosted', items:[
+    { n:'Reserve Wine', d:'House Red · House White', q:80, p:18 },
+    { n:'Grand Cru Wine Varietal', d:'Arte Latino Cava', q:80, p:4 },
+    { n:'Grand Cru Beer', d:'Mich Ultra · Stella Artois · Westbrook IPA', tags:['Upgraded'], q:80, p:18 },
+    { n:'Non-Alcoholic Package', d:'sweet tea, unsweet tea, lemonade, full mixer selection', tags:['Required with beer & wine'], q:80, p:10 } ] },
+  { c:'Composed petite plates', t:'7:00 PM · 90 minutes · full seating', items:[
+    { n:'Petite Filet', d:'yukon fondue, broccolini florets, bordelaise', tags:['Gluten free','Station 1'], q:77, p:26 },
+    { n:'Buttermilk Fried Chicken', d:'three cheese mac, collard greens, pepper vinegar', tags:['Station 2'], q:77, p:20 },
+    { n:'Ricotta Ravioli', d:'poached asparagus, goat cheese, lemon beurre blanc', tags:['Vegetarian','Station 3'], q:77, p:18 },
+    { n:'Glazed Butternut Squash', d:'cider glaze, warm chickpea salad', tags:['Vegan','Gluten free'], q:3, p:38 } ] },
+  { c:'Toast', t:'7:50 PM · passed', items:[
+    { n:'Champagne Toast', d:'Arte Latino Cava, passed to every guest, served in a champagne coupe', tags:['Complimentary'], q:80, p:0 } ] },
+  { c:'Cake', t:'8:15 PM', items:[
+    { n:'Publix — two tiers', d:'Set on the left side of the stage, cut and served by PPHG onto salad plates. Baker supplies the stand and any anniversary-tier box; delivery must be same day.', tags:['Confirmed'], q:1, p:0 } ] },
+  { c:'Vendor meals', t:'7:30 PM · one hour after stations open', items:[
+    { n:'Stations, two plates max', d:'2 photo · 1 DJ · 3 planner. Cut from 8 — the AV tech and ceremony musicians are no longer covered.', q:6, p:25 } ] }
+];
+
+const MENU_NOTES = [
+  'Preset: iced water at every seat.',
+  'Place setting: highball glass, universal wine glass, dinner fork, dinner knife and a black Snyder napkin.',
+  'Dinner wines poured tableside: house red and house white.',
+  'Joshua’s drink of choice: water and white wine. Gabriel’s: still to be chosen.',
+  'Three station attendants and two additional servers for wine and water service.',
+  'PPHG supplies all china, silver and glassware: 160 salad plates, 160 pasta bowls, 80 dinner forks, 200 salad forks, 80 dinner knives, 80 salad knives, 275 champagne coupes, 360 wine glasses and 324 highballs.',
+  'Ballroom set with 80 gold chivari chairs, 10 guest tables, a sweetheart and a cake table, 3 station tables, 2 bars and 4 cocktail tables.',
+  'Linens and napkins come from Snyder. Everything else on the table is PPHG’s.',
+  'PPHG provides the bar and station signs. Posters are client provided.',
+  'Setup can begin at 9:00 AM. Earlier access needs approval a month out and may require a parking buyout.'
+];
+
+const RUNSHEET = [
+  { t:'Thu 3 Sep', e:'Invitation Only collects the linens', w:'Snyder, 3875 Meeting St · returned Tue 8 Sep' },
+  { t:'Sat 1:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · BEO says 1:00, you have circulated 2:00', flag:true },
+  { t:'Sat 4–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant · <a href="https://maps.app.goo.gl/9sbx3BhfSvYbhJpV8" target="_blank" rel="noopener">open in Maps</a>' },
+  { t:'9:00 AM',  e:'Venue opens' },
+  { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
+  { t:'11:00 AM', e:'Linens on site and set', w:'Brought in by Invitation Only from Thursday’s pick-up' },
+  { t:'1:00 PM',  e:'Florist delivers and sets up', w:'Amanda Cubello, arranging for Stephen' },
+  { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
+  { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
+  { t:'3:30 PM',  e:'Sound tech and piano arrive', w:'Jacob Scaife · Palmetto Strings' },
+  { t:'3:45 PM',  e:'Couple arrival', w:'Optional venue reveal' },
+  { t:'4:00 PM',  e:'Wedding party arrives at the venue' },
+  { t:'4:30 PM',  e:'Photography begins', w:'Richard Bell · 5 hours confirmed, runs to 9:30 PM' },
+  { t:'3:45 PM',  e:'Grooms arrive on site', w:'Final touches in Stars Lounge, arriving about 80% ready' },
+  { t:'4:30 PM',  e:'Richard Bell begins coverage', w:'2 photographers · getting-ready and detail shots in Stars Lounge' },
+  { t:'4:30 PM',  e:'Preludes and guest arrival', w:'Popcorn at the concession stand in the lobby' },
+  { t:'5:00 PM',  e:'Ceremony', w:'In the Theatre · Father Will' },
+  { t:'5:30 PM',  e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony — about ten minutes' },
+  { t:'5:40 PM',  e:'Cocktail hour', w:'Stars Lounge, flipped from the getting-ready room · family portraits here',
+    sub:['Cava passed straight after the ceremony','All five hors d’oeuvres passed','Drinks of choice — Joshua: water and white wine · Gabriel: TBD'] },
+  { t:'6:30 PM',  e:'Reception opens', w:'In the Ballroom — move guests, find seating' },
+  { t:'6:45 PM',  e:'Formalities',
+    sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
+  { t:'7:00 PM',  e:'Dinner stations open', w:'Three petite-plate stations, 90 minutes' },
+  { t:'7:30 PM',  e:'Vendor meals', w:'Location TBD. Only 6 covered — 2 photo, 1 DJ, 3 planner.' },
+  { t:'7:50 PM',  e:'PPHG passes champagne', w:'Served in champagne coupes' },
+  { t:'7:55 PM',  e:'Roasts and toasts' },
+  { t:'8:15 PM',  e:'Cutting of the cake', w:'Left side of the stage · PPHG cuts and serves onto salad plates' },
+  { t:'8:30 PM',  e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
+  { t:'9:30 PM',  e:'Photographer departs', w:'End of the contracted 5 hours. No send-off.' },
+  { t:'10:15 PM', e:'Informal last call for alcohol' },
+  { t:'10:20 PM', e:'Last song of the night' },
+  { t:'10:25 PM', e:'Prepare for departure', w:'No formal send-off' },
+  { t:'10:30 PM', e:'Formal event closure',
+    sub:['Photography ends — 8 hours from 2:30','Guests depart the American Theater','PPHG staff and on-site vendors break down'] },
+  { t:'10:45 PM', e:'Off-site vendors return for strike', w:'Linens boxed for Invitation Only to return Tuesday' },
+  { t:'12:00 AM', e:'Venue closes', w:'PPHG’s own BEO timeline says breakdown concludes 12:30 AM' }
+];
+
+const SETTLED = [
+  'Fully seated — no standing reception',
+  'Preset water with tableside service',
+  'Tableside wine service',
+  'Passed cava for the toasts',
+  'Preset silverware and napkins',
+  'China at the stations',
+  'Cocktail hour staged in Stars Lounge'
+];
+
+const PEOPLE = [
+  { r:'Venue · event manager', n:'Olivia Nilsen', o:'Patrick Properties', e:'olivia@pphgcharleston.com', t:'843.628.7116' },
+  { r:'Venue · sales rep', n:'Jackie Willis Roberts', o:'Patrick Properties', e:'jackie@pphgcharleston.com' },
+  { r:'Venue', n:'The American Theater', o:'446 King Street, Charleston SC 29403' },
+  { r:'Planner', n:'Loraine Cook', o:'Invitation Only', e:'loraine.cook@invitationonlycharleston.com', t:'843.695.8884' },
+  { r:'Photography', n:'Richard Bell Photography', o:'672 Marina Dr Ste 103, Charleston', e:'info@richbell.com' },
+  { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'via Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
+  { r:'Ceremony music', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com' },
+  { r:'AV tech', n:'Jacob Scaife', e:'jscaife912@gmail.com', t:'804.387.5783' },
+  { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216' },
+  { r:'Officiant', n:'Father Will', t:'336.340.8183' },
+  { r:'Florist', n:'Stephen', t:'301.549.8622', x:'Arrangements and delivery by Amanda Cubello' },
+  { r:'Florals · arranging and delivery', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
+  { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest, not a vendor' },
+  { r:'Cake and pool party', n:'Barbara', e:'warriorbjtaylor@hotmail.com' },
+  { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 4:00 – 9:00 PM' }
+];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const money  = n => n == null ? '—' : '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money0 = n => n == null ? '—' : '$' + Math.round(n).toLocaleString('en-US');
+const parseD = s => new Date(s + 'T12:00:00-04:00');
+const fmtD   = s => parseD(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const daysTo = s => Math.ceil((parseD(s) - new Date()) / 86400000);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
+
+let me = null, D = { vendors:[], payments:[], tasks:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+
+const MONEY_PW = 'jgwedding';
+const PW_KEY = 'wedding-ops-money';
+let moneyOpen = sessionStorage.getItem(PW_KEY) === MONEY_PW;
+
+/* ---------- who are you ---------- */
+const NAME_KEY = 'wedding-ops-name';
+async function init(){
+  const saved = (localStorage.getItem(NAME_KEY) || '').trim();
+  saved ? enter(saved) : showGate();
+}
+function showGate(){
+  document.body.classList.add('gated');
+  $('#app').hidden = true; $('#gate').hidden = false;
+  $('#gateName').value = localStorage.getItem(NAME_KEY) || '';
+  $('#gateName').focus();
+}
+$('#gateForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#gateName').value.trim(); if (!name) return;
+  localStorage.setItem(NAME_KEY, name); enter(name);
+});
+async function enter(name){
+  me = name;
+  const { error } = await load();
+  if (error){ $('#gateMsg').innerHTML = `<div class="msg err">Could not reach the board. Check your connection and try again.</div>`; showGate(); return; }
+  document.body.classList.remove('gated');
+  $('#gate').hidden = true; $('#app').hidden = false;
+  $('#whoMsg').textContent = `Live · you are ${me}`;
+  await loadDocs();
+  renderAll();
+  sb.channel('board').on('postgres_changes', { event:'*', schema:'public' },
+    async () => { await load(); renderAll(); }).subscribe();
+  setInterval(() => { header(); timeline(); tasks(); }, 60000);   // keeps the countdown honest
+}
+$('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate(); };
+
+/* ---------- data ---------- */
+async function load(){
+  const [v,p,t] = await Promise.all([
+    sb.from('vendors').select('*').order('sort_order'),
+    sb.from('payments').select('*').order('paid_on'),
+    sb.from('tasks').select('*').order('due_date')
+  ]);
+  if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
+  D = { vendors:v.data, payments:p.data, tasks:t.data };
+  return {};
+}
+async function loadDocs(){
+  const [{ data, error }, lab] = await Promise.all([
+    sb.storage.from(BUCKET).list('', { limit:200, sortBy:{ column:'created_at', order:'desc' } }),
+    sb.from('doc_labels').select('*')
+  ]);
+  docs = error ? [] : (data || []).filter(f => f.name !== '.emptyFolderPlaceholder');
+  labels = {};
+  if (!lab.error) for (const r of (lab.data || [])) labels[r.storage_name] = r;
+}
+const prettyName = f => (labels[f.name]?.label) || f.name.replace(/^\d+__/,'');
+const paidFor = id => D.payments.filter(p=>p.vendor_id===id).reduce((a,p)=>a+Number(p.amount),0);
+const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
+
+/* ---------- render ---------- */
+function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
+  menu(); runsheet(); guestRoster(); people(); renderDocs(); }
+
+function applyMoneyLock(){
+  $('#moneyLock').hidden = moneyOpen;
+  $('#moneyBody').hidden = !moneyOpen;
+  $$('.tally .mny').forEach(d => d.hidden = !moneyOpen);
+}
+
+$('#lockForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if ($('#lockPw').value === MONEY_PW){
+    moneyOpen = true;
+    sessionStorage.setItem(PW_KEY, MONEY_PW);
+    $('#lockPw').value = ''; $('#lockErr').textContent = '';
+    applyMoneyLock(); header();
+  } else {
+    $('#lockErr').textContent = 'That is not it. Ask Josh.';
+    $('#lockPw').select();
+  }
+});
+
+function header(){
+  const total = D.vendors.reduce((a,v)=>a+Number(v.total||0),0);
+  const paid  = D.vendors.reduce((a,v)=>a+(v.total!=null?paidFor(v.id):0),0);
+  const due = total - paid;
+  const soon = D.vendors.filter(v=>v.due_date && daysTo(v.due_date)<=30).reduce((a,v)=>a+(owed(v)||0),0);
+  const days = Math.ceil((WEDDING_DATE - new Date())/86400000);
+  $('#tDays').textContent = days > 0 ? days : (days === 0 ? 'Today' : '—');
+  $('#tTasks').textContent = D.tasks.filter(t=>!t.done).length;
+  applyMoneyLock();
+  if (!moneyOpen) return;
+  $('#tTotal').textContent = money0(total);
+  $('#tPaid').textContent = money0(paid);
+  $('#tDue').textContent = money0(due);
+  $('#tSoon').textContent = money0(soon);
+  const pct = x => (total ? x/total*100 : 0).toFixed(2)+'%';
+  $('#moneyBar').innerHTML = `<i style="width:${pct(paid)};background:var(--moss)"></i><i style="width:${pct(soon)};background:var(--rust)"></i><i style="width:${pct(due-soon)};background:var(--brass)"></i>`;
+  $('#lgPaid').textContent = money0(paid);
+  $('#lgSoon').textContent = money0(soon);
+  $('#lgLater').textContent = money0(due-soon);
+}
+
+function flags(){
+  $('#flags').innerHTML = FLAGS.map(f=>`<div class="flag ${f.lvl==='warn'?'warn':''}"><h3>${f.h}</h3>${f.p.map(p=>`<p>${p}</p>`).join('')}</div>`).join('');
+  const b = $('#bAlerts'); b.textContent = FLAGS.length; b.classList.toggle('hot', FLAGS.some(f=>f.lvl==='hot'));
+  $('#closedBox').innerHTML = `<div style="columns:260px auto;column-gap:28px;color:var(--ink-2);line-height:1.95;font-size:14.5px">${
+    CLOSED.map(c=>`<div style="break-inside:avoid">✓&nbsp; ${c}</div>`).join('')}</div>`;
+}
+
+function vendors(){
+  $('#vgrid').innerHTML = D.vendors.map(v=>{
+    const o = owed(v), pd = paidFor(v.id);
+    const pill = v.status==='done' ? '<span class="pill paid">Settled</span>'
+      : v.total==null ? (pd>0 ? '<span class="pill alt">Paid, not quoted</span>' : '<span class="pill tbd">No number yet</span>')
+      : o<=0 ? '<span class="pill paid">Paid in full</span>' : '<span class="pill due">Balance due</span>';
+    const when = v.due_date ? `<span>Due ${fmtD(v.due_date)}</span><span>${daysTo(v.due_date)} days</span>`
+      : (v.total!=null && o>0 ? '<span>No due date on file</span>' : '<span>—</span>');
+    return `<article class="v">
+      <div class="top"><div><h3>${esc(v.name)}</h3><div class="cat">${esc(v.category||'')}</div></div>${pill}</div>
+      ${v.total!=null
+        ? `<dl><dt>Contracted</dt><dd>${money(v.total)}</dd><dt>Paid</dt><dd>${money(pd)}</dd>
+             <dt>Outstanding</dt><dd class="${o>0?'owe':''}">${money(o)}</dd></dl>`
+        : (pd > 0
+           ? `<dl><dt>Contracted</dt><dd style="color:var(--ink-3)">not quoted</dd>
+                <dt>Paid</dt><dd>${money(pd)}</dd>
+                <dt>Outstanding</dt><dd style="color:var(--ink-3)">unknown</dd></dl>`
+           : '')}
+      <div class="when">${when}</div>
+      ${v.note ? `<div class="note">${esc(v.note)}</div>` : ''}
+      <div class="act"><button class="btn ghost sm" data-pay="${v.id}" data-name="${esc(v.name)}">Record payment</button></div>
+    </article>`;
+  }).join('');
+}
+
+function payments(){
+  const rows = [...D.payments].sort((a,b)=>a.paid_on<b.paid_on?1:-1);
+  const name = id => (D.vendors.find(v=>v.id===id)||{}).name || id;
+  $('#payBody').innerHTML = rows.map(p=>
+    `<tr><td class="num">${fmtD(p.paid_on)}</td><td>${esc(name(p.vendor_id))}</td>
+     <td>${esc(p.method||'')}${p.entered_by_name && p.entered_by_name!=='seed' ? ` <span style="color:var(--ink-3)">· ${esc(p.entered_by_name)}</span>` : ''}</td>
+     <td class="n">${money(p.amount)}</td>
+     <td style="text-align:right;white-space:nowrap"><button class="btn ghost sm" data-editpay="${p.id}">Correct</button>
+       <button class="btn ghost sm" data-delpay="${p.id}" style="margin-left:5px;color:var(--rust)">Delete</button></td></tr>`
+  ).join('') + `<tr><td colspan="3"><strong>Total paid to date</strong></td><td class="n"><strong>${money(rows.reduce((a,p)=>a+Number(p.amount),0))}</strong></td><td></td></tr>`;
+}
+
+function timeline(){
+  let hot = 0;
+  $('#timeline').innerHTML = [...MILESTONES].sort((a,b)=>a.date<b.date?-1:1).map(m=>{
+    const d = daysTo(m.date), isHot = d>=0 && d<=14, past = d<0;
+    if (isHot) hot++;
+    return `<div class="tl-i ${isHot?'hot':''} ${past?'past':''}">
+      <div class="d">${fmtD(m.date)}${m.time?' · '+m.time:''} · ${past?'passed':(d===0?'today':d+' days')}</div>
+      <div class="t">${m.title}${m.amount?` <span class="amt">— ${money(m.amount)}</span>`:''}</div>
+      <div class="m">${m.detail}</div></div>`;
+  }).join('');
+  const b=$('#bDates'); b.textContent=hot; b.classList.toggle('hot',hot>0);
+}
+
+function taskRow(t){
+  const d = t.due_date ? daysTo(t.due_date) : null;
+  const urgent = d!==null && d<=3 && !t.done;
+  const meta = [ t.owner ? esc(t.owner) : '',
+    t.due_date ? `<span class="${urgent?'od':''}">${fmtD(t.due_date)}${!t.done ? ` · ${d<0?Math.abs(d)+' days late':(d===0?'today':d+' days')}` : ''}</span>` : '',
+    t.done && t.done_by_name ? `by ${esc(t.done_by_name)}` : '' ].filter(Boolean);
+  return `<div class="task ${t.done?'done':''}">
+    <input type="checkbox" data-id="${t.id}" ${t.done?'checked':''} aria-label="Mark done">
+    <div class="body"><div class="title">${esc(t.title)}</div><div class="meta">${meta.join('')}</div></div>
+    ${t.seed_key==null?`<button class="x" data-deltask="${t.id}" title="Remove">×</button>`:''}</div>`;
+}
+
+function tasks(){
+  const open = D.tasks.filter(t=>!t.done).sort((a,b)=>(a.due_date||'9999')<(b.due_date||'9999')?-1:1);
+  const done = D.tasks.filter(t=>t.done);
+  $('#taskOpen').innerHTML = open.length ? open.map(taskRow).join('') : `<div class="task"><div class="body"><div class="title">Nothing open.</div></div></div>`;
+  $('#taskDone').innerHTML = done.length ? done.map(taskRow).join('') : `<div class="task"><div class="body"><div class="title" style="color:var(--ink-3)">Nothing checked off yet.</div></div></div>`;
+  const b=$('#bTasks'); b.textContent=open.length;
+  b.classList.toggle('hot', open.some(t=>t.due_date && daysTo(t.due_date)<=3));
+  if (!$('#ntOwner').options.length) $('#ntOwner').innerHTML = OWNERS.map(o=>`<option>${o}</option>`).join('');
+}
+
+function decisions(){
+  $('#decBody').innerHTML = DECISIONS.map(d=>`<tr><td><strong>${d.q}</strong></td><td>${d.s}</td><td>${d.impact}</td><td>${d.by}</td></tr>`).join('');
+}
+
+function menu(){
+  $('#menuBox').innerHTML = MENU.map(c=>`<div class="course">
+    <div class="course-h"><h3>${c.c}</h3><span class="tm">${c.t}</span></div>
+    ${c.items.map(i=>`<div class="dish">
+      <div><div class="nmm">${i.n}</div><div class="dsc">${i.d}</div>
+        ${i.tags?`<div class="tags">${i.tags.map(t=>`<span class="pill ${t==='Vegan'?'paid':t==='Gluten free'?'tbd':'alt'}">${t}</span>`).join('')}</div>`:''}
+      </div>
+      <div class="qty"><b>${i.q}${i.p?' × '+money0(i.p):''}</b>${i.p?money(i.q*i.p):'included'}</div>
+    </div>`).join('')}</div>`).join('');
+  $('#menuNotes').innerHTML = `<ul style="margin:0;padding-left:20px;color:var(--ink-2);line-height:1.9">${MENU_NOTES.map(n=>`<li>${n}</li>`).join('')}</ul>`;
+}
+
+function runsheet(){
+  $('#runBody').innerHTML = RUNSHEET.map(r=>
+    `<tr${r.flag?' style="background:var(--rust-lo)"':''}>
+      <td class="num" style="white-space:nowrap${r.flag?';color:var(--rust);font-weight:600':''}">${r.t}</td>
+      <td><strong${r.flag?' style="color:var(--rust)"':''}>${r.e}</strong>
+        ${r.sub?`<ul style="margin:6px 0 0;padding-left:18px;color:var(--ink-2);font-size:13.5px;line-height:1.7">${r.sub.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}</td>
+      <td${r.flag?' style="color:var(--rust)"':''}>${r.w||''}</td></tr>`).join('');
+  $('#settledList').innerHTML = SETTLED.map(x=>`<li>${x}</li>`).join('');
+}
+
+const DIET_META = {
+  'Vegan':      { cls:'vegan',  short:'Vegan', srv:'Glazed Butternut Squash is on the order at 3.' },
+  'Gluten free':{ cls:'gluten', short:'GF',    srv:'Petite Filet and the butternut squash are both gluten free.' },
+  'Dairy free': { cls:'dairy',  short:'Dairy', srv:'Two children — their mother is handling it. No action needed from the venue.' },
+  'Nut allergy':{ cls:'nut',    short:'Nuts',  srv:'Nothing on the current menu lists almonds. Worth confirming with the kitchen.' }
+};
+
+function guestRoster(){
+  const flagged = GUESTS.filter(g=>g.k);
+  $('#countCalc').innerHTML = [
+    ['Attending', 69, 'Every RSVP is in.'],
+    ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
+    ['Plated at', 77, 'Each petite station on the BEO.'],
+    ['Restrictions', flagged.length, 'Across four dietary groups.'],
+    ['Vendor meals', 6, 'Cut from 8. The AV tech and musicians are not covered.']
+  ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
+
+  $('#dietGrid').innerHTML = Object.entries(DIET_META).map(([key,m])=>{
+    const who = flagged.filter(g=>g.k===key);
+    return `<div class="dcard ${m.cls}">
+      <div class="cnt">${who.length}</div>
+      <div class="lbl">${key}</div>
+      <ul>${who.map(g=>`<li>${esc(g.n)}</li>`).join('')}</ul>
+      <div class="srv">${m.srv}</div></div>`;
+  }).join('');
+
+  drawRoster();
+  $('#bGuests').textContent = flagged.length;
+}
+
+function drawRoster(){
+  const list = GUESTS.filter(g => {
+    if (gFilter === 'diet' && !g.k) return false;
+    return !gQuery || g.n.toLowerCase().includes(gQuery);
+  });
+  $('#roster').innerHTML = list.length ? list.map(g=>{
+    const m = g.k ? DIET_META[g.k] : null;
+    const cls = m ? { vegan:'veg', gluten:'glu', dairy:'dai', nut:'nut' }[m.cls] : '';
+    return `<span class="g ${g.k?'flagged '+cls:''}" title="${esc(g.d||'')}">${esc(g.n)}${m?`<span class="tag">${m.short}</span>`:''}</span>`;
+  }).join('') : `<span style="color:var(--ink-3)">Nobody matches that.</span>`;
+}
+
+function people(){
+  $('#peopleBody').innerHTML = PEOPLE.map(p=>{
+    const lines = [];
+    if (p.e) lines.push(`<a class="cline" href="mailto:${p.e}">${p.e}</a>`);
+    if (p.t) lines.push(`<a class="cline" href="tel:${p.t.replace(/[^0-9+]/g,'')}">${p.t}</a>`);
+    if (p.x) lines.push(`<span class="cline muted">${esc(p.x)}</span>`);
+    return `<article class="v contact"><div class="cat">${esc(p.r)}</div><h3>${esc(p.n)}</h3>
+      ${p.o ? `<div class="org">${esc(p.o)}</div>` : ''}
+      ${lines.length ? `<div class="clines">${lines.join('')}</div>` : ''}</article>`;
+  }).join('');
+}
+
+function renderDocs(){
+  if (!docs.length){ $('#docList').innerHTML = `<div class="pad" style="color:var(--ink-3)">Nothing uploaded yet.</div>`; return; }
+  $('#docList').innerHTML = docs.map(f=>{
+    const ext = (f.name.split('.').pop()||'').toUpperCase().slice(0,4);
+    const url = sb.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl;
+    const when = f.created_at ? new Date(f.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const size = f.metadata?.size ? kb(f.metadata.size) : '';
+    const lab = labels[f.name];
+    const meta = [when, size, lab?.renamed_by ? `renamed by ${esc(lab.renamed_by)}` : ''].filter(Boolean).join(' · ');
+    return `<div class="doc"><div class="ic">${ext||'FILE'}</div>
+      <div class="dn"><a href="${url}" target="_blank" rel="noopener">${esc(prettyName(f))}</a>
+        <div class="dm">${meta}</div></div>
+      <button class="dr" data-rename="${esc(f.name)}">Rename</button></div>`;
+  }).join('');
+}
+
+/* ---------- uploads ---------- */
+async function upload(files){
+  const msg = $('#upMsg');
+  for (const f of files){
+    if (f.size > 26214400){ msg.textContent = `${f.name} is over 25 MB.`; continue; }
+    msg.textContent = `Uploading ${f.name}…`;
+    const safe = Date.now() + '__' + f.name.replace(/[^\w.\- ]/g,'_');
+    const { error } = await sb.storage.from(BUCKET).upload(safe, f, { cacheControl:'3600' });
+    msg.textContent = error ? `${f.name} failed: ${error.message}` : `${f.name} uploaded.`;
+  }
+  await loadDocs(); renderDocs();
+}
+$('#pickBtn').onclick = () => $('#fileIn').click();
+$('#fileIn').onchange = e => { upload([...e.target.files]); e.target.value=''; };
+const drop = $('#drop');
+['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => upload([...e.dataTransfer.files]));
+
+/* ---------- interactions ---------- */
+$$('nav button').forEach(b=>b.onclick=()=>{
+  $$('nav button').forEach(x=>x.setAttribute('aria-selected','false'));
+  b.setAttribute('aria-selected','true');
+  $$('.panel').forEach(p=>p.hidden=true);
+  $('#p-'+b.dataset.tab).hidden=false;
+});
+
+$('#gSearch').addEventListener('input', e => { gQuery = e.target.value.trim().toLowerCase(); drawRoster(); });
+$$('[data-gf]').forEach(b => b.onclick = () => { gFilter = b.dataset.gf; drawRoster(); });
+
+document.addEventListener('change', async e=>{
+  const cb = e.target.closest('.task input[type=checkbox]'); if (!cb) return;
+  const done = cb.checked;
+  await sb.from('tasks').update({ done, done_by_name: done ? me : null, done_at: done ? new Date().toISOString() : null }).eq('id', cb.dataset.id);
+  await load(); tasks();
+});
+
+document.addEventListener('click', async e=>{
+  const dt = e.target.closest('[data-deltask]');
+  if (dt){ await sb.from('tasks').delete().eq('id', dt.dataset.deltask); await load(); tasks(); return; }
+  const dp = e.target.closest('[data-delpay]');
+  if (dp){
+    const row = D.payments.find(x => String(x.id) === dp.dataset.delpay); if (!row) return;
+    const vn = (D.vendors.find(v=>v.id===row.vendor_id)||{}).name || row.vendor_id;
+    const ok = confirm(`Delete this payment?\n\n${money(row.amount)} to ${vn}\n${fmtD(row.paid_on)}${row.method?' · '+row.method:''}\n\nThis cannot be undone. If the amount is just wrong, use Correct instead.`);
+    if (!ok) return;
+    await sb.from('payments').delete().eq('id', row.id);
+    await load(); renderAll(); return;
+  }
+  const ep = e.target.closest('[data-editpay]');
+  if (ep){
+    const row = D.payments.find(x => String(x.id) === ep.dataset.editpay); if (!row) return;
+    const dlg = $('#payDlg');
+    dlg.dataset.vendor = row.vendor_id; dlg.dataset.editId = row.id;
+    $('#payTitle').textContent = 'Correct the payment to ' + ((D.vendors.find(v=>v.id===row.vendor_id)||{}).name || '');
+    $('#payDate').value = row.paid_on; $('#payAmt').value = Number(row.amount); $('#payMethod').value = row.method || '';
+    $('#paySave').textContent = 'Save correction'; dlg.showModal(); return;
+  }
+  const rn = e.target.closest('[data-rename]');
+  if (rn){
+    const key = rn.dataset.rename;
+    const f = docs.find(d => d.name === key); if (!f) return;
+    const next = prompt('Display name for this file:', prettyName(f));
+    if (next === null) return;
+    const label = next.trim();
+    if (!label){
+      await sb.from('doc_labels').delete().eq('storage_name', key);
+    } else {
+      await sb.from('doc_labels').upsert({ storage_name:key, label, renamed_by:me });
+    }
+    await loadDocs(); renderDocs(); return;
+  }
+  const pay = e.target.closest('[data-pay]');
+  if (pay){
+    const dlg = $('#payDlg');
+    dlg.dataset.vendor = pay.dataset.pay; delete dlg.dataset.editId;
+    $('#payTitle').textContent = 'Payment to ' + pay.dataset.name;
+    $('#payDate').value = new Date().toISOString().slice(0,10);
+    $('#payAmt').value = ''; $('#payMethod').value = '';
+    $('#paySave').textContent = 'Save payment'; dlg.showModal();
+  }
+});
+
+let saving = false;
+$('#payDlg').addEventListener('close', async function(){
+  const editId = this.dataset.editId; delete this.dataset.editId;
+  if (this.returnValue !== 'save' || saving) return;
+  const amount = parseFloat($('#payAmt').value); if (isNaN(amount)) return;
+  const row = { vendor_id:this.dataset.vendor, paid_on:$('#payDate').value, amount,
+                method:$('#payMethod').value || null, entered_by_name: me };
+
+  if (!editId){
+    const near = D.payments.filter(p => p.vendor_id===row.vendor_id && Number(p.amount)===amount);
+    const exact = near.find(p => p.paid_on===row.paid_on);
+    if (exact){
+      const vn = (D.vendors.find(v=>v.id===row.vendor_id)||{}).name || '';
+      if (!confirm(`Looks like this is already recorded.\n\n${money(amount)} to ${vn} on ${fmtD(row.paid_on)} is already on the board.\n\nRecord it a second time anyway?`)) return;
+    } else if (near.length){
+      const vn = (D.vendors.find(v=>v.id===row.vendor_id)||{}).name || '';
+      if (!confirm(`A payment of ${money(amount)} to ${vn} already exists, dated ${fmtD(near[0].paid_on)}.\n\nAdd this one as well?`)) return;
+    }
+  }
+
+  saving = true;
+  try {
+    const res = editId
+      ? await sb.from('payments').update(row).eq('id', editId)
+      : await sb.from('payments').insert(row);
+    if (res.error){
+      alert(res.error.code === '23505'
+        ? 'That exact payment is already on the board — same vendor, date, amount and method. Nothing was added.'
+        : 'Could not save that payment: ' + res.error.message);
+    }
+  } finally { saving = false; }
+  await load(); renderAll();
+});
+
+$('#ntAdd').onclick = async ()=>{
+  const title = $('#ntTitle').value.trim(); if(!title) return;
+  await sb.from('tasks').insert({ title, owner:$('#ntOwner').value, due_date:$('#ntDue').value || null });
+  $('#ntTitle').value=''; $('#ntDue').value='';
+  await load(); tasks();
+};
+$('#ntTitle').onkeydown = e => { if(e.key==='Enter') $('#ntAdd').click(); };
+
+init();
+</script>
+</body>
+</html>
