@@ -187,6 +187,9 @@ td.n{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric
 .doc .dn{flex:1;min-width:0;overflow-wrap:anywhere}
 .doc .dn a{font-weight:600;text-decoration:none;color:var(--ink)}
 .doc .dn a:hover{color:var(--brass);text-decoration:underline}
+.doc .dr{background:none;border:0;color:var(--ink-3);font-size:13px;padding:4px 8px;border-radius:3px;
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;font-weight:700;white-space:nowrap}
+.doc .dr:hover{color:var(--brass);background:var(--brass-lo)}
 .doc .dm{font-size:12px;color:var(--ink-3);margin-top:2px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.09em;font-weight:600}
 
 .gate{max-width:460px;margin:13vh auto;padding:0 20px;text-align:center}
@@ -200,6 +203,15 @@ body.gated{background:#FFFDF8}
 .gate input{flex:1;min-width:220px;text-align:left;padding:11px 13px;font-size:15px;border-color:#E0DACB;background:#FFFEFB}
 .gate .msg{margin-top:18px;font-size:14px;padding:12px 14px;border-radius:var(--r);text-align:left}
 .gate .msg.err{background:var(--rust-lo);color:var(--rust);border:1px solid var(--rust-line)}
+
+.lock{max-width:400px;margin:26px auto;text-align:center}
+.lock .card{padding:32px 28px}
+.lock .ic{font-size:30px;line-height:1}
+.lock h3{font-size:14px;letter-spacing:.16em;margin:12px 0 8px}
+.lock p{color:var(--ink-2);font-size:14px;margin:0 0 18px;line-height:1.55}
+.lock form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lock input{flex:1;min-width:170px;text-align:left}
+.lock .err{margin-top:14px;font-size:13.5px;color:var(--rust)}
 
 footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-2);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
 .who{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-weight:600}
@@ -244,16 +256,17 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     </div>
     <div class="tally">
       <div><div class="k">Days out</div><div class="v days num" id="tDays">—</div></div>
-      <div><div class="k">Contracted</div><div class="v num" id="tTotal">—</div></div>
-      <div><div class="k">Paid</div><div class="v paid num" id="tPaid">—</div></div>
-      <div><div class="k">Outstanding</div><div class="v due num" id="tDue">—</div></div>
-      <div><div class="k">Due in 30 days</div><div class="v due num" id="tSoon">—</div></div>
+      <div><div class="k">Open tasks</div><div class="v num" id="tTasks">—</div></div>
+      <div class="mny" hidden><div class="k">Contracted</div><div class="v num" id="tTotal">—</div></div>
+      <div class="mny" hidden><div class="k">Paid</div><div class="v paid num" id="tPaid">—</div></div>
+      <div class="mny" hidden><div class="k">Outstanding</div><div class="v due num" id="tDue">—</div></div>
+      <div class="mny" hidden><div class="k">Due in 30 days</div><div class="v due num" id="tSoon">—</div></div>
     </div>
   </header>
 
   <nav role="tablist">
-    <button role="tab" data-tab="money" aria-selected="true">Money</button>
-    <button role="tab" data-tab="alerts" aria-selected="false">Alerts<span class="badge hot" id="bAlerts">0</span></button>
+    <button role="tab" data-tab="money" aria-selected="false">Money</button>
+    <button role="tab" data-tab="alerts" aria-selected="true">Alerts<span class="badge hot" id="bAlerts">0</span></button>
     <button role="tab" data-tab="dates" aria-selected="false">Deadlines<span class="badge hot" id="bDates">0</span></button>
     <button role="tab" data-tab="tasks" aria-selected="false">Tasks<span class="badge" id="bTasks">0</span></button>
     <button role="tab" data-tab="menu" aria-selected="false">Menu</button>
@@ -263,7 +276,21 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
   </nav>
 
-  <section class="panel" id="p-money">
+  <section class="panel" id="p-money" hidden>
+    <div class="lock" id="moneyLock">
+      <div class="card">
+        <div class="ic">&#128274;</div>
+        <h3>Money is private</h3>
+        <p>Vendor totals, balances and payment history. Enter the passphrase to view.</p>
+        <form id="lockForm">
+          <input type="password" id="lockPw" placeholder="Passphrase" autocomplete="off">
+          <button class="btn" type="submit">Unlock</button>
+        </form>
+        <div class="err" id="lockErr"></div>
+      </div>
+    </div>
+
+    <div id="moneyBody" hidden>
     <div class="sec"><div class="card pad">
       <div class="bar" id="moneyBar"></div>
       <div class="legend">
@@ -280,9 +307,10 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <div class="sec-h"><h2>Payments made</h2><span class="hint">Payments can’t be deleted. Got one wrong? Correct it — set it to 0 if it never happened.</span></div>
       <div class="card"><table><thead><tr><th>Date</th><th>Vendor</th><th>Method</th><th style="text-align:right">Amount</th><th></th></tr></thead><tbody id="payBody"></tbody></table></div>
     </div>
+    </div>
   </section>
 
-  <section class="panel" id="p-alerts" hidden>
+  <section class="panel" id="p-alerts">
     <div class="sec">
       <div class="sec-h"><h2>Needs attention</h2></div>
       <div id="flags"></div>
@@ -372,7 +400,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       </div>
     </div>
     <div class="sec">
-      <div class="sec-h"><h2>On file</h2><span class="hint">Uploads can’t be deleted from here — re-upload a corrected version instead.</span></div>
+      <div class="sec-h"><h2>On file</h2><span class="hint">Rename changes the display name only — the stored file keeps its own. Clear the box to revert. Uploads can’t be deleted from here.</span></div>
       <div class="card"><div id="docList"></div></div>
     </div>
   </section>
@@ -629,7 +657,11 @@ const daysTo = s => Math.ceil((parseD(s) - new Date()) / 86400000);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
-let me = null, D = { vendors:[], payments:[], tasks:[] }, docs = [], gFilter = 'all', gQuery = '';
+let me = null, D = { vendors:[], payments:[], tasks:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+
+const MONEY_PW = 'jgwedding';
+const PW_KEY = 'wedding-ops-money';
+let moneyOpen = sessionStorage.getItem(PW_KEY) === MONEY_PW;
 
 /* ---------- who are you ---------- */
 const NAME_KEY = 'wedding-ops-name';
@@ -675,15 +707,40 @@ async function load(){
   return {};
 }
 async function loadDocs(){
-  const { data, error } = await sb.storage.from(BUCKET).list('', { limit:200, sortBy:{ column:'created_at', order:'desc' } });
+  const [{ data, error }, lab] = await Promise.all([
+    sb.storage.from(BUCKET).list('', { limit:200, sortBy:{ column:'created_at', order:'desc' } }),
+    sb.from('doc_labels').select('*')
+  ]);
   docs = error ? [] : (data || []).filter(f => f.name !== '.emptyFolderPlaceholder');
+  labels = {};
+  if (!lab.error) for (const r of (lab.data || [])) labels[r.storage_name] = r;
 }
+const prettyName = f => (labels[f.name]?.label) || f.name.replace(/^\d+__/,'');
 const paidFor = id => D.payments.filter(p=>p.vendor_id===id).reduce((a,p)=>a+Number(p.amount),0);
 const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
 
 /* ---------- render ---------- */
 function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
   menu(); runsheet(); guestRoster(); people(); renderDocs(); }
+
+function applyMoneyLock(){
+  $('#moneyLock').hidden = moneyOpen;
+  $('#moneyBody').hidden = !moneyOpen;
+  $$('.tally .mny').forEach(d => d.hidden = !moneyOpen);
+}
+
+$('#lockForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if ($('#lockPw').value === MONEY_PW){
+    moneyOpen = true;
+    sessionStorage.setItem(PW_KEY, MONEY_PW);
+    $('#lockPw').value = ''; $('#lockErr').textContent = '';
+    applyMoneyLock(); header();
+  } else {
+    $('#lockErr').textContent = 'That is not it. Ask Josh.';
+    $('#lockPw').select();
+  }
+});
 
 function header(){
   const total = D.vendors.reduce((a,v)=>a+Number(v.total||0),0);
@@ -692,6 +749,9 @@ function header(){
   const soon = D.vendors.filter(v=>v.due_date && daysTo(v.due_date)<=30).reduce((a,v)=>a+(owed(v)||0),0);
   const days = Math.ceil((WEDDING_DATE - new Date())/86400000);
   $('#tDays').textContent = days > 0 ? days : (days === 0 ? 'Today' : '—');
+  $('#tTasks').textContent = D.tasks.filter(t=>!t.done).length;
+  applyMoneyLock();
+  if (!moneyOpen) return;
   $('#tTotal').textContent = money0(total);
   $('#tPaid').textContent = money0(paid);
   $('#tDue').textContent = money0(due);
@@ -869,9 +929,12 @@ function renderDocs(){
     const url = sb.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl;
     const when = f.created_at ? new Date(f.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
     const size = f.metadata?.size ? kb(f.metadata.size) : '';
+    const lab = labels[f.name];
+    const meta = [when, size, lab?.renamed_by ? `renamed by ${esc(lab.renamed_by)}` : ''].filter(Boolean).join(' · ');
     return `<div class="doc"><div class="ic">${ext||'FILE'}</div>
-      <div class="dn"><a href="${url}" target="_blank" rel="noopener">${esc(f.name.replace(/^\d+__/,''))}</a>
-        <div class="dm">${[when,size].filter(Boolean).join(' · ')}</div></div></div>`;
+      <div class="dn"><a href="${url}" target="_blank" rel="noopener">${esc(prettyName(f))}</a>
+        <div class="dm">${meta}</div></div>
+      <button class="dr" data-rename="${esc(f.name)}">Rename</button></div>`;
   }).join('');
 }
 
@@ -932,6 +995,20 @@ document.addEventListener('click', async e=>{
     $('#payTitle').textContent = 'Correct the payment to ' + ((D.vendors.find(v=>v.id===row.vendor_id)||{}).name || '');
     $('#payDate').value = row.paid_on; $('#payAmt').value = Number(row.amount); $('#payMethod').value = row.method || '';
     $('#paySave').textContent = 'Save correction'; dlg.showModal(); return;
+  }
+  const rn = e.target.closest('[data-rename]');
+  if (rn){
+    const key = rn.dataset.rename;
+    const f = docs.find(d => d.name === key); if (!f) return;
+    const next = prompt('Display name for this file:', prettyName(f));
+    if (next === null) return;
+    const label = next.trim();
+    if (!label){
+      await sb.from('doc_labels').delete().eq('storage_name', key);
+    } else {
+      await sb.from('doc_labels').upsert({ storage_name:key, label, renamed_by:me });
+    }
+    await loadDocs(); renderDocs(); return;
   }
   const pay = e.target.closest('[data-pay]');
   if (pay){

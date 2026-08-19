@@ -14,7 +14,7 @@ change you make is stamped with it.
 | Region | us-east-1 |
 | Key in `index.html` | publishable (`sb_publishable_...`) — safe to commit |
 
-Tables: `vendors`, `payments`, `tasks`. Storage bucket: `documents`.
+Tables: `vendors`, `payments`, `tasks`, `doc_labels`. Storage bucket: `documents`.
 RLS is on, with open read/write policies for the `anon` role. Anyone holding
 the publishable key can read and edit — that key ships in `index.html`, so
 treat the Pages URL as the only thing standing between the board and a
@@ -72,6 +72,26 @@ Two consequences worth knowing:
 
 Keep Drive as the archive; this bucket is for what people need to open from
 their phone.
+
+## The Money passphrase
+
+The Money tab is gated behind `jgwedding`, held in `sessionStorage` so it asks
+once per browser session. The header tallies for contracted, paid and
+outstanding stay hidden until it's entered; days-out and open-task counts
+show either way. The board now opens on Alerts rather than Money.
+
+**This is a curtain, not a lock.** The vendor and payment rows still come down
+through the public key, so anyone who opens devtools can read them whether or
+not they type the passphrase. It stops someone glancing at the screen over
+your shoulder. It does not stop anyone who wants the numbers. Real protection
+would mean putting auth back and writing an RLS policy against it.
+
+## Renaming documents
+
+`doc_labels` maps a storage filename to a display label. Renaming in the UI
+writes a row there; the stored object keeps its original timestamped name, so
+existing links never break. Clearing the box deletes the row and the file
+falls back to its real filename. Each rename records who did it.
 
 ## Schema notes
 
