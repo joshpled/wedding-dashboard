@@ -165,6 +165,13 @@ td.n{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric
 .rfilter input{flex:1;min-width:180px;max-width:280px}
 
 /* ---- Menu ---- */
+.share{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;
+  background:var(--brass-lo);border:1px solid var(--brass-line);border-radius:var(--r);padding:15px 18px;margin-bottom:22px}
+.share .txt{min-width:220px;flex:1}
+.share .txt strong{display:block;font-size:15.5px}
+.share .txt span{font-size:13.5px;color:var(--ink-2);line-height:1.5}
+.share a.btn{text-decoration:none;display:inline-block}
+
 .course{margin-bottom:26px}
 .course-h{display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--brass-line);margin-bottom:14px;flex-wrap:wrap}
 .course-h h3{font-size:15px;letter-spacing:.18em;color:var(--brass)}
@@ -274,6 +281,10 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="guests" aria-selected="false">Guests<span class="badge" id="bGuests">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
+    <a href="timeline.html" target="_blank" rel="noopener"
+       style="margin-left:auto;align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
+              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+              font-size:14.5px;font-weight:600">Timeline &#8599;</a>
   </nav>
 
   <section class="panel" id="p-money" hidden>
@@ -359,6 +370,11 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   </section>
 
   <section class="panel" id="p-runsheet" hidden>
+    <div class="share">
+      <div class="txt"><strong>Shareable timeline</strong>
+        <span>A clean, printable version with no money or task list — safe to send to vendors, the wedding party and family.</span></div>
+      <a class="btn" href="timeline.html" target="_blank" rel="noopener">Open timeline</a>
+    </div>
     <div class="sec">
       <div class="sec-h"><h2>Suggested timeline</h2><span class="hint">From Invitation Only. Rows in red conflict with something contracted.</span></div>
       <div class="card"><table><thead><tr><th style="width:110px">Time</th><th>What happens</th><th style="width:38%">Where / who</th></tr></thead><tbody id="runBody"></tbody></table></div>
