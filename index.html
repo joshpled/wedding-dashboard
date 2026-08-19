@@ -421,62 +421,63 @@ const MILESTONES = [
   { date:'2026-08-15', title:'Rehearsal time confirmed with the venue', amount:null, detail:'Still blank on the BEO, and subject to venue scheduling.' },
   { date:'2026-08-20', title:'Snyder quote expires', amount:814.50, detail:'50% deposit plus the CCRA, or the linen order lapses.' },
   { date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
-  { date:'2026-08-26', title:'PPHG final guest count and final payment', amount:16742.17, detail:'Largest single payment of the wedding.' },
+  { date:'2026-08-26', title:'PPHG final guest count and final payment', amount:17109.37, detail:'Largest single payment of the wedding.' },
   { date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
-  { date:'2026-09-05', title:'Rehearsal, 2:00 PM', amount:null, detail:'The American Theater, 446 King Street. Loraine runs it.' },
+  { date:'2026-09-05', title:'Rehearsal, 1:00 PM', amount:null, detail:'The American Theater, 446 King Street. The BEO says 1:00 — you have circulated 2:00.' },
   { date:'2026-09-05', title:'Pool party, 4:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes from the venue.' },
   { date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
   { date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
 ];
 
 const FLAGS = [
-  { lvl:'hot', h:'Everything now points at 26 August', p:[
-    'Final guest count and <strong>$16,742.17</strong> to PPHG, both due that day. It is the largest single payment of the wedding and the last date anything about the catering can move.',
-    'Two things have to land before it: the <strong>seating chart</strong>, because PPHG needs table and seat numbers against every dietary restriction, and the <strong>getting-ready location</strong>, which their timeline still shows as 0:00PM.'] },
+  { lvl:'hot', h:'The rehearsal is booked for 1:00 PM, not 2:00', p:[
+    'The 19 August BEO reads <strong>REHEARSAL TIME: 9/5 @ 1PM</strong>. Everything you have circulated says 2:00.',
+    'PPHG also notes rehearsal times are always subject to venue scheduling, so theirs is probably the real one. Confirm which it is and correct it everywhere before the wedding party books flights around the wrong hour.'] },
 
-  { lvl:'warn', h:'PPHG’s own paperwork is still half empty', p:[
-    'On page 5 of the BEO the vendor list — photographer, videographer, rentals, floral, cake, officiant, ceremony musicians, entertainment — is <strong>entirely blank</strong>, and so is the rehearsal time. You now have every one of those names. Send them over so their staff and security are staged correctly.',
-    'Still open on the same document: <strong>Gabriel’s drink of choice</strong>, the gold chivari chair and table counts, and the vendor meal location.'] },
+  { lvl:'hot', h:'Vendor meals were cut from 8 to 6', p:[
+    'The order now reads <strong>2 photo, 1 DJ, 3 planner</strong> — six covers. Anthony coming off as a guest accounts for one, but the <strong>AV line has gone too</strong>, and the ceremony musicians were never on it.',
+    'Jacob is on site from 3:30 to past 10:30. Lauren and the "Friends of Grooms" are there through the ceremony. At six covers, none of them eats.',
+    'Decide who genuinely needs feeding and get the quantity right before the 26th. Each cover is $25 plus service and tax.'] },
 
-  { lvl:'warn', h:'Three vendor meals are still unnamed', p:[
-    'The BEO lists 1 AV, 2 photo, 1 DJ, 2 planner and <strong>3 TBD</strong>, billed at eight covers. With Anthony eating as a guest, eight is the right number — but nobody has said who the three are.',
-    'The ceremony musician and Loraine’s second body account for two. Name the third.'] },
+  { lvl:'warn', h:'Everything now points at 26 August', p:[
+    'Final guest count and <strong>$17,109.37</strong> to PPHG, both due that day. It is the largest single payment of the wedding and the last date anything about the catering can move.',
+    'The <strong>seating chart</strong> has to land before it — PPHG needs table and seat numbers against every dietary restriction.'] },
 
-  { lvl:'hot', h:'The Snyder quote expires on 20 August', p:[
-    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>. The quote lapses on 20 August.',
-    'Two things make this worse than a normal deadline. The 5 wheat matte satin sweetheart linens are a <strong>specialty order, not in stock</strong> — they have to be brought in. And nothing on the order can be altered within three weeks of the 3 September pick-up.'] },
-
-  { lvl:'warn', h:'Saturday moves everyone across the bridge', p:[
-    'Rehearsal is <strong>2:00 PM at The American Theater</strong>, 446 King Street. The pool party is <strong>4:00 to 9:00 PM at Restore at Carolina Park</strong>, 1588 Bloom St, Mt Pleasant.',
-    'That is roughly <strong>25 minutes</strong> apart over the Ravenel Bridge, and it is a Saturday of Labor Day weekend. Two hours is enough, but tell people both addresses up front so nobody follows the wrong car.'] },
-
-  { lvl:'warn', h:'Loose ends with a cost attached', p:[
-    '<strong>Palmetto Strings</strong> — $650 outstanding with no due date on file. Lauren has not been asked.',
-    '<strong>Jacob’s AV deposit</strong> — paid, but the amount is not recorded anywhere, so his true balance is unknown.',
-    '<strong>Father Will</strong> — no honorarium agreed, and no confirmation he is coming to the rehearsal.',
-    '<strong>Anthony Rivera</strong> — scope, deliverables and cost all unconfirmed.',
-    '<strong>Florals</strong> — Stephen and Amanda are booked but nothing is quoted.'] },
+  { lvl:'warn', h:'The Snyder quote expires on 20 August', p:[
+    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>. The quote lapses tomorrow.',
+    'The BEO now depends on it: the place setting reads <strong>Black Napkin (Snyder)</strong>. No linen order, no napkins.'] },
 
   { lvl:'warn', h:'Stars Lounge has to do two jobs an hour apart', p:[
-    'You are getting ready there from <strong>4:30</strong>, arriving about 80% ready. Cocktail hour is staged in the same room from <strong>5:40</strong>.',
-    'That gives PPHG the ceremony half-hour to flip it, and it means anything personal — garment bags, bags, shoes — has to be out of there before 5:00. Confirm the turnaround with Olivia and tell Loraine so someone owns clearing the room.'] },
+    'PPHG has you arriving at <strong>3:45</strong> for final touches in Stars Lounge. Cocktail hour is staged in the same room from 5:40.',
+    'They have set it with 3 lowboys, 3 cocktail tables and 9 chairs. Anything personal has to be clear before 5:00 — confirm the turnaround with Olivia and give Loraine someone to own it.'] },
 
-  { lvl:'warn', h:'The all-guest photo needs announcing or it will not happen', p:[
-    'Straight after the ceremony everyone stays in the Cinema for a photo with all 80 guests. Left to themselves, half the room stands up and walks toward the bar.',
-    'Have Father Will say it at the close of the ceremony, or the DJ over the room. It also pushes cocktail hour service to about <strong>5:40</strong> — Olivia should know so food and drink are not sitting out for ten minutes.'] }
+  { lvl:'warn', h:'Four vendor slots are still blank on their paperwork', p:[
+    'Photographer, rentals, cake, officiant, musicians, entertainment and AV are all filled in now. Still empty: <strong>videographer, lighting, transportation, getaway send-off and floral</strong>.',
+    'Floral is the one that matters — Stephen and Amanda Cubello are delivering at 1:00 PM and PPHG has no record of them. The others are genuinely nil, so tell Olivia that rather than leaving her guessing.'] },
+
+  { lvl:'warn', h:'Loose ends with a cost attached', p:[
+    '<strong>Palmetto Strings</strong> — $650 outstanding with no due date on file.',
+    '<strong>Jacob’s AV deposit</strong> — paid, but the amount is not recorded anywhere.',
+    '<strong>Father Will</strong> — no honorarium agreed.',
+    '<strong>Anthony Rivera</strong> — scope, deliverables and cost all unconfirmed.',
+    '<strong>Florals</strong> — Stephen and Amanda are booked but nothing is quoted.',
+    '<strong>Gabriel’s drink of choice</strong> — still blank after four revisions.'] }
 ];
 
 const DECISIONS = [
-  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses', impact:'$1,629 order at risk', by:'20 Aug' },
+  { q:'Rehearsal time', s:'BEO says 1:00 PM, you have told people 2:00', impact:'None, but it has to be right', by:'20 Aug' },
+  { q:'Vendor meal count', s:'Cut to 6. Jacob and the ceremony musicians have no plate.', impact:'≈ $34 all-in per cover added', by:'24 Aug' },
+  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses — and the BEO now names Snyder for the napkins', impact:'$1,629 order at risk', by:'20 Aug' },
+  { q:'Beer package', s:'Upgraded from Reserve to Grand Cru — Mich Ultra, Stella and Westbrook IPA', impact:'+$320 plus fees', by:'21 Aug' },
+  { q:'Ceremony musicians', s:'BEO lists "Palmetto Strings + Friends of Grooms" — who are the friends?', impact:'Possible extra vendor meals', by:'24 Aug' },
   { q:'Gabriel’s drink of choice', s:'Still blank on the BEO', impact:'None', by:'26 Aug' },
-  { q:'Vendor meals — 3 TBD', s:'Ceremony musician and Loraine’s second body cover two. Name the third.', impact:'Already billed at 8', by:'15 Aug' },
   { q:'Family formal list', s:'Needed in shooting order — the portrait window is 5:55 to 6:30', impact:'None, but it protects the reception', by:'25 Aug' },
-  { q:'Palmetto Strings balance', s:'$650 outstanding, no due date on file', impact:'$650', by:'15 Aug' },
-  { q:'Jacob’s AV deposit', s:'Paid, amount never recorded', impact:'$500 total', by:'15 Aug' },
-  { q:'Father Will’s honorarium', s:'Nothing agreed', impact:'Unknown', by:'15 Aug' },
-  { q:'Videography scope', s:'Anthony is booked but deliverables and cost are unconfirmed', impact:'Unknown', by:'15 Aug' },
-  { q:'Floral scope', s:'Stephen and Amanda are booked, nothing quoted', impact:'Unknown', by:'15 Aug' },
-  { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'20 Aug' }
+  { q:'Palmetto Strings balance', s:'$650 outstanding, no due date on file', impact:'$650', by:'22 Aug' },
+  { q:'Jacob’s AV deposit', s:'Paid, amount never recorded', impact:'$500 total', by:'22 Aug' },
+  { q:'Father Will’s honorarium', s:'Nothing agreed', impact:'Unknown', by:'22 Aug' },
+  { q:'Videography scope', s:'Anthony is booked but deliverables and cost are unconfirmed', impact:'Unknown', by:'22 Aug' },
+  { q:'Floral scope', s:'Stephen and Amanda are booked, nothing quoted, and PPHG has no record of them', impact:'Unknown', by:'24 Aug' },
+  { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'26 Aug' }
 ];
 
 const CLOSED = [
@@ -496,7 +497,10 @@ const CLOSED = [
   'Photography at 5 hours, 4:30 – 9:30 PM — getting ready in Stars Lounge, all-guest photo and couple portraits in the Cinema, family during cocktail hour',
   'No send-off — photographer leaves at 9:30 and the party runs to 10:30',
   'Wedding party arrives at the venue at 4:00 PM',
-  'All glassware coming from PPHG in-house — nothing rented',
+  'All glassware from PPHG — 275 champagne coupes, 360 wine glasses, 324 highballs',
+  'Ballroom set: 80 gold chivari chairs, 10 guest tables, sweetheart and cake tables, 3 station tables, 2 bars',
+  'Stars Lounge set: 3 lowboys, 3 cocktail tables, 9 chairs',
+  'PPHG providing bar and station signs',
   'Linen pick-up and return handled by Invitation Only',
   'Florals with Stephen, arranged and delivered by Amanda Cubello',
   'Videography with Anthony Rivera at Blue Box Digital — attending as a guest',
@@ -518,37 +522,37 @@ const MENU = [
   { c:'Bar', t:'5:30 PM · five hours · hosted', items:[
     { n:'Reserve Wine', d:'House Red · House White', q:80, p:18 },
     { n:'Grand Cru Wine Varietal', d:'Arte Latino Cava', q:80, p:4 },
-    { n:'Reserve Beer', d:'Michelob Ultra · Stella Artois', q:80, p:14 },
+    { n:'Grand Cru Beer', d:'Mich Ultra · Stella Artois · Westbrook IPA', tags:['Upgraded'], q:80, p:18 },
     { n:'Non-Alcoholic Package', d:'sweet tea, unsweet tea, lemonade, full mixer selection', tags:['Required with beer & wine'], q:80, p:10 } ] },
   { c:'Composed petite plates', t:'7:00 PM · 90 minutes · full seating', items:[
     { n:'Petite Filet', d:'yukon fondue, broccolini florets, bordelaise', tags:['Gluten free','Station 1'], q:77, p:26 },
     { n:'Buttermilk Fried Chicken', d:'three cheese mac, collard greens, pepper vinegar', tags:['Station 2'], q:77, p:20 },
     { n:'Ricotta Ravioli', d:'poached asparagus, goat cheese, lemon beurre blanc', tags:['Vegetarian','Station 3'], q:77, p:18 },
     { n:'Glazed Butternut Squash', d:'cider glaze, warm chickpea salad', tags:['Vegan','Gluten free'], q:3, p:38 } ] },
-  { c:'Toast', t:'7:45 PM · passed', items:[
-    { n:'Champagne Toast', d:'Arte Latino Cava, passed to every guest', tags:['Complimentary'], q:80, p:0 } ] },
+  { c:'Toast', t:'7:50 PM · passed', items:[
+    { n:'Champagne Toast', d:'Arte Latino Cava, passed to every guest, served in a champagne coupe', tags:['Complimentary'], q:80, p:0 } ] },
   { c:'Cake', t:'8:15 PM', items:[
-    { n:'Publix — two tiers', d:'Cut and served by the PPHG team. Baker supplies the stand and any anniversary-tier box; delivery must be same day.', tags:['Confirmed'], q:1, p:0 } ] },
+    { n:'Publix — two tiers', d:'Set on the left side of the stage, cut and served by PPHG onto salad plates. Baker supplies the stand and any anniversary-tier box; delivery must be same day.', tags:['Confirmed'], q:1, p:0 } ] },
   { c:'Vendor meals', t:'7:30 PM · one hour after stations open', items:[
-    { n:'Stations, two plates max', d:'1 AV · 2 photo · 1 DJ · 2 planner · 3 TBD. The videographer is counted as a guest.', q:8, p:25 } ] }
+    { n:'Stations, two plates max', d:'2 photo · 1 DJ · 3 planner. Cut from 8 — the AV tech and ceremony musicians are no longer covered.', q:6, p:25 } ] }
 ];
 
 const MENU_NOTES = [
   'Preset: iced water at every seat.',
-  'Place setting: water glass, wine glass, dinner fork, dinner knife, napkin.',
-  'Dinner wines poured tableside: Pinot Grigio and Pinot Noir.',
+  'Place setting: highball glass, universal wine glass, dinner fork, dinner knife and a black Snyder napkin.',
+  'Dinner wines poured tableside: house red and house white.',
   'Joshua’s drink of choice: water and white wine. Gabriel’s: still to be chosen.',
-  'Three station attendants and two additional servers on the order.',
-  'Catering equipment rental is estimated at $100 per station and trues up to actual.',
-  'PPHG supplies all china, silver and glassware in-house: 140 salad plates, 140 pasta bowls, 70 dinner forks, 170 salad forks, 70 dinner knives, 100 salad knives, plus the water and wine glasses.',
-  'Gold chivari chairs and table counts are still marked TBD on the BEO.',
+  'Three station attendants and two additional servers for wine and water service.',
+  'PPHG supplies all china, silver and glassware: 160 salad plates, 160 pasta bowls, 80 dinner forks, 200 salad forks, 80 dinner knives, 80 salad knives, 275 champagne coupes, 360 wine glasses and 324 highballs.',
+  'Ballroom set with 80 gold chivari chairs, 10 guest tables, a sweetheart and a cake table, 3 station tables, 2 bars and 4 cocktail tables.',
   'Linens and napkins come from Snyder. Everything else on the table is PPHG’s.',
+  'PPHG provides the bar and station signs. Posters are client provided.',
   'Setup can begin at 9:00 AM. Earlier access needs approval a month out and may require a parking buyout.'
 ];
 
 const RUNSHEET = [
   { t:'Thu 3 Sep', e:'Invitation Only collects the linens', w:'Snyder, 3875 Meeting St · returned Tue 8 Sep' },
-  { t:'Sat 2:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · run by Loraine' },
+  { t:'Sat 1:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · BEO says 1:00, you have circulated 2:00', flag:true },
   { t:'Sat 4–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant · <a href="https://maps.app.goo.gl/9sbx3BhfSvYbhJpV8" target="_blank" rel="noopener">open in Maps</a>' },
   { t:'9:00 AM',  e:'Venue opens' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
@@ -560,7 +564,8 @@ const RUNSHEET = [
   { t:'3:45 PM',  e:'Couple arrival', w:'Optional venue reveal' },
   { t:'4:00 PM',  e:'Wedding party arrives at the venue' },
   { t:'4:30 PM',  e:'Photography begins', w:'Richard Bell · 5 hours confirmed, runs to 9:30 PM' },
-  { t:'4:30 PM',  e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready · Richard Bell begins coverage' },
+  { t:'3:45 PM',  e:'Grooms arrive on site', w:'Final touches in Stars Lounge, arriving about 80% ready' },
+  { t:'4:30 PM',  e:'Richard Bell begins coverage', w:'2 photographers · getting-ready and detail shots in Stars Lounge' },
   { t:'4:30 PM',  e:'Preludes and guest arrival', w:'Popcorn at the concession stand in the lobby' },
   { t:'5:00 PM',  e:'Ceremony', w:'In the Theatre · Father Will' },
   { t:'5:30 PM',  e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony — about ten minutes' },
@@ -570,10 +575,10 @@ const RUNSHEET = [
   { t:'6:45 PM',  e:'Formalities',
     sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
   { t:'7:00 PM',  e:'Dinner stations open', w:'Three petite-plate stations, 90 minutes' },
-  { t:'7:30 PM',  e:'Vendor meals', w:'Lobby, tentative. 8 covered — videographer eats as a guest.' },
-  { t:'7:45 PM',  e:'PPHG passes champagne' },
+  { t:'7:30 PM',  e:'Vendor meals', w:'Location TBD. Only 6 covered — 2 photo, 1 DJ, 3 planner.' },
+  { t:'7:50 PM',  e:'PPHG passes champagne', w:'Served in champagne coupes' },
   { t:'7:55 PM',  e:'Roasts and toasts' },
-  { t:'8:15 PM',  e:'Cutting of the cake', w:'PPHG cuts and serves' },
+  { t:'8:15 PM',  e:'Cutting of the cake', w:'Left side of the stage · PPHG cuts and serves onto salad plates' },
   { t:'8:30 PM',  e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
   { t:'9:30 PM',  e:'Photographer departs', w:'End of the contracted 5 hours. No send-off.' },
   { t:'10:15 PM', e:'Informal last call for alcohol' },
@@ -817,7 +822,7 @@ function guestRoster(){
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Plated at', 77, 'Each petite station on the BEO.'],
     ['Restrictions', flagged.length, 'Across four dietary groups.'],
-    ['Vendor meals', 8, 'Separate from the count. The videographer eats as a guest.']
+    ['Vendor meals', 6, 'Cut from 8. The AV tech and musicians are not covered.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
   $('#dietGrid').innerHTML = Object.entries(DIET_META).map(([key,m])=>{
