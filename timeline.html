@@ -125,11 +125,11 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
 
   <div class="photo">
     <h2>Photography</h2>
-    <p class="lede">Richard Bell Photography · 2 photographers · 5 hours contracted.
-      Coverage is a fixed window, so anything you want photographed has to sit inside it.</p>
+    <p class="lede">Richard Bell Photography · 2 photographers · 5 contracted hours plus a complimentary
+      30 minutes at the start. On site from 4:00, coverage ends at 9:30.</p>
     <div class="bookend">
-      <div><div class="k">Arrives</div><div class="v">4:30 PM</div></div>
-      <div><div class="k">Coverage</div><div class="v">5 hours</div></div>
+      <div><div class="k">Arrives</div><div class="v">4:00 PM</div></div>
+      <div><div class="k">Coverage</div><div class="v">5.5 hours</div></div>
       <div><div class="k">Ends</div><div class="v">9:30 PM</div></div>
     </div>
     <div class="card" id="photoSheet"></div>
@@ -147,7 +147,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
       <li>Setup can begin at 9:00 AM. Anything earlier needs venue approval.</li>
       <li>Stars Lounge is the getting-ready room until the ceremony, then flips to cocktail hour. Anything personal needs clearing out before 5:00.</li>
       <li>Straight after the ceremony everyone stays in the Cinema for an all-guest photo. Someone has to announce it, or the room empties.</li>
-      <li>Photography runs 4:30 to 9:30 PM, starting with getting ready at the theater. No send-off coverage — the photographer leaves at 9:30.</li>
+      <li>Photography runs 4:00 to 9:30 PM — five contracted hours plus a complimentary half hour at the start. No send-off coverage; the photographers leave at 9:30.</li>
       <li>All amplified music concludes at 10:30 PM and the bar closes at the same time.</li>
       <li>Venue closes at midnight. PPHG breakdown concludes by 12:30 AM.</li>
     </ul>
@@ -180,7 +180,8 @@ const DAYS = [
     { t:'3:30', e:'Sound tech and piano arrive', w:'Jacob Scaife · Palmetto Strings' },
     { t:'3:45', e:'Couple arrival', w:'Optional venue reveal' },
     { t:'4:00', e:'Wedding party arrives at the venue' },
-    { t:'4:30', e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready · Richard Bell begins coverage' },
+    { t:'4:00', e:'Photographers arrive', w:'Richard Bell · complimentary half hour before the contracted five' },
+    { t:'4:30', e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready' },
     { t:'4:30', e:'Doors open, guests arrive', w:'Preludes playing · popcorn at the concession stand in the lobby' },
     { t:'5:00', e:'Ceremony', w:'In the Cinema · Father Will officiating · up to 30 minutes', key:true },
     { t:'5:30', e:'All-guest photo in the Cinema', w:'Everyone stays seated straight after the ceremony — about ten minutes' },
@@ -210,15 +211,16 @@ const DAYS = [
 ];
 
 const PHOTO = [
-  { t:'4:30', e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready, so this is finishing touches and detail shots. Both photographers on site.',
-    sub:['Details gathered in advance: rings, invitation suite, shoes, florals','Guests arrive from 4:30 too — the lobby is the public route, Stars Lounge is not'] },
+  { t:'4:00', e:'Photographers arrive', w:'Complimentary half hour at the front of the day. Details and the empty rooms before anyone is in them.',
+    sub:['Details gathered in advance: rings, invitation suite, shoes, florals','The Cinema and Ballroom photograph best now, fully set and empty'] },
+  { t:'4:30', e:'Getting ready in Stars Lounge', w:'Arriving about 80% ready, so this is finishing touches. Guests start arriving at the same time — the lobby is the public route, Stars Lounge is not.' },
   { t:'4:50', e:'Guest arrivals and preludes', w:'Candids in the lobby, popcorn at the concession stand, preludes playing.' },
   { t:'5:00 – 5:30', e:'Ceremony', w:'In the Cinema. Two angles — one at the front for faces, one at the back for the room.' },
   { t:'5:30 – 5:40', e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony. This has to be announced from the front or half the room walks out.' },
   { t:'5:40 – 5:55', e:'Couple portraits in the Cinema', w:'Guests released to cocktail hour. The room is still dressed and now empty.' },
   { t:'5:55 – 6:30', e:'Family and wedding party portraits', w:'In or near Stars Lounge while cocktail hour runs.',
     sub:['Family formals — bring a written list in shooting order','Wedding party','Anything left of the couple set'] },
-  { t:'6:30', e:'Ballroom detail shots', w:'Photographed before guests move in. Tables, florals, cake, sweetheart table.' },
+  { t:'6:30', e:'Ballroom detail shots', w:'Any room shots not already covered at 4:00, before guests move in.' },
   { t:'6:45', e:'Entrances', w:'Wedding party introduced, then the couple. Both photographers on the door — one wide, one tight.' },
   { t:'6:50 – 7:00', e:'First dance and parent dances', w:'Then welcome, thank you and the blessing.' },
   { t:'7:00 – 7:45', e:'Dinner and candids', w:'Stations open. Table shots and guest candids while people are seated and findable.' },
