@@ -142,13 +142,42 @@ td.n{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric
 .calc .n{font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.5}
 
 /* ---- Guests ---- */
+.tl-i .cf{margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tl-i .cfby{font-size:12.5px;color:var(--moss);font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.tl-i.ok:before{background:var(--moss-lo);border-color:var(--moss)}
+.tl-i.ok .t{color:var(--ink-3)}
+
+details.done-wrap{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow)}
+details.done-wrap summary{padding:13px 18px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.13em;font-size:14px;font-weight:700;color:var(--ink-2);
+  list-style:none;display:flex;align-items:center;gap:10px}
+details.done-wrap summary::-webkit-details-marker{display:none}
+details.done-wrap summary:before{content:"▸";color:var(--brass);font-size:12px}
+details.done-wrap[open] summary:before{content:"▾"}
+details.done-wrap summary:hover{color:var(--ink);background:#FCFBF9}
+details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;overflow-y:auto}
+.dgroup{padding:9px 18px;background:#FCFBF9;border-bottom:1px solid var(--rule-2);
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
+  font-size:12px;font-weight:700;color:var(--ink-3)}
+
+.gtable input{border:1px solid transparent;background:transparent;padding:5px 7px;width:100%;font-size:14px;border-radius:3px}
+.gtable input:hover{border-color:var(--rule-2);background:#fff}
+.gtable input:focus{border-color:var(--brass-line);background:#fff}
+.gtable select{padding:5px 7px;font-size:13.5px;border-color:var(--rule-2)}
+.gtable td{padding:4px 8px;vertical-align:middle}
+.gtable .x{background:none;border:0;color:var(--ink-3);font-size:17px;padding:3px 7px;border-radius:3px}
+.gtable .x:hover{color:var(--rust);background:var(--rust-lo)}
+
 .dietgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .dcard{border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px;background:var(--card);box-shadow:var(--shadow);border-top:4px solid var(--rule)}
 .dcard.vegan{border-top-color:var(--moss)} .dcard.gluten{border-top-color:var(--brass)}
 .dcard.dairy{border-top-color:var(--plum)} .dcard.nut{border-top-color:var(--rust)}
+.dcard.other{border-top-color:var(--ink-3)}
 .dcard .cnt{font-family:"IBM Plex Mono",monospace;font-size:38px;line-height:1;font-weight:500}
 .dcard.vegan .cnt{color:var(--moss)} .dcard.gluten .cnt{color:var(--brass)}
 .dcard.dairy .cnt{color:var(--plum)} .dcard.nut .cnt{color:var(--rust)}
+.dcard.other .cnt{color:var(--ink-2)}
 .dcard .lbl{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:12.5px;font-weight:700;margin-top:6px}
 .dcard ul{margin:10px 0 0;padding:10px 0 0;list-style:none;border-top:1px solid var(--rule-2);font-size:14px;color:var(--ink-2);line-height:1.75}
 .dcard .srv{margin-top:10px;font-size:12.5px;color:var(--ink-3);font-style:italic;line-height:1.45}
@@ -355,7 +384,12 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         </div>
       </div>
     </div>
-    <div class="sec"><div class="sec-h"><h2>Done</h2></div><div class="card"><div id="taskDone"></div></div></div>
+    <div class="sec">
+      <details class="done-wrap" id="doneWrap">
+        <summary>Done <span id="doneCount" style="color:var(--ink-3);font-weight:600"></span></summary>
+        <div class="inner" id="taskDone"></div>
+      </details>
+    </div>
   </section>
 
   <section class="panel" id="p-menu" hidden>
@@ -395,13 +429,21 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <div class="dietgrid" id="dietGrid"></div>
     </div>
     <div class="sec">
-      <div class="sec-h"><h2>Confirmed guests</h2><span class="hint">All 69 accounted for.</span></div>
+      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click any field to edit. Pick a restriction from the dropdown, or choose “Add another…” for one that isn’t listed. Changes sync to everyone.</span></div>
       <div class="rfilter">
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
         <button class="btn ghost sm" data-gf="diet">Restrictions only</button>
       </div>
-      <div class="roster" id="roster"></div>
+      <div class="card"><table class="gtable">
+        <thead><tr><th style="width:24%">Name</th><th style="width:26%">Email</th><th style="width:17%">Phone</th>
+          <th style="width:16%">Dietary</th><th>Notes</th><th style="width:40px"></th></tr></thead>
+        <tbody id="guestBody"></tbody>
+      </table>
+      <div class="addrow">
+        <input name="title" id="ngName" placeholder="Add a guest…">
+        <button class="btn" id="ngAdd">Add guest</button>
+      </div></div>
     </div>
   </section>
 
@@ -456,71 +498,54 @@ const BUCKET = 'documents';
 const WEDDING_DATE = new Date('2026-09-06T17:00:00-04:00');
 const OWNERS = ['Josh','Gabriel','Josh & Gabriel','Barbara','Josh & Barbara','Loraine'];
 
-const GUESTS = [{"n": "Ally Allard-Smith", "k": null, "d": "", "p": false}, {"n": "Amanda Cubello", "k": null, "d": "", "p": false}, {"n": "Angie Bostinto", "k": null, "d": "", "p": false}, {"n": "Annie Dillon", "k": null, "d": "", "p": false}, {"n": "Anthony Rivera", "k": null, "d": "", "p": false}, {"n": "Armando Rivera", "k": "Vegan", "d": "Vegan", "p": false}, {"n": "Ashanti Williams", "k": "Nut allergy", "d": "Almonds", "p": false}, {"n": "Barbara Taylor", "k": null, "d": "", "p": false}, {"n": "Becky Smith", "k": null, "d": "", "p": false}, {"n": "Belinda Smith", "k": null, "d": "", "p": false}, {"n": "Blair Perry", "k": null, "d": "", "p": false}, {"n": "Calvin Lathan", "k": null, "d": "", "p": false}, {"n": "Catherine Gluodenis", "k": null, "d": "", "p": false}, {"n": "Chase Lee", "k": null, "d": "Dairy (Odessa and Loretta)", "p": true}, {"n": "Chris Fagone", "k": null, "d": "", "p": false}, {"n": "Cindy Miller", "k": null, "d": "", "p": false}, {"n": "Czej Potynska", "k": null, "d": "", "p": false}, {"n": "Dillan Borges", "k": null, "d": "", "p": false}, {"n": "Edwin Mejia", "k": null, "d": "", "p": false}, {"n": "Edwin Rivera", "k": null, "d": "", "p": false}, {"n": "Emily Sergo", "k": null, "d": "", "p": false}, {"n": "Gabriel Taylor", "k": null, "d": "", "p": false}, {"n": "Gianna Coronado", "k": null, "d": "", "p": false}, {"n": "Guest (unnamed)", "k": null, "d": "", "p": false}, {"n": "Imara Ashton Miles", "k": "Gluten free", "d": "Gluten free if available", "p": false}, {"n": "Janna Leigh Ryon", "k": null, "d": "", "p": false}, {"n": "Jesus Perez", "k": null, "d": "", "p": false}, {"n": "Johnathan Jimison", "k": null, "d": "", "p": false}, {"n": "Josh Mason", "k": null, "d": "", "p": false}, {"n": "Joshua Perez Leduc", "k": null, "d": "", "p": false}, {"n": "Katherine Thomas", "k": null, "d": "", "p": false}, {"n": "Kathie Schirf", "k": null, "d": "", "p": false}, {"n": "Ken Miller", "k": null, "d": "", "p": false}, {"n": "Kris Cubello", "k": null, "d": "", "p": false}, {"n": "Kristen Fitzpatrick", "k": null, "d": "", "p": false}, {"n": "Laura Schofield", "k": null, "d": "", "p": false}, {"n": "Lera Zamaraeva", "k": null, "d": "", "p": false}, {"n": "Loretta", "k": "Dairy free", "d": "Dairy (Odessa and Loretta)", "p": false}, {"n": "Lorrie Goff", "k": null, "d": "", "p": false}, {"n": "MC", "k": null, "d": "Dairy (Odessa and Loretta)", "p": true}, {"n": "Madison Wright", "k": "Nut allergy", "d": "Almonds", "p": false}, {"n": "Mario Sanclemente", "k": null, "d": "", "p": false}, {"n": "Mario Sanclemente", "k": null, "d": "", "p": false}, {"n": "Maritza Sanchez", "k": null, "d": "", "p": false}, {"n": "Melody Flores", "k": null, "d": "", "p": false}, {"n": "Mikhaila Young", "k": null, "d": "", "p": false}, {"n": "Morgan Fagone", "k": null, "d": "", "p": false}, {"n": "Myrtelina Leduc", "k": null, "d": "", "p": false}, {"n": "Noelle Leinwol", "k": null, "d": "", "p": false}, {"n": "Odessa", "k": "Dairy free", "d": "Dairy (Odessa and Loretta)", "p": false}, {"n": "Oliver Gonzalez", "k": "Vegan", "d": "Vegan", "p": false}, {"n": "Ren Wilson", "k": "Gluten free", "d": "Gluten", "p": false}, {"n": "Reva Thompson", "k": null, "d": "", "p": false}, {"n": "Sam Caps", "k": "Gluten free", "d": "Gluten", "p": false}, {"n": "Sergio Dijiani", "k": null, "d": "", "p": false}, {"n": "Shani Prewitt", "k": null, "d": "", "p": false}, {"n": "Sheila Rivera", "k": "Vegan", "d": "Vegan", "p": false}, {"n": "Skip Schirf", "k": null, "d": "", "p": false}, {"n": "Sonia Leduc", "k": null, "d": "", "p": false}, {"n": "Sophia Sanclemente", "k": null, "d": "", "p": false}, {"n": "Stephani Mason", "k": null, "d": "", "p": false}, {"n": "Thomas Gluodenis", "k": null, "d": "", "p": false}, {"n": "Tomasita Negron", "k": null, "d": "", "p": false}, {"n": "Will Buck", "k": null, "d": "", "p": false}, {"n": "Zach Rivera", "k": null, "d": "", "p": false}, {"n": "Zoe BF", "k": null, "d": "", "p": false}, {"n": "Zoe Rivera", "k": null, "d": "", "p": false}, {"n": "Zulma Leduc", "k": null, "d": "", "p": false}, {"n": "Zulmarie Lee", "k": null, "d": "Dairy (Odessa and Loretta)", "p": true}];
-
 const MILESTONES = [
-  { date:'2026-08-07', title:'Invitation Only balance', amount:2909.75, detail:'Invoice 00498. Zelle avoids the 3% fee.' },
-  { date:'2026-08-12', title:'Markel certificate of insurance to PPHG', amount:null, detail:'They need to be named as additional insured.' },
-  { date:'2026-08-12', title:'Getting-ready location and times to Olivia', amount:null, detail:'The BEO still shows 0:00PM for grooms arrival and first look.' },
-  { date:'2026-08-15', title:'Rehearsal time confirmed with the venue', amount:null, detail:'Still blank on the BEO, and subject to venue scheduling.' },
-  { date:'2026-08-20', title:'Snyder quote expires', amount:814.50, detail:'50% deposit plus the CCRA, or the linen order lapses.' },
-  { date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
-  { date:'2026-08-26', title:'PPHG final guest count and final payment', amount:17109.37, detail:'Largest single payment of the wedding.' },
-  { date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
-  { date:'2026-09-05', title:'Rehearsal, 1:00 PM', amount:null, detail:'The American Theater, 446 King Street. The BEO says 1:00 — you have circulated 2:00.' },
-  { date:'2026-09-05', title:'Pool party, 4:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes from the venue.' },
-  { date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
-  { date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
+  { k:'snyder',   date:'2026-08-20', title:'Snyder quote expires', amount:814.50, detail:'50% deposit plus the CCRA, or the linen order lapses.' },
+  { k:'palmetto', date:'2026-08-22', title:'Palmetto Strings balance', amount:650, detail:'Venmo @palmettostrings. Contract says two weeks out.' },
+  { k:'photo',    date:'2026-08-23', title:'Richard Bell Photography balance', amount:2800, detail:'Invoice 17H1742217.' },
+  { k:'dj',       date:'2026-08-23', title:'Dream Day Charleston balance', amount:2300, detail:'A mailed check must be postmarked by this date.' },
+  { k:'seating',  date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
+  { k:'pphg',     date:'2026-08-26', title:'PPHG final guest count and final payment', amount:17109.37, detail:'Largest single payment of the wedding.' },
+  { k:'linenout', date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
+  { k:'rehearsal',date:'2026-09-05', title:'Rehearsal, 2:00 PM', amount:null, detail:'The American Theater, 446 King Street. Loraine runs it.' },
+  { k:'pool',     date:'2026-09-05', title:'Pool party, 4:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes away.' },
+  { k:'wedding',  date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
+  { k:'linenback',date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
 ];
 
 const FLAGS = [
-  { lvl:'hot', h:'The rehearsal is booked for 1:00 PM, not 2:00', p:[
-    'The 19 August BEO reads <strong>REHEARSAL TIME: 9/5 @ 1PM</strong>. Everything you have circulated says 2:00.',
-    'PPHG also notes rehearsal times are always subject to venue scheduling, so theirs is probably the real one. Confirm which it is and correct it everywhere before the wedding party books flights around the wrong hour.'] },
+  { lvl:'hot', h:'The Snyder quote expires today', p:[
+    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>.',
+    'The BEO now depends on it — the place setting reads <strong>Black Napkin (Snyder)</strong>. No linen order, no napkins. The sweetheart linens are also a specialty order that has to be brought in.'] },
 
-  { lvl:'hot', h:'Vendor meals were cut from 8 to 6', p:[
-    'The order now reads <strong>2 photo, 1 DJ, 3 planner</strong> — six covers. Anthony coming off as a guest accounts for one, but the <strong>AV line has gone too</strong>, and the ceremony musicians were never on it.',
-    'Jacob is on site from 3:30 to past 10:30. Lauren and the "Friends of Grooms" are there through the ceremony. At six covers, none of them eats.',
-    'Decide who genuinely needs feeding and get the quantity right before the 26th. Each cover is $25 plus service and tax.'] },
+  { lvl:'hot', h:'26 August is the wall', p:[
+    'Final guest count and <strong>$17,109.37</strong> to PPHG, both due that day. Largest single payment of the wedding and the last date anything about the catering can move.',
+    'The <strong>seating chart</strong> has to land before it — PPHG needs table and seat numbers against all eleven dietary restrictions.'] },
 
-  { lvl:'warn', h:'Everything now points at 26 August', p:[
-    'Final guest count and <strong>$17,109.37</strong> to PPHG, both due that day. It is the largest single payment of the wedding and the last date anything about the catering can move.',
-    'The <strong>seating chart</strong> has to land before it — PPHG needs table and seat numbers against every dietary restriction.'] },
+  { lvl:'warn', h:'Three payments land in four days', p:[
+    '22 August: $650 to Palmetto Strings. 23 August: $2,800 to Richard Bell and $2,300 to Dream Day. 26 August: $17,109.37 to PPHG.',
+    'That is <strong>$22,859 between the 22nd and the 26th</strong>, plus the Snyder deposit before then.'] },
 
-  { lvl:'warn', h:'The Snyder quote expires on 20 August', p:[
-    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>. The quote lapses tomorrow.',
-    'The BEO now depends on it: the place setting reads <strong>Black Napkin (Snyder)</strong>. No linen order, no napkins.'] },
+  { lvl:'warn', h:'Palmetto is booked to 6:00 and the room needs them to 5:55', p:[
+    'Their contract covers <strong>4:30 to 6:00 PM</strong> — prelude and ceremony only. The all-guest photo runs to 5:40 and couple portraits to 5:55, all in the Cinema where their gear is.',
+    'It fits, but with five minutes to spare. Anything past 6:00 costs <strong>$25 per 15 minutes per person</strong>, and they can decline to stay at all.'] },
 
-  { lvl:'warn', h:'Stars Lounge has to do two jobs an hour apart', p:[
-    'You arrive at <strong>3:30</strong> for the details walkthrough, then finish in Stars Lounge from 4:00. Cocktail hour is staged in the same room from 5:40.',
-    'They have set it with 3 lowboys, 3 cocktail tables and 9 chairs. Anything personal has to be clear before 5:00 — confirm the turnaround with Olivia and give Loraine someone to own it.'] },
+  { lvl:'warn', h:'PPHG still has gaps in their own paperwork', p:[
+    'Their vendor list has blanks for <strong>floral, videographer, lighting, transportation and send-off</strong>. Floral matters — Stephen and Amanda deliver at 1:00 PM and PPHG has no record of them. The rest are genuinely nil; tell Olivia that rather than leaving her guessing.',
+    'Also still blank: <strong>Gabriel’s drink of choice</strong>, and the vendor meal location.',
+    'Their timeline sheet still reads <strong>3:45PM Grooms Arrive</strong> and <strong>0:00PM First Look</strong>. You are arriving at 3:30 and there is no first look.'] },
 
-  { lvl:'warn', h:'Four vendor slots are still blank on their paperwork', p:[
-    'Photographer, rentals, cake, officiant, musicians, entertainment and AV are all filled in now. Still empty: <strong>videographer, lighting, transportation, getaway send-off and floral</strong>.',
-    'Floral is the one that matters — Stephen and Amanda Cubello are delivering at 1:00 PM and PPHG has no record of them. The others are genuinely nil, so tell Olivia that rather than leaving her guessing.'] },
-
-  { lvl:'warn', h:'Loose ends with a cost attached', p:[
-    '<strong>Palmetto Strings</strong> — $650 outstanding with no due date on file.',
-    '<strong>Jacob’s AV deposit</strong> — paid, but the amount is not recorded anywhere.',
-    '<strong>Father Will</strong> — no honorarium agreed.',
-    '<strong>Anthony Rivera</strong> — scope, deliverables and cost all unconfirmed.',
-    '<strong>Florals</strong> — Stephen and Amanda are booked but nothing is quoted.',
-    '<strong>Gabriel’s drink of choice</strong> — still blank after four revisions.'] }
+  { lvl:'warn', h:'Two things still have no number', p:[
+    '<strong>The pool party</strong> — Barbara is handling it, but nothing is quoted or tracked.',
+    '<strong>Day-after plans</strong> — no brunch, and no decision on an alternative.'] }
 ];
 
 const DECISIONS = [
-  { q:'Rehearsal time', s:'BEO says 1:00 PM, you have told people 2:00', impact:'None, but it has to be right', by:'20 Aug' },
-  { q:'Vendor meal count', s:'Cut to 6. Jacob and the ceremony musicians have no plate.', impact:'≈ $34 all-in per cover added', by:'24 Aug' },
-  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses — and the BEO now names Snyder for the napkins', impact:'$1,629 order at risk', by:'20 Aug' },
-  { q:'Beer package', s:'Upgraded from Reserve to Grand Cru — Mich Ultra, Stella and Westbrook IPA', impact:'+$320 plus fees', by:'21 Aug' },
-  { q:'Ceremony musicians', s:'BEO lists "Palmetto Strings + Friends of Grooms" — who are the friends?', impact:'Possible extra vendor meals', by:'24 Aug' },
-  { q:'Gabriel’s drink of choice', s:'Still blank on the BEO', impact:'None', by:'26 Aug' },
-  { q:'Family formal list', s:'Needed in shooting order — the portrait window is 5:55 to 6:30', impact:'None, but it protects the reception', by:'25 Aug' },
-  { q:'Palmetto Strings balance', s:'$650 outstanding, no due date on file', impact:'$650', by:'22 Aug' },
-  { q:'Jacob’s AV deposit', s:'Paid, amount never recorded', impact:'$500 total', by:'22 Aug' },
-  { q:'Father Will’s honorarium', s:'Nothing agreed', impact:'Unknown', by:'22 Aug' },
-  { q:'Videography scope', s:'Anthony is booked but deliverables and cost are unconfirmed', impact:'Unknown', by:'22 Aug' },
-  { q:'Floral scope', s:'Stephen and Amanda are booked, nothing quoted, and PPHG has no record of them', impact:'Unknown', by:'24 Aug' },
+  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses — and the BEO names Snyder for the napkins', impact:'$1,629 order at risk', by:'Today' },
+  { q:'Seating chart', s:'Needed with table and seat numbers for all eleven dietary restrictions', impact:'Blocks the 26 Aug handoff', by:'24 Aug' },
+  { q:'Family formal list', s:'Needed in shooting order — the portrait window is 5:55 to 6:30', impact:'Protects the reception', by:'25 Aug' },
+  { q:'Gabriel’s drink of choice', s:'Still blank on the BEO after four revisions', impact:'None', by:'26 Aug' },
+  { q:'Ceremony musicians', s:'BEO lists "Palmetto Strings + Friends of Grooms" — who are the friends?', impact:'None, meals are covered at 6', by:'26 Aug' },
+  { q:'Vendor meal location', s:'Still TBD on the BEO', impact:'None', by:'26 Aug' },
   { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'26 Aug' }
 ];
 
@@ -528,30 +553,32 @@ const CLOSED = [
   'Menu confirmed and signed with PPHG',
   'Guest count locked at 80 — contractual, regardless of who attends',
   'Additional venue hour restored, event runs 5:00 – 10:30 PM',
-  'Stars Lounge restored at $500 — cocktail hour confirmed there',
+  'Stars Lounge included at $500 — cocktail hour confirmed there',
   'All five hors d’oeuvres at 50 pieces each — 250 total',
   'Petite Filet and Buttermilk Fried Chicken confirmed as the stations',
+  'Beer upgraded to Grand Cru — Mich Ultra, Stella Artois, Westbrook IPA',
   'Vegan plate on the order at 3',
   'Dairy-free — two children, their mother has it covered',
-  'Vendor meals on the order at 8',
+  'Vendor meals at 6 — 2 photo, 1 DJ, 3 planner',
   'Security at 18 hours, two guards',
-  'Gelato bar removed',
-  'Cake confirmed with Publix — two tiers, cut and served by PPHG',
+  'Cake paid — Publix, two tiers, cut and served by PPHG',
   'Childcare — not being offered, all six families notified',
-  'Photography 4:00 – 9:30 PM — 5 contracted hours plus a complimentary 30 minutes. Getting ready in Stars Lounge, all-guest photo and couple portraits in the Cinema, family during cocktail hour',
-  'No send-off — photographer leaves at 9:30 and the party runs to 10:30',
+  'Rehearsal confirmed for 2:00 PM Saturday at the venue',
+  'Pool party 4:00 – 9:00 PM at Restore at Carolina Park',
   'Grooms arrive 3:30 for the details walkthrough; wedding party and photographers at 4:00',
+  'Photography 4:00 – 9:30 PM — 5 contracted hours plus a complimentary 30 minutes',
+  'No send-off — photographers leave at 9:30 and the party runs to 10:30',
+  'AV tech cancelled — the Palmetto package already includes a sound tech',
+  'Florals paid — Stephen, with Amanda Cubello arranging and delivering at 1:00 PM',
+  'Father Will officiating free of charge',
+  'Videography free — Anthony Rivera attending as a guest',
   'All glassware from PPHG — 275 champagne coupes, 360 wine glasses, 324 highballs',
   'Ballroom set: 80 gold chivari chairs, 10 guest tables, sweetheart and cake tables, 3 station tables, 2 bars',
   'Stars Lounge set: 3 lowboys, 3 cocktail tables, 9 chairs',
   'PPHG providing bar and station signs',
   'Linen pick-up and return handled by Invitation Only',
-  'Florals with Stephen, arranged and delivered by Amanda Cubello',
-  'Videography with Anthony Rivera at Blue Box Digital — attending as a guest',
   'Setup access from 9:00 AM the day of the event',
-  'All 69 RSVPs in and accounted for',
-  'Rehearsal set for 2:00 PM Saturday at the venue',
-  'Pool party set for 4:00 – 9:00 PM Saturday at Restore at Carolina Park'
+  'All 69 RSVPs in and accounted for'
 ];
 
 const MENU = [
@@ -596,40 +623,39 @@ const MENU_NOTES = [
 
 const RUNSHEET = [
   { t:'Thu 3 Sep', e:'Invitation Only collects the linens', w:'Snyder, 3875 Meeting St · returned Tue 8 Sep' },
-  { t:'Sat 1:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · BEO says 1:00, you have circulated 2:00', flag:true },
-  { t:'Sat 4–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant · <a href="https://maps.app.goo.gl/9sbx3BhfSvYbhJpV8" target="_blank" rel="noopener">open in Maps</a>' },
-  { t:'9:00 AM',  e:'Venue opens' },
+  { t:'Sat 2:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · run by Loraine' },
+  { t:'Sat 4–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant' },
+  { t:'9:00 AM',  e:'Venue opens', w:'Earliest permitted setup' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
   { t:'11:00 AM', e:'Linens on site and set', w:'Brought in by Invitation Only from Thursday’s pick-up' },
-  { t:'1:00 PM',  e:'Florist delivers and sets up', w:'Amanda Cubello, arranging for Stephen' },
+  { t:'1:00 PM',  e:'Florals delivered and set', w:'Amanda Cubello, arranging for Stephen' },
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
-  { t:'3:30 PM',  e:'Sound tech and piano arrive', w:'Jacob Scaife · Palmetto Strings' },
-  { t:'3:30 PM',  e:'Grooms arrive — final details walkthrough', w:'Venue reveal and a last look at the room before anyone else is in it' },
+  { t:'3:30 PM',  e:'Palmetto Strings load in', w:'Keyboard, speakers, mics and their own sound tech · booked 4:30 – 6:00' },
+  { t:'3:30 PM',  e:'Grooms arrive — final details walkthrough', w:'Venue reveal before anyone else is in the room' },
   { t:'4:00 PM',  e:'Wedding party and photographers arrive', w:'Party partially ready · Richard Bell begins the complimentary half hour' },
   { t:'4:15 PM',  e:'Getting-ready coverage in Stars Lounge', w:'Finishing touches and detail shots · rings, invitation suite, florals' },
-  { t:'4:30 PM',  e:'Preludes and guest arrival', w:'Popcorn at the concession stand in the lobby' },
-  { t:'5:00 PM',  e:'Ceremony', w:'In the Theatre · Father Will' },
+  { t:'4:30 PM',  e:'Doors open — guests arrive', w:'Preludes playing · popcorn at the concession stand in the lobby' },
+  { t:'5:00 PM',  e:'Ceremony', w:'In the Cinema · Father Will · up to 30 minutes' },
   { t:'5:30 PM',  e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony — about ten minutes' },
   { t:'5:40 PM',  e:'Cocktail hour', w:'Stars Lounge, flipped from the getting-ready room · family portraits here',
-    sub:['Cava passed straight after the ceremony','All five hors d’oeuvres passed','Drinks of choice — Joshua: water and white wine · Gabriel: TBD'] },
-  { t:'6:30 PM',  e:'Reception opens', w:'In the Ballroom — move guests, find seating' },
+    sub:['Cava passed as guests arrive','Five passed hors d’oeuvres','Bar opens — wine, beer and non-alcoholic'] },
+  { t:'6:30 PM',  e:'Guests move to the Ballroom', w:'Find seating' },
   { t:'6:45 PM',  e:'Formalities',
     sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
   { t:'7:00 PM',  e:'Dinner stations open', w:'Three petite-plate stations, 90 minutes' },
-  { t:'7:30 PM',  e:'Vendor meals', w:'Location TBD. Only 6 covered — 2 photo, 1 DJ, 3 planner.' },
+  { t:'7:30 PM',  e:'Vendor meals', w:'Location TBD · 6 covered — 2 photo, 1 DJ, 3 planner' },
   { t:'7:50 PM',  e:'PPHG passes champagne', w:'Served in champagne coupes' },
   { t:'7:55 PM',  e:'Roasts and toasts' },
   { t:'8:15 PM',  e:'Cutting of the cake', w:'Left side of the stage · PPHG cuts and serves onto salad plates' },
   { t:'8:30 PM',  e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
-  { t:'9:30 PM',  e:'Photographer departs', w:'End of the contracted 5 hours. No send-off.' },
+  { t:'9:30 PM',  e:'Photographers depart', w:'End of coverage. No send-off.' },
   { t:'10:15 PM', e:'Informal last call for alcohol' },
   { t:'10:20 PM', e:'Last song of the night' },
   { t:'10:25 PM', e:'Prepare for departure', w:'No formal send-off' },
-  { t:'10:30 PM', e:'Formal event closure',
-    sub:['Photography ends — 8 hours from 2:30','Guests depart the American Theater','PPHG staff and on-site vendors break down'] },
+  { t:'10:30 PM', e:'Event closes', w:'Amplified music ends, bar closes, guests depart' },
   { t:'10:45 PM', e:'Off-site vendors return for strike', w:'Linens boxed for Invitation Only to return Tuesday' },
-  { t:'12:00 AM', e:'Venue closes', w:'PPHG’s own BEO timeline says breakdown concludes 12:30 AM' }
+  { t:'12:00 AM', e:'Venue closes', w:'PPHG breakdown concludes by 12:30 AM' }
 ];
 
 const SETTLED = [
@@ -643,24 +669,23 @@ const SETTLED = [
 ];
 
 const PEOPLE = [
+  { r:'Planner', n:'Loraine Cook', o:'Invitation Only', e:'loraine.cook@invitationonlycharleston.com', t:'843.695.8884' },
   { r:'Venue · event manager', n:'Olivia Nilsen', o:'Patrick Properties', e:'olivia@pphgcharleston.com', t:'843.628.7116' },
   { r:'Venue · sales rep', n:'Jackie Willis Roberts', o:'Patrick Properties', e:'jackie@pphgcharleston.com' },
   { r:'Venue', n:'The American Theater', o:'446 King Street, Charleston SC 29403' },
-  { r:'Planner', n:'Loraine Cook', o:'Invitation Only', e:'loraine.cook@invitationonlycharleston.com', t:'843.695.8884' },
-  { r:'Photography', n:'Richard Bell Photography', o:'672 Marina Dr Ste 103, Charleston', e:'info@richbell.com' },
-  { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'via Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
-  { r:'Ceremony music', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com' },
-  { r:'AV tech', n:'Jacob Scaife', e:'jscaife912@gmail.com', t:'804.387.5783' },
-  { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216' },
-  { r:'Officiant', n:'Father Will', t:'336.340.8183' },
-  { r:'Florist', n:'Stephen', t:'301.549.8622', x:'Arrangements and delivery by Amanda Cubello' },
-  { r:'Florals · arranging and delivery', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
-  { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest, not a vendor' },
-  { r:'Cake and pool party', n:'Barbara', e:'warriorbjtaylor@hotmail.com' },
+  { r:'Photography · lead', n:'Mell Bell', o:'Richard Bell Photography', t:'864.320.2428', e:'info@richbell.com' },
+  { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest — no charge' },
+  { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
+  { r:'Ceremony music and sound', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com', t:'843.532.8656' },
+  { r:'Officiant', n:'Father Will', t:'336.340.8183', x:'Officiating free of charge' },
+  { r:'Florist', n:'Stephen', t:'301.549.8622', x:'Paid · Amanda Cubello arranging and delivering' },
+  { r:'Florals · delivery 1:00 PM', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
+  { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216-14' },
+  { r:'Cake and pool party', n:'Barbara Taylor', e:'warriorbjtaylor@hotmail.com' },
   { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 4:00 – 9:00 PM' }
 ];
 
-/* ---------- helpers ---------- */
+/* ---------- helpers ---------- *//* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const money  = n => n == null ? '—' : '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -671,7 +696,7 @@ const daysTo = s => Math.ceil((parseD(s) - new Date()) / 86400000);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
-let me = null, D = { vendors:[], payments:[], tasks:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{} }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
 const PW_KEY = 'wedding-ops-money';
@@ -711,13 +736,17 @@ $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate()
 
 /* ---------- data ---------- */
 async function load(){
-  const [v,p,t] = await Promise.all([
+  const [v,p,t,g,m] = await Promise.all([
     sb.from('vendors').select('*').order('sort_order'),
     sb.from('payments').select('*').order('paid_on'),
-    sb.from('tasks').select('*').order('due_date')
+    sb.from('tasks').select('*').order('due_date'),
+    sb.from('guests').select('*').order('name'),
+    sb.from('milestone_status').select('*')
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
-  D = { vendors:v.data, payments:p.data, tasks:t.data };
+  const ms = {};
+  if (!m.error) for (const r of (m.data || [])) ms[r.key] = r;
+  D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms };
   return {};
 }
 async function loadDocs(){
@@ -824,12 +853,22 @@ function payments(){
 function timeline(){
   let hot = 0;
   $('#timeline').innerHTML = [...MILESTONES].sort((a,b)=>a.date<b.date?-1:1).map(m=>{
-    const d = daysTo(m.date), isHot = d>=0 && d<=14, past = d<0;
+    const st = D.ms[m.k];
+    const ok = st?.confirmed;
+    const d = daysTo(m.date), isHot = !ok && d>=0 && d<=14, past = d<0;
     if (isHot) hot++;
-    return `<div class="tl-i ${isHot?'hot':''} ${past?'past':''}">
+    const when = st?.confirmed_at
+      ? new Date(st.confirmed_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    return `<div class="tl-i ${isHot?'hot':''} ${past&&!ok?'past':''} ${ok?'ok':''}">
       <div class="d">${fmtD(m.date)}${m.time?' · '+m.time:''} · ${past?'passed':(d===0?'today':d+' days')}</div>
       <div class="t">${m.title}${m.amount?` <span class="amt">— ${money(m.amount)}</span>`:''}</div>
-      <div class="m">${m.detail}</div></div>`;
+      <div class="m">${m.detail}</div>
+      <div class="cf">
+        ${ok
+          ? `<span class="cfby">&#10003; Confirmed by ${esc(st.confirmed_by||'someone')}${when?' · '+when:''}</span>
+             <button class="btn ghost sm" data-unconfirm="${m.k}">Undo</button>`
+          : `<button class="btn ghost sm" data-confirm="${m.k}">Mark confirmed</button>`}
+      </div></div>`;
   }).join('');
   const b=$('#bDates'); b.textContent=hot; b.classList.toggle('hot',hot>0);
 }
@@ -850,7 +889,16 @@ function tasks(){
   const open = D.tasks.filter(t=>!t.done).sort((a,b)=>(a.due_date||'9999')<(b.due_date||'9999')?-1:1);
   const done = D.tasks.filter(t=>t.done);
   $('#taskOpen').innerHTML = open.length ? open.map(taskRow).join('') : `<div class="task"><div class="body"><div class="title">Nothing open.</div></div></div>`;
-  $('#taskDone').innerHTML = done.length ? done.map(taskRow).join('') : `<div class="task"><div class="body"><div class="title" style="color:var(--ink-3)">Nothing checked off yet.</div></div></div>`;
+  const groups = {};
+  for (const t of done){
+    const key = t.done_by_name || 'Closed out';
+    (groups[key] = groups[key] || []).push(t);
+  }
+  const ordered = Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
+  $('#taskDone').innerHTML = done.length
+    ? ordered.map(k=>`<div class="dgroup">${esc(k)} · ${groups[k].length}</div>${groups[k].map(taskRow).join('')}`).join('')
+    : `<div class="task"><div class="body"><div class="title" style="color:var(--ink-3)">Nothing checked off yet.</div></div></div>`;
+  $('#doneCount').textContent = done.length ? `· ${done.length}` : '';
   const b=$('#bTasks'); b.textContent=open.length;
   b.classList.toggle('hot', open.some(t=>t.due_date && daysTo(t.due_date)<=3));
   if (!$('#ntOwner').options.length) $('#ntOwner').innerHTML = OWNERS.map(o=>`<option>${o}</option>`).join('');
@@ -874,11 +922,10 @@ function menu(){
 
 function runsheet(){
   $('#runBody').innerHTML = RUNSHEET.map(r=>
-    `<tr${r.flag?' style="background:var(--rust-lo)"':''}>
-      <td class="num" style="white-space:nowrap${r.flag?';color:var(--rust);font-weight:600':''}">${r.t}</td>
-      <td><strong${r.flag?' style="color:var(--rust)"':''}>${r.e}</strong>
+    `<tr><td class="num" style="white-space:nowrap">${r.t}</td>
+      <td><strong>${r.e}</strong>
         ${r.sub?`<ul style="margin:6px 0 0;padding-left:18px;color:var(--ink-2);font-size:13.5px;line-height:1.7">${r.sub.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}</td>
-      <td${r.flag?' style="color:var(--rust)"':''}>${r.w||''}</td></tr>`).join('');
+      <td>${r.w||''}</td></tr>`).join('');
   $('#settledList').innerHTML = SETTLED.map(x=>`<li>${x}</li>`).join('');
 }
 
@@ -888,23 +935,37 @@ const DIET_META = {
   'Dairy free': { cls:'dairy',  short:'Dairy', srv:'Two children — their mother is handling it. No action needed from the venue.' },
   'Nut allergy':{ cls:'nut',    short:'Nuts',  srv:'Nothing on the current menu lists almonds. Worth confirming with the kitchen.' }
 };
+const DIET_BASE = ['Vegan','Gluten free','Dairy free','Nut allergy'];
+const OTHER = '__other__';
+
+// every category in use, base ones first, then anything added later
+function dietTypes(){
+  const extra = [...new Set(D.guests.map(g=>g.dietary).filter(Boolean))]
+    .filter(k => !DIET_BASE.includes(k)).sort();
+  return [...DIET_BASE, ...extra];
+}
+
+const CUSTOM_META = { cls:'other', short:'Diet',
+  srv:'Not one of the standard four — flag it to Olivia explicitly so the kitchen sees it.' };
+const metaFor = k => DIET_META[k] || CUSTOM_META;
 
 function guestRoster(){
-  const flagged = GUESTS.filter(g=>g.k);
+  const G = D.guests;
+  const flagged = G.filter(g=>g.dietary);
   $('#countCalc').innerHTML = [
-    ['Attending', 69, 'Every RSVP is in.'],
+    ['Attending', G.length, 'Every RSVP is in.'],
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Plated at', 77, 'Each petite station on the BEO.'],
     ['Restrictions', flagged.length, 'Across four dietary groups.'],
-    ['Vendor meals', 6, 'Cut from 8. The AV tech and musicians are not covered.']
+    ['Vendor meals', 6, '2 photo, 1 DJ, 3 planner. Separate from the count.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  $('#dietGrid').innerHTML = Object.entries(DIET_META).map(([key,m])=>{
-    const who = flagged.filter(g=>g.k===key);
+  $('#dietGrid').innerHTML = dietTypes().map(key=>{
+    const m = metaFor(key);
+    const who = flagged.filter(g=>g.dietary===key);
     return `<div class="dcard ${m.cls}">
-      <div class="cnt">${who.length}</div>
-      <div class="lbl">${key}</div>
-      <ul>${who.map(g=>`<li>${esc(g.n)}</li>`).join('')}</ul>
+      <div class="cnt">${who.length}</div><div class="lbl">${esc(key)}</div>
+      <ul>${who.map(g=>`<li>${esc(g.name)}</li>`).join('')}</ul>
       <div class="srv">${m.srv}</div></div>`;
   }).join('');
 
@@ -913,15 +974,23 @@ function guestRoster(){
 }
 
 function drawRoster(){
-  const list = GUESTS.filter(g => {
-    if (gFilter === 'diet' && !g.k) return false;
-    return !gQuery || g.n.toLowerCase().includes(gQuery);
+  const types = dietTypes();
+  const list = D.guests.filter(g => {
+    if (gFilter === 'diet' && !g.dietary) return false;
+    return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
-  $('#roster').innerHTML = list.length ? list.map(g=>{
-    const m = g.k ? DIET_META[g.k] : null;
-    const cls = m ? { vegan:'veg', gluten:'glu', dairy:'dai', nut:'nut' }[m.cls] : '';
-    return `<span class="g ${g.k?'flagged '+cls:''}" title="${esc(g.d||'')}">${esc(g.n)}${m?`<span class="tag">${m.short}</span>`:''}</span>`;
-  }).join('') : `<span style="color:var(--ink-3)">Nobody matches that.</span>`;
+  $('#guestBody').innerHTML = list.length ? list.map(g=>`<tr>
+    <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
+    <td><input value="${esc(g.email||'')}" data-gid="${g.id}" data-gf="email" placeholder="—" type="email"></td>
+    <td><input value="${esc(g.phone||'')}" data-gid="${g.id}" data-gf="phone" placeholder="—"></td>
+    <td><select data-gid="${g.id}" data-gf="dietary">
+        <option value=""${!g.dietary?' selected':''}>—</option>
+        ${types.map(o=>`<option value="${esc(o)}"${g.dietary===o?' selected':''}>${esc(o)}</option>`).join('')}
+        <option value="${OTHER}">Add another…</option>
+      </select></td>
+    <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
+    <td><button class="x" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`).join('')
+    : `<tr><td colspan="6" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
 
 function people(){
@@ -983,13 +1052,56 @@ $('#gSearch').addEventListener('input', e => { gQuery = e.target.value.trim().to
 $$('[data-gf]').forEach(b => b.onclick = () => { gFilter = b.dataset.gf; drawRoster(); });
 
 document.addEventListener('change', async e=>{
+  const gs = e.target.closest('select[data-gid]');
+  if (gs){
+    let val = gs.value;
+    if (val === OTHER){
+      const typed = prompt('What is the restriction?\n\nKeep it short — it becomes a category, so use the same wording for anyone else with it.');
+      val = (typed || '').trim();
+      if (!val){ drawRoster(); return; }
+      // match an existing category case-insensitively so you don't get two of the same
+      const hit = dietTypes().find(t => t.toLowerCase() === val.toLowerCase());
+      if (hit) val = hit;
+    }
+    await sb.from('guests').update({ dietary: val || null }).eq('id', gs.dataset.gid);
+    await load(); guestRoster(); return;
+  }
   const cb = e.target.closest('.task input[type=checkbox]'); if (!cb) return;
   const done = cb.checked;
   await sb.from('tasks').update({ done, done_by_name: done ? me : null, done_at: done ? new Date().toISOString() : null }).eq('id', cb.dataset.id);
   await load(); tasks();
 });
 
+document.addEventListener('blur', async e=>{
+  const gi = e.target.closest('input[data-gid]'); if (!gi) return;
+  const g = D.guests.find(x => String(x.id) === gi.dataset.gid); if (!g) return;
+  const field = gi.dataset.gf, next = gi.value.trim();
+  if ((g[field] || '') === next) return;
+  if (field === 'name' && !next){ gi.value = g.name; return; }
+  await sb.from('guests').update({ [field]: next || null }).eq('id', g.id);
+  await load(); guestRoster();
+}, true);
+
 document.addEventListener('click', async e=>{
+  const cfm = e.target.closest('[data-confirm]');
+  if (cfm){
+    await sb.from('milestone_status').upsert({ key:cfm.dataset.confirm, confirmed:true,
+      confirmed_by: me, confirmed_at: new Date().toISOString() });
+    await load(); timeline(); return;
+  }
+  const ucf = e.target.closest('[data-unconfirm]');
+  if (ucf){
+    await sb.from('milestone_status').upsert({ key:ucf.dataset.unconfirm, confirmed:false,
+      confirmed_by:null, confirmed_at:null });
+    await load(); timeline(); return;
+  }
+  const dg = e.target.closest('[data-delguest]');
+  if (dg){
+    const g = D.guests.find(x => String(x.id) === dg.dataset.delguest); if (!g) return;
+    if (!confirm(`Remove ${g.name} from the guest list?\n\nThis cannot be undone.`)) return;
+    await sb.from('guests').delete().eq('id', g.id);
+    await load(); guestRoster(); return;
+  }
   const dt = e.target.closest('[data-deltask]');
   if (dt){ await sb.from('tasks').delete().eq('id', dt.dataset.deltask); await load(); tasks(); return; }
   const dp = e.target.closest('[data-delpay]');
@@ -1076,6 +1188,14 @@ $('#ntAdd').onclick = async ()=>{
   await load(); tasks();
 };
 $('#ntTitle').onkeydown = e => { if(e.key==='Enter') $('#ntAdd').click(); };
+
+$('#ngAdd').onclick = async ()=>{
+  const name = $('#ngName').value.trim(); if(!name) return;
+  await sb.from('guests').insert({ name });
+  $('#ngName').value = '';
+  await load(); guestRoster();
+};
+$('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
 
 init();
 </script>
