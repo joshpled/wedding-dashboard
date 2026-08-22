@@ -161,6 +161,14 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
   font-size:12px;font-weight:700;color:var(--ink-3)}
 
+.gtable .mut{color:var(--ink-3)}
+.gtable tr.editing{background:var(--brass-lo)}
+.gtable .ic{background:none;border:1px solid transparent;color:var(--ink-3);font-size:15px;
+  padding:4px 8px;border-radius:3px;line-height:1}
+.gtable .ic:hover{color:var(--brass);background:#fff;border-color:var(--brass-line)}
+.gtable .ic.done{color:var(--moss)}
+.gtable .ic.done:hover{color:var(--moss);border-color:var(--moss-line)}
+.gtable input[type=checkbox]{width:16px;height:16px;accent-color:var(--moss);cursor:pointer}
 .gtable input{border:1px solid transparent;background:transparent;padding:5px 7px;width:100%;font-size:14px;border-radius:3px}
 .gtable input:hover{border-color:var(--rule-2);background:#fff}
 .gtable input:focus{border-color:var(--brass-line);background:#fff}
@@ -185,6 +193,10 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .fp .tc{font-family:"IBM Plex Mono",monospace;font-size:7.5px;fill:var(--ink-3);
   text-anchor:middle;pointer-events:none}
 .fp .sh{fill:var(--brass-lo);stroke:var(--brass);stroke-width:1.6}
+.fp .ch{fill:var(--ink);opacity:.72}
+.fp .cok{fill:var(--ink);opacity:.82}
+.fp .tn{font-size:9px}
+.fp .tc{font-size:7.5px;font-weight:600}
 
 .seatgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:12px;padding:16px}
 .tcard{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);padding:14px 15px}
@@ -199,7 +211,11 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .tcard li button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:0 4px;border-radius:3px;line-height:1}
 .tcard li button:hover{color:var(--rust);background:#fff}
 .tcard .empty{color:var(--ink-3);font-style:italic;font-size:13px;margin-top:9px}
-.tcard select{margin-top:10px;width:100%;font-size:13px}
+.tcard .seatadd{margin-top:11px;display:flex;gap:6px}
+.tcard .seatadd input{flex:1;min-width:0;font-size:13px;padding:6px 8px}
+.tcard .seatadd .btn{padding:6px 12px;font-size:12.5px}
+.tcard .tnm{cursor:pointer;border-bottom:1px dashed var(--rule)}
+.tcard .tnm:hover{color:var(--brass);border-bottom-color:var(--brass)}
 .tcard .diet{font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
   text-transform:uppercase;letter-spacing:.08em;font-weight:700}
 
@@ -469,10 +485,13 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
         <button class="btn ghost sm" data-gf="diet">Restrictions only</button>
+        <button class="btn ghost sm" id="expGuests" style="margin-left:auto">Print guest list</button>
       </div>
       <div class="card"><table class="gtable">
-        <thead><tr><th style="width:22%">Name</th><th style="width:24%">Email</th><th style="width:15%">Phone</th>
-          <th style="width:15%">Dietary</th><th style="width:8%">Table</th><th>Notes</th><th style="width:40px"></th></tr></thead>
+        <thead><tr><th style="width:44px" title="Details sent">Sent</th><th style="width:20%">Name</th>
+          <th style="width:22%">Email</th><th style="width:14%">Phone</th>
+          <th style="width:14%">Dietary</th><th style="width:9%">Table</th><th>Notes</th>
+          <th style="width:74px"></th></tr></thead>
         <tbody id="guestBody"></tbody>
       </table>
       <div class="addrow">
@@ -489,7 +508,8 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     </div>
 
     <div class="sec">
-      <div class="sec-h"><h2>Table assignments</h2><span class="hint" id="seatHint"></span></div>
+      <div class="sec-h"><h2>Table assignments</h2><span class="hint" id="seatHint"></span>
+        <button class="btn ghost sm" id="expSeat" style="margin-left:auto">Print seating chart</button></div>
       <div class="card"><div id="seatBoard"></div></div>
     </div>
 
@@ -757,7 +777,7 @@ const daysTo = s => Math.ceil((parseD(s) - new Date()) / 86400000);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
-let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{} }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{} }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
 const PW_KEY = 'wedding-ops-money';
@@ -797,17 +817,20 @@ $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate()
 
 /* ---------- data ---------- */
 async function load(){
-  const [v,p,t,g,m] = await Promise.all([
+  const [v,p,t,g,m,tn] = await Promise.all([
     sb.from('vendors').select('*').order('sort_order'),
     sb.from('payments').select('*').order('paid_on'),
     sb.from('tasks').select('*').order('due_date'),
     sb.from('guests').select('*').order('name'),
-    sb.from('milestone_status').select('*')
+    sb.from('milestone_status').select('*'),
+    sb.from('table_names').select('*')
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
   const ms = {};
   if (!m.error) for (const r of (m.data || [])) ms[r.key] = r;
-  D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms };
+  const tnames = {};
+  if (!tn.error) for (const r of (tn.data || [])) if (r.name) tnames[r.table_no] = r.name;
+  D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms, tnames };
   return {};
 }
 async function loadDocs(){
@@ -1034,131 +1057,46 @@ function guestRoster(){
   $('#bGuests').textContent = flagged.length;
 }
 
+const editing = new Set();
+
 function drawRoster(){
   const types = dietTypes();
   const list = D.guests.filter(g => {
     if (gFilter === 'diet' && !g.dietary) return false;
     return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
-  $('#guestBody').innerHTML = list.length ? list.map(g=>`<tr>
-    <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
-    <td><input value="${esc(g.email||'')}" data-gid="${g.id}" data-gf="email" placeholder="—" type="email"></td>
-    <td><input value="${esc(g.phone||'')}" data-gid="${g.id}" data-gf="phone" placeholder="—"></td>
-    <td><select data-gid="${g.id}" data-gf="dietary">
-        <option value=""${!g.dietary?' selected':''}>—</option>
-        ${types.map(o=>`<option value="${esc(o)}"${g.dietary===o?' selected':''}>${esc(o)}</option>`).join('')}
-        <option value="${OTHER}">Add another…</option>
-      </select></td>
-    <td><input value="${g.table_no ?? ''}" data-gid="${g.id}" data-gf="table_no" placeholder="—"
-        style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
-    <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
-    <td><button class="x" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`).join('')
-    : `<tr><td colspan="7" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
-}
+  $('#guestBody').innerHTML = list.length ? list.map(g=>{
+    const ed = editing.has(String(g.id));
+    const tn = g.table_no == null ? '' : tableName(g.table_no).full;
+    if (!ed) return `<tr>
+      <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
+        title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
+      <td><strong>${esc(g.name)}</strong></td>
+      <td>${g.email ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>` : '<span class="mut">—</span>'}</td>
+      <td>${g.phone ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>` : '<span class="mut">—</span>'}</td>
+      <td>${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(g.dietary)}</span>` : '<span class="mut">—</span>'}</td>
+      <td>${tn ? esc(tn) : '<span class="mut">—</span>'}</td>
+      <td>${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="ic" data-edit="${g.id}" title="Edit this row">&#9998;</button></td></tr>`;
 
-/* ---------- seating ---------- */
-const SEATS_PER = 8;
-// positions mirror the Invitation Only layout: two columns of five, stage at the top
-const TABLES = [
-  {n:1,x:118,y:196},{n:2,x:196,y:196},
-  {n:3,x:118,y:246},{n:4,x:196,y:246},
-  {n:5,x:118,y:296},{n:6,x:196,y:296},
-  {n:7,x:118,y:346},{n:8,x:196,y:346},
-  {n:9,x:118,y:396},{n:10,x:196,y:396}
-];
-
-const ROOMS = [
-  { n:'Ballroom', c:'Reception · 80 seated',
-    d:'Stage at the north end with the dance floor in front of it. Ten 4x4 guest tables in two columns, sweetheart table between them, cake table on the west wall. Three stations along the side walls, two bars and four cocktail tables at the south end.' },
-  { n:'Cinema', c:'Ceremony · stadium seating',
-    d:'Fixed stadium rows, so there is no seating chart to make. The all-guest photo happens here straight after the ceremony, then couple portraits once the room clears.' },
-  { n:'Stars Lounge', c:'Cocktail hour · 24\u2032 11\u2033 × 17\u2032',
-    d:'Getting-ready room until 5:00, then flipped for cocktail hour. Bar on the west wall, screen on the south. Three high tops and three low tops, nine chairs. Standing room — no assigned seating.' },
-  { n:'Lobby', c:'Arrivals · 37\u2032 4\u2033 wide',
-    d:'Doors open here at 4:30. Popcorn displayed at the concession stand. Restrooms off the lobby, both accessible.' }
-];
-
-function floorplan(){
-  const counts = {};
-  for (const g of D.guests) if (g.table_no) counts[g.table_no] = (counts[g.table_no]||0)+1;
-
-  const tables = TABLES.map(t=>{
-    const c = counts[t.n]||0;
-    const cls = c > SEATS_PER ? 'over' : c === SEATS_PER ? 'full' : '';
-    return `<g data-table="${t.n}" style="cursor:pointer">
-      <rect class="tb ${cls}" x="${t.x-26}" y="${t.y-19}" width="52" height="38" rx="3"/>
-      <text class="tn" x="${t.x}" y="${t.y-1}">${t.n}</text>
-      <text class="tc" x="${t.x}" y="${t.y+11}">${c}/${SEATS_PER}</text></g>`;
-  }).join('');
-
-  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 314 470" xmlns="http://www.w3.org/2000/svg" role="img"
-      aria-label="Ballroom floor plan with ten guest tables">
-    <rect class="rm" x="42" y="20" width="230" height="436" rx="2"/>
-    <rect class="fx" x="72" y="20" width="170" height="30"/>
-    <text class="lbl big" x="157" y="40" text-anchor="middle">STAGE</text>
-    <rect class="zn" x="112" y="58" width="90" height="46"/>
-    <text class="lbl" x="157" y="85" text-anchor="middle">DANCE FLOOR</text>
-    <rect class="fx" x="48" y="60" width="34" height="26" rx="2"/>
-    <text class="lbl" x="65" y="76" text-anchor="middle">CAKE</text>
-    <rect class="sh" x="132" y="118" width="50" height="30" rx="3"/>
-    <text class="lbl" x="157" y="137" text-anchor="middle" style="fill:var(--brass)">SWEETHEART</text>
-    ${tables}
-    <rect class="fx" x="46" y="238" width="16" height="86" rx="2"/>
-    <text class="lbl" x="54" y="286" text-anchor="middle" transform="rotate(-90 54 286)">STATION 3</text>
-    <rect class="fx" x="252" y="196" width="16" height="86" rx="2"/>
-    <text class="lbl" x="260" y="242" text-anchor="middle" transform="rotate(-90 260 242)">STATION 2</text>
-    <rect class="fx" x="252" y="292" width="16" height="86" rx="2"/>
-    <text class="lbl" x="260" y="336" text-anchor="middle" transform="rotate(-90 260 336)">STATION 1</text>
-    <rect class="zn" x="52" y="418" width="210" height="34"/>
-    <rect class="fx" x="118" y="422" width="78" height="12" rx="2"/>
-    <text class="lbl" x="157" y="431" text-anchor="middle">BAR</text>
-    <rect class="fx" x="118" y="440" width="78" height="12" rx="2"/>
-    <text class="lbl" x="157" y="449" text-anchor="middle">BAR</text>
-    <circle class="fx" cx="76" cy="426" r="8"/><circle class="fx" cx="238" cy="426" r="8"/>
-    <circle class="fx" cx="76" cy="447" r="8"/><circle class="fx" cx="238" cy="447" r="8"/>
-    <text class="lbl" x="157" y="410" text-anchor="middle" style="fill:var(--ink-3)">COCKTAIL TABLES &amp; BARS</text>
-  </svg>`;
-}
-
-function seatBoard(){
-  const byTable = {};
-  for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
-  const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
-
-  $('#seatHint').textContent = unseated.length
-    ? `${unseated.length} still unseated of ${D.guests.length}.`
-    : `Everyone is seated.`;
-  $('#bSeat').textContent = unseated.length;
-  $('#bSeat').classList.toggle('hot', unseated.length > 0);
-
-  const opts = `<option value="">Seat someone here…</option>` +
-    unseated.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
-
-  const card = (no, label, cap) => {
-    const at = (byTable[no]||[]).sort((a,b)=>a.name.localeCompare(b.name));
-    const cls = at.length > cap ? 'over' : at.length === cap ? 'full' : '';
-    return `<div class="tcard ${cls}">
-      <h4>${label}<span>${at.length}/${cap}</span></h4>
-      ${at.length
-        ? `<ul>${at.map(g=>`<li><span>${esc(g.name)}${g.dietary?` <span class="diet">${esc(g.dietary)}</span>`:''}</span>
-             <button data-unseat="${g.id}" title="Remove">&times;</button></li>`).join('')}</ul>`
-        : `<div class="empty">Nobody yet.</div>`}
-      <select data-seat="${no}">${opts}</select>
-    </div>`;
-  };
-
-  $('#seatBoard').innerHTML = `<div class="seatgrid">
-    ${card(0,'Sweetheart table',2)}
-    ${TABLES.map(t=>card(t.n,'Table '+t.n,SEATS_PER)).join('')}
-  </div>`;
-}
-
-function seating(){ floorplan(); seatBoard(); rooms(); }
-
-function rooms(){
-  $('#roomCards').innerHTML = ROOMS.map(r=>`<article class="v">
-    <div><h3>${r.n}</h3><div class="cat">${r.c}</div></div>
-    <div class="note">${r.d}</div></article>`).join('');
+    return `<tr class="editing">
+      <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}></td>
+      <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
+      <td><input value="${esc(g.email||'')}" data-gid="${g.id}" data-gf="email" placeholder="—" type="email"></td>
+      <td><input value="${esc(g.phone||'')}" data-gid="${g.id}" data-gf="phone" placeholder="—"></td>
+      <td><select data-gid="${g.id}" data-gf="dietary">
+          <option value=""${!g.dietary?' selected':''}>—</option>
+          ${types.map(o=>`<option value="${esc(o)}"${g.dietary===o?' selected':''}>${esc(o)}</option>`).join('')}
+          <option value="${OTHER}">Add another…</option></select></td>
+      <td><input value="${g.table_no ?? ''}" data-gid="${g.id}" data-gf="table_no" placeholder="—"
+          style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
+      <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="ic done" data-doneedit="${g.id}" title="Finish editing">&#10003;</button>
+        <button class="ic" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`;
+  }).join('')
+    : `<tr><td colspan="8" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
 
 function people(){
@@ -1220,12 +1158,6 @@ $('#gSearch').addEventListener('input', e => { gQuery = e.target.value.trim().to
 $$('[data-gf]').forEach(b => b.onclick = () => { gFilter = b.dataset.gf; drawRoster(); });
 
 document.addEventListener('change', async e=>{
-  const seat = e.target.closest('select[data-seat]');
-  if (seat){
-    const id = seat.value; if (!id) return;
-    await sb.from('guests').update({ table_no: Number(seat.dataset.seat) }).eq('id', id);
-    await load(); seating(); guestRoster(); return;
-  }
   const gs = e.target.closest('select[data-gid]');
   if (gs){
     let val = gs.value;
@@ -1238,6 +1170,13 @@ document.addEventListener('change', async e=>{
       if (hit) val = hit;
     }
     await sb.from('guests').update({ dietary: val || null }).eq('id', gs.dataset.gid);
+    await load(); guestRoster(); return;
+  }
+  const ct = e.target.closest('input[data-contact]');
+  if (ct){
+    const on = ct.checked;
+    await sb.from('guests').update({ contacted:on, contacted_by: on ? me : null,
+      contacted_at: on ? new Date().toISOString() : null }).eq('id', ct.dataset.contact);
     await load(); guestRoster(); return;
   }
   const cb = e.target.closest('.task input[type=checkbox]'); if (!cb) return;
@@ -1268,6 +1207,28 @@ document.addEventListener('blur', async e=>{
 }, true);
 
 document.addEventListener('click', async e=>{
+  const ed = e.target.closest('[data-edit]');
+  if (ed){ editing.add(ed.dataset.edit); drawRoster(); return; }
+  const de = e.target.closest('[data-doneedit]');
+  if (de){ editing.delete(de.dataset.doneedit); drawRoster(); return; }
+
+  const rt = e.target.closest('[data-rename-table]');
+  if (rt){
+    const no = Number(rt.dataset.renameTable);
+    if (no === 0) return;
+    const next = prompt('Name for this table:', D.tnames[no] || '');
+    if (next === null) return;
+    await sb.from('table_names').upsert({ table_no:no, name: next.trim() || null });
+    await load(); seating(); guestRoster(); return;
+  }
+
+  const sg = e.target.closest('[data-seatgo]');
+  if (sg){
+    const inp = document.querySelector(`[data-seatinput="${sg.dataset.seatgo}"]`);
+    await seatByName(Number(sg.dataset.seatgo), inp.value);
+    return;
+  }
+
   const un = e.target.closest('[data-unseat]');
   if (un){
     await sb.from('guests').update({ table_no:null, seat_no:null }).eq('id', un.dataset.unseat);
@@ -1397,6 +1358,13 @@ $('#ngAdd').onclick = async ()=>{
   await load(); guestRoster();
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
+$('#expSeat').onclick = exportSeating;
+$('#expGuests').onclick = exportGuests;
+
+document.addEventListener('keydown', async e => {
+  const si = e.target.closest('[data-seatinput]');
+  if (si && e.key === 'Enter'){ e.preventDefault(); await seatByName(Number(si.dataset.seatinput), si.value); }
+});
 
 init();
 </script>
