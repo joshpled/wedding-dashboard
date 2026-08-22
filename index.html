@@ -766,7 +766,7 @@ const PEOPLE = [
   { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 4:00 – 9:00 PM' }
 ];
 
-/* ---------- helpers ---------- *//* ---------- helpers ---------- */
+/* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const money  = n => n == null ? '—' : '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1098,6 +1098,288 @@ function drawRoster(){
   }).join('')
     : `<tr><td colspan="8" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
+
+/* ---------- seating ---------- */
+const SEATS_PER = 8;
+
+const TABLES = [
+  {n:1,x:100,y:186},{n:2,x:200,y:186},
+  {n:3,x:100,y:246},{n:4,x:200,y:246},
+  {n:5,x:100,y:306},{n:6,x:200,y:306},
+  {n:7,x:100,y:366},{n:8,x:200,y:366},
+  {n:9,x:118,y:424},{n:10,x:182,y:424}
+];
+
+const ROOMS = [
+  { n:'Ballroom', c:'Reception · 80 seated',
+    d:'Stage at the north end with the dance floor in front of it. Ten 4x4 guest tables in two columns, sweetheart table between them, cake table on the west wall. Three stations along the side walls, two bars and four cocktail tables at the south end.' },
+  { n:'Cinema', c:'Ceremony · stadium seating',
+    d:'Fixed stadium rows, so there is no seating chart to make. The all-guest photo happens here straight after the ceremony, then couple portraits once the room clears.' },
+  { n:'Stars Lounge', c:'Cocktail hour · 24 ft 11 in × 17 ft',
+    d:'Getting-ready room until 5:00, then flipped for cocktail hour. Bar on the west wall, screen on the south. Three high tops and three low tops, nine chairs. Standing room, no assigned seating.' },
+  { n:'Lobby', c:'Arrivals · 37 ft 4 in wide',
+    d:'Doors open here at 4:30. Popcorn displayed at the concession stand. Restrooms off the lobby, both accessible.' }
+];
+
+function tableName(n){
+  if (n === 0) return { full:'Sweetheart table', short:'SH' };
+  const custom = D.tnames[n];
+  return custom
+    ? { full:custom, short: custom.length > 9 ? custom.slice(0,8) + '…' : custom }
+    : { full:'Table ' + n, short:String(n) };
+}
+
+function floorplan(){
+  const counts = {};
+  for (const g of D.guests) if (g.table_no) counts[g.table_no] = (counts[g.table_no]||0)+1;
+
+  const chairs = (x,y,r) => {
+    let out = '';
+    for (let i=0;i<8;i++){
+      const a = (Math.PI/4)*i + Math.PI/8;
+      out += `<circle class="ch" cx="${(x+Math.cos(a)*r).toFixed(1)}" cy="${(y+Math.sin(a)*r).toFixed(1)}" r="3.1"/>`;
+    }
+    return out;
+  };
+
+  const tables = TABLES.map(t=>{
+    const c = counts[t.n]||0;
+    const cls = c > SEATS_PER ? 'over' : c === SEATS_PER ? 'full' : '';
+    const nm = tableName(t.n);
+    return `<g data-table="${t.n}" style="cursor:pointer">
+      ${chairs(t.x,t.y,20)}
+      <rect class="tb ${cls}" x="${t.x-13}" y="${t.y-13}" width="26" height="26" transform="rotate(45 ${t.x} ${t.y})"/>
+      <text class="tn" x="${t.x}" y="${t.y+3}">${esc(nm.short)}</text>
+      <text class="tc" x="${t.x}" y="${t.y+31}">${c}/${SEATS_PER}</text></g>`;
+  }).join('');
+
+  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg"
+      role="img" aria-label="Ballroom floor plan">
+    <defs><pattern id="chk" width="16" height="16" patternUnits="userSpaceOnUse">
+      <rect width="16" height="16" fill="#FBFAF7"/>
+      <rect width="8" height="8" fill="#EFECE4"/>
+      <rect x="8" y="8" width="8" height="8" fill="#EFECE4"/>
+    </pattern></defs>
+
+    <rect class="rm" x="30" y="14" width="240" height="472"/>
+    <rect class="fx" x="62" y="14" width="176" height="30"/>
+    <text class="lbl big" x="150" y="34" text-anchor="middle">STAGE</text>
+    <rect x="66" y="50" width="168" height="26" fill="#fff" stroke="#3D434D" stroke-width="1.2"/>
+    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">SEATING FOR 80</text>
+    <text class="lbl" x="150" y="71" text-anchor="middle" style="fill:#3D434D">+ SWEETHEART TABLE</text>
+
+    <rect x="46" y="96" width="208" height="342" fill="url(#chk)"/>
+
+    <circle class="fx" cx="46" cy="106" r="13"/>
+    <text class="lbl" x="46" y="109" text-anchor="middle" style="font-size:7px">CAKE</text>
+
+    <rect x="98" y="92" width="104" height="36" fill="none" stroke="#3D434D" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <text class="lbl" x="150" y="107" text-anchor="middle" style="fill:#3D434D">DANCE</text>
+    <text class="lbl" x="150" y="118" text-anchor="middle" style="fill:#3D434D">AREA</text>
+
+    <g data-table="0" style="cursor:pointer">
+      <circle class="sh" cx="150" cy="150" r="13"/>
+      <text class="lbl" x="150" y="153" text-anchor="middle" style="fill:#6E5520;font-size:8px">SH</text>
+    </g>
+
+    <text class="lbl big" x="150" y="300" text-anchor="middle" transform="rotate(-90 150 300)"
+      style="fill:#878D99;letter-spacing:.34em">BALLROOM</text>
+
+    ${tables}
+
+    <rect class="fx" x="32" y="230" width="14" height="78"/>
+    <text class="lbl" x="39" y="269" text-anchor="middle" transform="rotate(-90 39 269)">STATION 3</text>
+    <rect class="fx" x="254" y="182" width="14" height="78"/>
+    <text class="lbl" x="261" y="221" text-anchor="middle" transform="rotate(-90 261 221)">STATION 2</text>
+    <rect class="fx" x="254" y="268" width="14" height="78"/>
+    <text class="lbl" x="261" y="307" text-anchor="middle" transform="rotate(-90 261 307)">STATION 1</text>
+
+    <rect x="30" y="438" width="240" height="48" fill="#E7E3DA"/>
+    <rect class="fx" x="112" y="446" width="76" height="13" rx="1"/>
+    <text class="lbl" x="150" y="455" text-anchor="middle">BAR</text>
+    <rect class="fx" x="112" y="466" width="76" height="13" rx="1"/>
+    <text class="lbl" x="150" y="475" text-anchor="middle">BAR</text>
+    <circle class="cok" cx="72" cy="450" r="9"/><text class="lbl" x="72" y="453" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="228" cy="450" r="9"/><text class="lbl" x="228" y="453" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="72" cy="472" r="9"/><text class="lbl" x="72" y="475" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="228" cy="472" r="9"/><text class="lbl" x="228" y="475" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+  </svg>`;
+}
+
+function seatBoard(){
+  const byTable = {};
+  for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
+  const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
+
+  $('#seatHint').textContent = unseated.length
+    ? `${unseated.length} still unseated of ${D.guests.length}.`
+    : 'Everyone is seated.';
+  const b = $('#bSeat');
+  if (b){ b.textContent = unseated.length; b.classList.toggle('hot', unseated.length > 0); }
+
+  const card = (no, cap) => {
+    const nm = tableName(no);
+    const at = (byTable[no]||[]).sort((a,b)=>a.name.localeCompare(b.name));
+    const cls = at.length > cap ? 'over' : at.length === cap ? 'full' : '';
+    return `<div class="tcard ${cls}" data-tcard="${no}">
+      <h4><span class="tnm" data-rename-table="${no}" title="Click to rename">${esc(nm.full)}</span>
+          <span>${at.length}/${cap}</span></h4>
+      ${at.length
+        ? `<ul>${at.map(g=>`<li><span>${esc(g.name)}${g.dietary?` <span class="diet">${esc(g.dietary)}</span>`:''}</span>
+             <button data-unseat="${g.id}" title="Remove">&times;</button></li>`).join('')}</ul>`
+        : `<div class="empty">Nobody yet.</div>`}
+      <div class="seatadd">
+        <input list="unseatedList" data-seatinput="${no}" placeholder="Type a name…" autocomplete="off">
+        <button class="btn sm" data-seatgo="${no}">Add</button>
+      </div></div>`;
+  };
+
+  $('#seatBoard').innerHTML =
+    `<datalist id="unseatedList">${unseated.map(g=>`<option value="${esc(g.name)}"></option>`).join('')}</datalist>
+     <div class="seatgrid">${card(0,2)}${TABLES.map(t=>card(t.n,SEATS_PER)).join('')}</div>`;
+}
+
+async function seatByName(no, raw){
+  const q = (raw||'').trim().toLowerCase();
+  if (!q) return;
+  const pool = D.guests.filter(g => g.table_no == null);
+  let hit = pool.find(g => g.name.toLowerCase() === q);
+  if (!hit){
+    const partial = pool.filter(g => g.name.toLowerCase().includes(q));
+    if (partial.length === 0){
+      const seated = D.guests.find(g => g.name.toLowerCase().includes(q));
+      alert(seated
+        ? `${seated.name} is already at ${tableName(seated.table_no).full}. Remove them there first.`
+        : `No unseated guest matches "${raw}". Add them on the Guests tab first.`);
+      return;
+    }
+    if (partial.length > 1){ alert(`"${raw}" matches ${partial.length} people. Type more of the name.`); return; }
+    hit = partial[0];
+  }
+  await sb.from('guests').update({ table_no: no }).eq('id', hit.id);
+  await load(); seating(); guestRoster();
+}
+
+function rooms(){
+  $('#roomCards').innerHTML = ROOMS.map(r=>`<article class="v">
+    <div><h3>${r.n}</h3><div class="cat">${r.c}</div></div>
+    <div class="note">${r.d}</div></article>`).join('');
+}
+
+function seating(){ floorplan(); seatBoard(); rooms(); }
+
+/* ---------- printable exports ---------- */
+const PRINT_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,600;0,700&display=swap');
+  *{box-sizing:border-box}
+  body{margin:0;padding:46px 52px;background:#fff;color:#111418;
+       font:400 12pt/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:700;
+       letter-spacing:.12em;text-transform:uppercase}
+  header{text-align:center;border-bottom:2px solid #D8C08A;padding-bottom:16px;margin-bottom:26px}
+  header h1{font-size:34pt;letter-spacing:.16em;line-height:1}
+  header .s{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+       letter-spacing:.2em;font-size:9.5pt;color:#565D68;font-weight:600;margin-top:9px;line-height:1.9}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .t{border:1px solid #D5D0C6;border-radius:4px;padding:14px 16px;break-inside:avoid}
+  .t h3{font-size:11pt;letter-spacing:.14em;color:#6E5520;border-bottom:1px solid #EAE7E0;
+       padding-bottom:7px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:baseline}
+  .t h3 em{font-style:normal;font-size:8.5pt;color:#565D68;letter-spacing:0}
+  .t ol{margin:0;padding-left:19px;font-size:11pt;line-height:1.8;color:#3D434D}
+  .t li strong{color:#111418;font-weight:400}
+  .t .d{font-size:8pt;color:#6E5520;font-family:"Barlow Condensed",sans-serif;
+       text-transform:uppercase;letter-spacing:.09em;font-weight:700;margin-left:5px}
+  .t .none{color:#565D68;font-style:italic;font-size:10.5pt}
+  table{width:100%;border-collapse:collapse;font-size:10.5pt}
+  th{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
+     font-size:8.5pt;color:#565D68;text-align:left;font-weight:700;padding:8px 9px;border-bottom:1.5px solid #D5D0C6}
+  td{padding:7px 9px;border-bottom:1px solid #EFECE4;vertical-align:top;color:#3D434D}
+  td strong{color:#111418}
+  tr{break-inside:avoid}
+  .sum{display:flex;gap:26px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+  .sum div{text-align:center}
+  .sum .k{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+     letter-spacing:.14em;font-size:8pt;color:#565D68;font-weight:700}
+  .sum .v{font-size:18pt;font-weight:700;margin-top:2px}
+  footer{margin-top:30px;padding-top:12px;border-top:1px solid #EAE7E0;
+     font-size:8.5pt;color:#565D68;text-align:center}
+  @page{margin:14mm}
+  @media print{body{padding:0}}
+`;
+
+function openPrint(title, bodyHtml){
+  const w = window.open('', '_blank');
+  if (!w){ alert('Your browser blocked the popup. Allow popups for this page and try again.'); return; }
+  const doc = w.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>');
+  doc.close();
+  doc.title = title;
+  const st = doc.createElement('style');
+  st.textContent = PRINT_CSS;
+  doc.head.appendChild(st);
+  doc.body.innerHTML = bodyHtml;
+  setTimeout(() => { w.focus(); w.print(); }, 600);
+}
+
+const PRINT_HEAD = sub => `<header><h1>Joshua + Gabriel</h1>
+  <div class="s">Sunday 6 September 2026 &middot; The American Theater &middot; Charleston<br>${sub}</div></header>`;
+
+const PRINT_FOOT = extra => `<footer>Printed ${new Date().toLocaleDateString('en-US',
+  {month:'long',day:'numeric',year:'numeric'})}${extra ? ' &middot; ' + extra : ''}</footer>`;
+
+function exportSeating(){
+  const byTable = {};
+  for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
+  const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
+  const restricted = D.guests.filter(g=>g.dietary).length;
+
+  const block = no => {
+    const nm = tableName(no);
+    const at = (byTable[no]||[]).sort((a,b)=>a.name.localeCompare(b.name));
+    return `<div class="t"><h3>${esc(nm.full)}<em>${at.length} seated</em></h3>
+      ${at.length
+        ? `<ol>${at.map(g=>`<li><strong>${esc(g.name)}</strong>${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol>`
+        : '<div class="none">No one seated yet.</div>'}</div>`;
+  };
+
+  openPrint('Seating chart', PRINT_HEAD('Seating chart') + `
+    <div class="sum">
+      <div><div class="k">Guests</div><div class="v">${D.guests.length}</div></div>
+      <div><div class="k">Seated</div><div class="v">${D.guests.length - unseated.length}</div></div>
+      <div><div class="k">Tables</div><div class="v">${TABLES.length}</div></div>
+      <div><div class="k">Restrictions</div><div class="v">${restricted}</div></div>
+    </div>
+    <div class="grid">${block(0)}${TABLES.map(t=>block(t.n)).join('')}</div>
+    ${unseated.length ? `<div class="t" style="margin-top:18px;border-color:#E8B4A6">
+      <h3 style="color:#8A2F1C">Not yet seated<em>${unseated.length}</em></h3>
+      <ol>${unseated.map(g=>`<li><strong>${esc(g.name)}</strong>${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol></div>` : ''}
+    ` + PRINT_FOOT(`${restricted} dietary restrictions to relay to Patrick Properties`));
+}
+
+function exportGuests(){
+  const list = [...D.guests].sort((a,b)=>a.name.localeCompare(b.name));
+  const rows = list.map(g=>`<tr>
+    <td><strong>${esc(g.name)}</strong></td>
+    <td>${esc(g.email||'—')}</td>
+    <td>${esc(g.phone||'—')}</td>
+    <td>${g.dietary?esc(g.dietary):'—'}</td>
+    <td>${g.table_no==null?'—':esc(tableName(g.table_no).full)}</td>
+    <td style="text-align:center">${g.contacted?'&#10003;':'—'}</td>
+    <td>${esc(g.notes||'')}</td></tr>`).join('');
+
+  openPrint('Guest list', PRINT_HEAD('Guest list') + `
+    <div class="sum">
+      <div><div class="k">Attending</div><div class="v">${list.length}</div></div>
+      <div><div class="k">Seated</div><div class="v">${list.filter(g=>g.table_no!=null).length}</div></div>
+      <div><div class="k">Details sent</div><div class="v">${list.filter(g=>g.contacted).length}</div></div>
+      <div><div class="k">Restrictions</div><div class="v">${list.filter(g=>g.dietary).length}</div></div>
+    </div>
+    <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Dietary</th><th>Table</th>
+      <th style="text-align:center">Sent</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>
+    ` + PRINT_FOOT('Guaranteed count 80'));
+}
+
 
 function people(){
   $('#peopleBody').innerHTML = PEOPLE.map(p=>{
