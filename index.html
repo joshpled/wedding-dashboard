@@ -169,6 +169,40 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .gtable .x{background:none;border:0;color:var(--ink-3);font-size:17px;padding:3px 7px;border-radius:3px}
 .gtable .x:hover{color:var(--rust);background:var(--rust-lo)}
 
+.fp{width:100%;max-width:560px;margin:0 auto;display:block}
+.fp .rm{fill:#FCFBF8;stroke:var(--rule);stroke-width:1.5}
+.fp .zn{fill:var(--rule-2);opacity:.55}
+.fp .fx{fill:#EFEBE2;stroke:var(--rule);stroke-width:1}
+.fp .lbl{font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;fill:var(--ink-3)}
+.fp .big{font-size:12px;fill:var(--ink-2);letter-spacing:.2em}
+.fp .tb{fill:#fff;stroke:var(--brass);stroke-width:1.6;cursor:pointer}
+.fp .tb:hover{fill:var(--brass-lo)}
+.fp .tb.full{fill:var(--moss-lo);stroke:var(--moss)}
+.fp .tb.over{fill:var(--rust-lo);stroke:var(--rust)}
+.fp .tn{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;
+  fill:var(--ink);text-anchor:middle;pointer-events:none}
+.fp .tc{font-family:"IBM Plex Mono",monospace;font-size:7.5px;fill:var(--ink-3);
+  text-anchor:middle;pointer-events:none}
+.fp .sh{fill:var(--brass-lo);stroke:var(--brass);stroke-width:1.6}
+
+.seatgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:12px;padding:16px}
+.tcard{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);padding:14px 15px}
+.tcard.full{border-color:var(--moss-line);background:var(--moss-lo)}
+.tcard.over{border-color:var(--rust-line);background:var(--rust-lo)}
+.tcard h4{margin:0;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.13em;font-size:13px;display:flex;justify-content:space-between;align-items:baseline}
+.tcard h4 span{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);letter-spacing:0}
+.tcard ul{margin:10px 0 0;padding:9px 0 0;list-style:none;border-top:1px solid var(--rule-2);
+  font-size:13.5px;color:var(--ink-2);line-height:1.7}
+.tcard li{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tcard li button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:0 4px;border-radius:3px;line-height:1}
+.tcard li button:hover{color:var(--rust);background:#fff}
+.tcard .empty{color:var(--ink-3);font-style:italic;font-size:13px;margin-top:9px}
+.tcard select{margin-top:10px;width:100%;font-size:13px}
+.tcard .diet{font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+
 .dietgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .dcard{border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px;background:var(--card);box-shadow:var(--shadow);border-top:4px solid var(--rule)}
 .dcard.vegan{border-top-color:var(--moss)} .dcard.gluten{border-top-color:var(--brass)}
@@ -308,6 +342,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="menu" aria-selected="false">Menu</button>
     <button role="tab" data-tab="runsheet" aria-selected="false">Day of</button>
     <button role="tab" data-tab="guests" aria-selected="false">Guests<span class="badge" id="bGuests">0</span></button>
+    <button role="tab" data-tab="seating" aria-selected="false">Seating<span class="badge" id="bSeat">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
     <a href="timeline.html" target="_blank" rel="noopener"
@@ -436,14 +471,40 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         <button class="btn ghost sm" data-gf="diet">Restrictions only</button>
       </div>
       <div class="card"><table class="gtable">
-        <thead><tr><th style="width:24%">Name</th><th style="width:26%">Email</th><th style="width:17%">Phone</th>
-          <th style="width:16%">Dietary</th><th>Notes</th><th style="width:40px"></th></tr></thead>
+        <thead><tr><th style="width:22%">Name</th><th style="width:24%">Email</th><th style="width:15%">Phone</th>
+          <th style="width:15%">Dietary</th><th style="width:8%">Table</th><th>Notes</th><th style="width:40px"></th></tr></thead>
         <tbody id="guestBody"></tbody>
       </table>
       <div class="addrow">
         <input name="title" id="ngName" placeholder="Add a guest…">
         <button class="btn" id="ngAdd">Add guest</button>
       </div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-seating" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Ballroom floor plan</h2><span class="hint">Click a table to seat people at it. PPHG needs table and seat numbers by 26 August.</span></div>
+      <div class="card pad"><div id="floorplan"></div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>Table assignments</h2><span class="hint" id="seatHint"></span></div>
+      <div class="card"><div id="seatBoard"></div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>The other rooms</h2></div>
+      <div class="vgrid" id="roomCards"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>Walk the venue</h2><span class="hint">PPHG's Matterport tour — useful for picturing where people actually stand.</span></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <iframe id="tour" width="100%" height="460" frameborder="0" allowfullscreen
+          allow="xr-spatial-tracking" style="display:block;border:0"
+          src="https://my.matterport.com/show/?m=nEGwfwfq6yu&brand=0"></iframe>
+      </div>
     </div>
   </section>
 
@@ -764,7 +825,7 @@ const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
 
 /* ---------- render ---------- */
 function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
-  menu(); runsheet(); guestRoster(); people(); renderDocs(); }
+  menu(); runsheet(); guestRoster(); seating(); people(); renderDocs(); }
 
 function applyMoneyLock(){
   $('#moneyLock').hidden = moneyOpen;
@@ -988,9 +1049,116 @@ function drawRoster(){
         ${types.map(o=>`<option value="${esc(o)}"${g.dietary===o?' selected':''}>${esc(o)}</option>`).join('')}
         <option value="${OTHER}">Add another…</option>
       </select></td>
+    <td><input value="${g.table_no ?? ''}" data-gid="${g.id}" data-gf="table_no" placeholder="—"
+        style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
     <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
     <td><button class="x" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`).join('')
-    : `<tr><td colspan="6" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+    : `<tr><td colspan="7" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+}
+
+/* ---------- seating ---------- */
+const SEATS_PER = 8;
+// positions mirror the Invitation Only layout: two columns of five, stage at the top
+const TABLES = [
+  {n:1,x:118,y:196},{n:2,x:196,y:196},
+  {n:3,x:118,y:246},{n:4,x:196,y:246},
+  {n:5,x:118,y:296},{n:6,x:196,y:296},
+  {n:7,x:118,y:346},{n:8,x:196,y:346},
+  {n:9,x:118,y:396},{n:10,x:196,y:396}
+];
+
+const ROOMS = [
+  { n:'Ballroom', c:'Reception · 80 seated',
+    d:'Stage at the north end with the dance floor in front of it. Ten 4x4 guest tables in two columns, sweetheart table between them, cake table on the west wall. Three stations along the side walls, two bars and four cocktail tables at the south end.' },
+  { n:'Cinema', c:'Ceremony · stadium seating',
+    d:'Fixed stadium rows, so there is no seating chart to make. The all-guest photo happens here straight after the ceremony, then couple portraits once the room clears.' },
+  { n:'Stars Lounge', c:'Cocktail hour · 24\u2032 11\u2033 × 17\u2032',
+    d:'Getting-ready room until 5:00, then flipped for cocktail hour. Bar on the west wall, screen on the south. Three high tops and three low tops, nine chairs. Standing room — no assigned seating.' },
+  { n:'Lobby', c:'Arrivals · 37\u2032 4\u2033 wide',
+    d:'Doors open here at 4:30. Popcorn displayed at the concession stand. Restrooms off the lobby, both accessible.' }
+];
+
+function floorplan(){
+  const counts = {};
+  for (const g of D.guests) if (g.table_no) counts[g.table_no] = (counts[g.table_no]||0)+1;
+
+  const tables = TABLES.map(t=>{
+    const c = counts[t.n]||0;
+    const cls = c > SEATS_PER ? 'over' : c === SEATS_PER ? 'full' : '';
+    return `<g data-table="${t.n}" style="cursor:pointer">
+      <rect class="tb ${cls}" x="${t.x-26}" y="${t.y-19}" width="52" height="38" rx="3"/>
+      <text class="tn" x="${t.x}" y="${t.y-1}">${t.n}</text>
+      <text class="tc" x="${t.x}" y="${t.y+11}">${c}/${SEATS_PER}</text></g>`;
+  }).join('');
+
+  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 314 470" xmlns="http://www.w3.org/2000/svg" role="img"
+      aria-label="Ballroom floor plan with ten guest tables">
+    <rect class="rm" x="42" y="20" width="230" height="436" rx="2"/>
+    <rect class="fx" x="72" y="20" width="170" height="30"/>
+    <text class="lbl big" x="157" y="40" text-anchor="middle">STAGE</text>
+    <rect class="zn" x="112" y="58" width="90" height="46"/>
+    <text class="lbl" x="157" y="85" text-anchor="middle">DANCE FLOOR</text>
+    <rect class="fx" x="48" y="60" width="34" height="26" rx="2"/>
+    <text class="lbl" x="65" y="76" text-anchor="middle">CAKE</text>
+    <rect class="sh" x="132" y="118" width="50" height="30" rx="3"/>
+    <text class="lbl" x="157" y="137" text-anchor="middle" style="fill:var(--brass)">SWEETHEART</text>
+    ${tables}
+    <rect class="fx" x="46" y="238" width="16" height="86" rx="2"/>
+    <text class="lbl" x="54" y="286" text-anchor="middle" transform="rotate(-90 54 286)">STATION 3</text>
+    <rect class="fx" x="252" y="196" width="16" height="86" rx="2"/>
+    <text class="lbl" x="260" y="242" text-anchor="middle" transform="rotate(-90 260 242)">STATION 2</text>
+    <rect class="fx" x="252" y="292" width="16" height="86" rx="2"/>
+    <text class="lbl" x="260" y="336" text-anchor="middle" transform="rotate(-90 260 336)">STATION 1</text>
+    <rect class="zn" x="52" y="418" width="210" height="34"/>
+    <rect class="fx" x="118" y="422" width="78" height="12" rx="2"/>
+    <text class="lbl" x="157" y="431" text-anchor="middle">BAR</text>
+    <rect class="fx" x="118" y="440" width="78" height="12" rx="2"/>
+    <text class="lbl" x="157" y="449" text-anchor="middle">BAR</text>
+    <circle class="fx" cx="76" cy="426" r="8"/><circle class="fx" cx="238" cy="426" r="8"/>
+    <circle class="fx" cx="76" cy="447" r="8"/><circle class="fx" cx="238" cy="447" r="8"/>
+    <text class="lbl" x="157" y="410" text-anchor="middle" style="fill:var(--ink-3)">COCKTAIL TABLES &amp; BARS</text>
+  </svg>`;
+}
+
+function seatBoard(){
+  const byTable = {};
+  for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
+  const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
+
+  $('#seatHint').textContent = unseated.length
+    ? `${unseated.length} still unseated of ${D.guests.length}.`
+    : `Everyone is seated.`;
+  $('#bSeat').textContent = unseated.length;
+  $('#bSeat').classList.toggle('hot', unseated.length > 0);
+
+  const opts = `<option value="">Seat someone here…</option>` +
+    unseated.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+
+  const card = (no, label, cap) => {
+    const at = (byTable[no]||[]).sort((a,b)=>a.name.localeCompare(b.name));
+    const cls = at.length > cap ? 'over' : at.length === cap ? 'full' : '';
+    return `<div class="tcard ${cls}">
+      <h4>${label}<span>${at.length}/${cap}</span></h4>
+      ${at.length
+        ? `<ul>${at.map(g=>`<li><span>${esc(g.name)}${g.dietary?` <span class="diet">${esc(g.dietary)}</span>`:''}</span>
+             <button data-unseat="${g.id}" title="Remove">&times;</button></li>`).join('')}</ul>`
+        : `<div class="empty">Nobody yet.</div>`}
+      <select data-seat="${no}">${opts}</select>
+    </div>`;
+  };
+
+  $('#seatBoard').innerHTML = `<div class="seatgrid">
+    ${card(0,'Sweetheart table',2)}
+    ${TABLES.map(t=>card(t.n,'Table '+t.n,SEATS_PER)).join('')}
+  </div>`;
+}
+
+function seating(){ floorplan(); seatBoard(); rooms(); }
+
+function rooms(){
+  $('#roomCards').innerHTML = ROOMS.map(r=>`<article class="v">
+    <div><h3>${r.n}</h3><div class="cat">${r.c}</div></div>
+    <div class="note">${r.d}</div></article>`).join('');
 }
 
 function people(){
@@ -1052,6 +1220,12 @@ $('#gSearch').addEventListener('input', e => { gQuery = e.target.value.trim().to
 $$('[data-gf]').forEach(b => b.onclick = () => { gFilter = b.dataset.gf; drawRoster(); });
 
 document.addEventListener('change', async e=>{
+  const seat = e.target.closest('select[data-seat]');
+  if (seat){
+    const id = seat.value; if (!id) return;
+    await sb.from('guests').update({ table_no: Number(seat.dataset.seat) }).eq('id', id);
+    await load(); seating(); guestRoster(); return;
+  }
   const gs = e.target.closest('select[data-gid]');
   if (gs){
     let val = gs.value;
@@ -1076,13 +1250,40 @@ document.addEventListener('blur', async e=>{
   const gi = e.target.closest('input[data-gid]'); if (!gi) return;
   const g = D.guests.find(x => String(x.id) === gi.dataset.gid); if (!g) return;
   const field = gi.dataset.gf, next = gi.value.trim();
-  if ((g[field] || '') === next) return;
+  if (String(g[field] ?? '') === next) return;
   if (field === 'name' && !next){ gi.value = g.name; return; }
-  await sb.from('guests').update({ [field]: next || null }).eq('id', g.id);
-  await load(); guestRoster();
+  let val = next || null;
+  if (field === 'table_no'){
+    if (val !== null){
+      const n = parseInt(val, 10);
+      if (isNaN(n) || n < 0 || n > TABLES.length){
+        alert(`Table must be 0 for the sweetheart table, or 1 to ${TABLES.length}.`);
+        gi.value = g.table_no ?? ''; return;
+      }
+      val = n;
+    }
+  }
+  await sb.from('guests').update({ [field]: val }).eq('id', g.id);
+  await load(); guestRoster(); seating();
 }, true);
 
 document.addEventListener('click', async e=>{
+  const un = e.target.closest('[data-unseat]');
+  if (un){
+    await sb.from('guests').update({ table_no:null, seat_no:null }).eq('id', un.dataset.unseat);
+    await load(); seating(); guestRoster(); return;
+  }
+  const tbl = e.target.closest('[data-table]');
+  if (tbl){
+    const cards = $$('#seatBoard .tcard');
+    const target = cards[Number(tbl.dataset.table)];   // index 0 is the sweetheart card
+    if (target){
+      target.scrollIntoView({ behavior:'smooth', block:'center' });
+      target.style.outline = '2px solid var(--brass)';
+      setTimeout(()=>{ target.style.outline = ''; }, 1400);
+    }
+    return;
+  }
   const cfm = e.target.closest('[data-confirm]');
   if (cfm){
     await sb.from('milestone_status').upsert({ key:cfm.dataset.confirm, confirmed:true,
