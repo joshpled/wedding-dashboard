@@ -233,6 +233,15 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .tcard .seatadd{margin-top:11px;display:flex;gap:6px}
 .tcard .seatadd input{flex:1;min-width:0;font-size:13px;padding:6px 8px}
 .tcard .seatadd .btn{padding:6px 12px;font-size:12.5px}
+.sidesw{display:inline-flex;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;background:#fff}
+.sidesw button{background:none;border:0;padding:6px 13px;color:var(--ink-3);
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;
+  font-size:12.5px;font-weight:700;border-right:1px solid var(--rule-2)}
+.sidesw button:last-child{border-right:0}
+.sidesw button:hover{color:var(--ink);background:var(--rule-2)}
+.sidesw button[aria-pressed="true"]{background:var(--brass-lo);color:var(--brass)}
+.fp g[data-table].dim{opacity:.22}
+
 .tcard .trm{background:none;border:0;color:var(--ink-3);font-size:15px;line-height:1;
   padding:1px 5px;margin-left:5px;border-radius:3px}
 .tcard .trm:hover{color:var(--rust);background:#fff}
@@ -543,7 +552,12 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
     <div class="sec">
       <div class="sec-h"><h2>Table assignments</h2><span class="hint" id="seatHint"></span>
-        <span style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap">
+        <span style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+          <span class="sidesw" id="sideSw">
+            <button data-side="all">All</button>
+            <button data-side="left">Left</button>
+            <button data-side="right">Right</button>
+          </span>
           <button class="btn ghost sm" id="addTable">+ Add table</button>
           <button class="btn ghost sm" id="expSeat">Print seating chart</button>
         </span></div>
@@ -814,6 +828,7 @@ const daysTo = s => Math.ceil((parseD(s) - new Date()) / 86400000);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
+let sideFilter = 'all';
 let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{} }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
@@ -1182,6 +1197,13 @@ const ROOMS = [
     d:'Doors open here at 4:30. Popcorn displayed at the concession stand. Restrooms off the lobby, both accessible.' }
 ];
 
+function tableSide(n){
+  const t = TABLES.find(x => x.n === n);
+  if (!t) return 'centre';
+  return t.x < 150 ? 'left' : t.x > 150 ? 'right' : 'centre';
+}
+const matchesSide = n => sideFilter === 'all' || tableSide(n) === sideFilter || tableSide(n) === 'centre';
+
 function tableName(n){
   if (n === 0) return { full:'Sweetheart table', short:'SH' };
   const custom = D.tnames[n];
@@ -1207,7 +1229,7 @@ function floorplan(){
     const c = counts[t.n]||0;
     const cls = c > SEATS_PER ? 'over' : c === SEATS_PER ? 'full' : '';
     const nm = tableName(t.n);
-    return `<g data-table="${t.n}" style="cursor:pointer">
+    return `<g data-table="${t.n}" class="${matchesSide(t.n) ? '' : 'dim'}" style="cursor:pointer">
       ${chairs(t.x,t.y,20)}
       <rect class="tb ${cls}" x="${t.x-13}" y="${t.y-13}" width="26" height="26" transform="rotate(45 ${t.x} ${t.y})"/>
       <text class="tn" x="${t.x}" y="${t.y+3}">${esc(nm.short)}</text>
@@ -1313,9 +1335,15 @@ function seatBoard(){
 
   const cap = TABLES.length * SEATS_PER;
   const toSeat = D.guests.filter(g => g.table_no !== 0).length;
+  const seatedOn = side => D.guests.filter(g => g.table_no && tableSide(g.table_no) === side).length;
+  const sideBits = sideFilter === 'all'
+    ? `Left ${seatedOn('left')} seated · right ${seatedOn('right')} seated.`
+    : `${sideFilter === 'left' ? 'Left' : 'Right'} side: ${seatedOn(sideFilter)} seated across ` +
+      `${TABLES.filter(t => tableSide(t.n) === sideFilter).length} tables.`;
   $('#seatHint').textContent =
     (unseated.length ? `${unseated.length} still unseated of ${toSeat}. ` : 'Everyone is seated. ') +
-    `${TABLES.length} tables, ${cap} places${cap < toSeat ? ` — ${toSeat - cap} short` : `, ${cap - toSeat} spare`}.`;
+    `${TABLES.length} tables, ${cap} places${cap < toSeat ? ` — ${toSeat - cap} short` : `, ${cap - toSeat} spare`}. ` +
+    sideBits;
   const addBtn = $('#addTable');
   if (addBtn){
     addBtn.disabled = TABLES.length >= MAX_TABLES;
@@ -1342,9 +1370,13 @@ function seatBoard(){
       </div></div>`;
   };
 
+  const shown = TABLES.filter(t => matchesSide(t.n));
   $('#seatBoard').innerHTML =
     `<datalist id="unseatedList">${unseated.map(g=>`<option value="${esc(g.name)}"></option>`).join('')}</datalist>
-     <div class="seatgrid">${TABLES.map(t=>card(t.n,SEATS_PER)).join('')}</div>`;
+     <div class="seatgrid">${shown.length
+        ? shown.map(t=>card(t.n,SEATS_PER)).join('')
+        : `<div style="padding:8px;color:var(--ink-3)">No tables on that side yet.</div>`}</div>`;
+  $$('#sideSw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.side === sideFilter)));
 }
 
 async function seatByName(no, raw){
@@ -1784,6 +1816,8 @@ $('#ngAdd').onclick = async ()=>{
   await load(); guestRoster();
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
+$$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
+
 $('#addTable').onclick = async () => {
   if (TABLES.length >= MAX_TABLES) return;
   const used = new Set(TABLES.map(t => t.n));
