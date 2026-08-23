@@ -1107,11 +1107,10 @@ function drawRoster(){
 const SEATS_PER = 8;
 
 const TABLES = [
-  {n:1,x:100,y:200},{n:2,x:200,y:200},
-  {n:3,x:100,y:260},{n:4,x:200,y:260},
-  {n:5,x:100,y:320},{n:6,x:200,y:320},
-  {n:7,x:100,y:380},{n:8,x:200,y:380},
-  {n:9,x:100,y:440},{n:10,x:200,y:440}
+  {n:1,x:100,y:206},{n:2,x:200,y:206},
+  {n:3,x:100,y:274},{n:4,x:200,y:274},
+  {n:5,x:100,y:342},{n:6,x:200,y:342},
+  {n:7,x:100,y:410},{n:8,x:200,y:410}
 ];
 
 const ROOMS = [
@@ -1157,7 +1156,7 @@ function floorplan(){
       <text class="tc" x="${t.x}" y="${t.y+31}">${c}/${SEATS_PER}</text></g>`;
   }).join('');
 
-  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 300 566" xmlns="http://www.w3.org/2000/svg"
+  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 300 536" xmlns="http://www.w3.org/2000/svg"
       role="img" aria-label="Ballroom floor plan">
     <defs><pattern id="chk" width="16" height="16" patternUnits="userSpaceOnUse">
       <rect width="16" height="16" fill="#FBFAF7"/>
@@ -1165,16 +1164,16 @@ function floorplan(){
       <rect x="8" y="8" width="8" height="8" fill="#EFECE4"/>
     </pattern></defs>
 
-    <rect class="rm" x="30" y="14" width="240" height="538"/>
+    <rect class="rm" x="30" y="14" width="240" height="508"/>
 
     <rect class="fx" x="62" y="14" width="176" height="30"/>
     <text class="lbl big" x="150" y="34" text-anchor="middle">STAGE</text>
 
     <rect x="66" y="50" width="168" height="26" fill="#fff" stroke="#3D434D" stroke-width="1.2"/>
-    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">SEATING FOR 80</text>
+    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">8 TABLES · SEATS 64</text>
     <text class="lbl" x="150" y="71" text-anchor="middle" style="fill:#3D434D">+ SWEETHEART TABLE</text>
 
-    <rect x="46" y="96" width="208" height="386" fill="url(#chk)"/>
+    <rect x="46" y="96" width="208" height="356" fill="url(#chk)"/>
 
     <circle class="fx" cx="46" cy="106" r="13"/>
     <text class="lbl" x="46" y="109" text-anchor="middle" style="font-size:7px">CAKE</text>
@@ -1188,27 +1187,27 @@ function floorplan(){
       <text class="lbl" x="150" y="159" text-anchor="middle" style="fill:#6E5520;font-size:8px">SH</text>
     </g>
 
-    <text class="lbl big" x="150" y="320" text-anchor="middle" transform="rotate(-90 150 320)"
+    <text class="lbl big" x="150" y="308" text-anchor="middle" transform="rotate(-90 150 308)"
       style="fill:#878D99;letter-spacing:.34em">BALLROOM</text>
 
     ${tables}
 
-    <rect class="fx" x="32" y="270" width="14" height="80"/>
-    <text class="lbl" x="39" y="310" text-anchor="middle" transform="rotate(-90 39 310)">STATION 3</text>
-    <rect class="fx" x="254" y="212" width="14" height="80"/>
-    <text class="lbl" x="261" y="252" text-anchor="middle" transform="rotate(-90 261 252)">STATION 2</text>
-    <rect class="fx" x="254" y="330" width="14" height="80"/>
-    <text class="lbl" x="261" y="370" text-anchor="middle" transform="rotate(-90 261 370)">STATION 1</text>
+    <rect class="fx" x="32" y="272" width="14" height="80"/>
+    <text class="lbl" x="39" y="312" text-anchor="middle" transform="rotate(-90 39 312)">STATION 3</text>
+    <rect class="fx" x="254" y="214" width="14" height="80"/>
+    <text class="lbl" x="261" y="254" text-anchor="middle" transform="rotate(-90 261 254)">STATION 2</text>
+    <rect class="fx" x="254" y="332" width="14" height="80"/>
+    <text class="lbl" x="261" y="372" text-anchor="middle" transform="rotate(-90 261 372)">STATION 1</text>
 
-    <rect x="30" y="494" width="240" height="58" fill="#E7E3DA"/>
-    <rect class="fx" x="112" y="504" width="76" height="14" rx="1"/>
-    <text class="lbl" x="150" y="514" text-anchor="middle">BAR</text>
-    <rect class="fx" x="112" y="528" width="76" height="14" rx="1"/>
-    <text class="lbl" x="150" y="538" text-anchor="middle">BAR</text>
-    <circle class="cok" cx="72" cy="509" r="9"/><text class="lbl" x="72" y="512" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="228" cy="509" r="9"/><text class="lbl" x="228" y="512" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="72" cy="533" r="9"/><text class="lbl" x="72" y="536" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="228" cy="533" r="9"/><text class="lbl" x="228" y="536" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <rect x="30" y="464" width="240" height="58" fill="#E7E3DA"/>
+    <rect class="fx" x="112" y="474" width="76" height="14" rx="1"/>
+    <text class="lbl" x="150" y="484" text-anchor="middle">BAR</text>
+    <rect class="fx" x="112" y="498" width="76" height="14" rx="1"/>
+    <text class="lbl" x="150" y="508" text-anchor="middle">BAR</text>
+    <circle class="cok" cx="72" cy="479" r="9"/><text class="lbl" x="72" y="482" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="228" cy="479" r="9"/><text class="lbl" x="228" y="482" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="72" cy="503" r="9"/><text class="lbl" x="72" y="506" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="228" cy="503" r="9"/><text class="lbl" x="228" y="506" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
   </svg>`;
 }
 
