@@ -6,7 +6,7 @@
 <title>Payment schedule · Joshua + Gabriel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#111418; --ink-2:#3D434D; --ink-3:#565D68;
@@ -14,22 +14,27 @@
   --brass:#6E5520; --brass-lo:#FAF3E2; --brass-line:#D8C08A;
   --rust:#8A2F1C;  --rust-lo:#FDEEEA;  --rust-line:#E8B4A6;
   --moss:#26492F;  --moss-lo:#E9F2EB;  --moss-line:#A9C7B1;
+  --r:4px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);
   font:400 16px/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:860px;margin:0 auto;padding:44px 26px 90px}
-h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase}
+.wrap{max-width:880px;margin:0 auto;padding:44px 26px 90px}
+h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
 
-header{text-align:center;border-bottom:2px solid var(--brass-line);padding-bottom:18px;margin-bottom:26px}
-header h1{font-size:clamp(30px,6vw,46px);letter-spacing:.16em;line-height:1}
+header{text-align:center;border-bottom:2px solid var(--brass-line);padding-bottom:18px;margin-bottom:26px;position:relative}
+header h1{font-size:clamp(28px,6vw,44px);letter-spacing:.16em;line-height:1}
 header .s{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.2em;
   font-size:12px;color:var(--ink-3);font-weight:600;margin-top:10px;line-height:1.9}
+header .back{position:absolute;left:0;top:2px;font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.12em;font-size:13px;font-weight:700;
+  color:var(--brass);text-decoration:none}
+header .back:hover{text-decoration:underline}
 
-.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;
   background:var(--rule);border:1px solid var(--rule);margin-bottom:30px}
 .tally div{background:var(--card);padding:14px 16px;text-align:center}
 .tally .k{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;
@@ -37,17 +42,17 @@ header .s{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;let
 .tally .v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:500;margin-top:4px}
 .tally .v.due{color:var(--rust)} .tally .v.paid{color:var(--moss)}
 
-h2.sec{font-size:14px;letter-spacing:.18em;color:var(--brass);
-  border-bottom:1px solid var(--brass-line);padding-bottom:8px;margin:34px 0 16px}
+h2.sec{font-size:14px;letter-spacing:.18em;color:var(--brass);border-bottom:1px solid var(--brass-line);
+  padding-bottom:8px;margin:34px 0 16px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+h2.sec em{font-style:normal;font-family:"Public Sans",sans-serif;text-transform:none;
+  letter-spacing:0;font-size:13px;color:var(--ink-3);font-weight:400}
 
 .pay{border:1px solid var(--rule);border-left:5px solid var(--rust);background:var(--card);
   padding:18px 20px;margin-bottom:14px;break-inside:avoid}
 .pay.done{border-left-color:var(--moss);background:#FCFDFC}
 .pay .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.pay h3{font-size:17px;letter-spacing:.04em;text-transform:none;
-  font-family:"Public Sans",sans-serif;font-weight:700}
-.pay .amt{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;
-  color:var(--rust);white-space:nowrap}
+.pay h3{font-size:17px;letter-spacing:.04em;text-transform:none;font-family:"Public Sans",sans-serif;font-weight:700}
+.pay .amt{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;color:var(--rust);white-space:nowrap}
 .pay.done .amt{color:var(--moss);font-size:18px}
 .pay .when{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
   font-size:12.5px;font-weight:700;color:var(--rust);margin-top:3px}
@@ -55,22 +60,27 @@ h2.sec{font-size:14px;letter-spacing:.18em;color:var(--brass);
 .pay .how{margin-top:13px;padding-top:12px;border-top:1px solid var(--rule-2);
   font-size:14.5px;color:var(--ink-2);line-height:1.6}
 .pay .how b{color:var(--ink);font-weight:700}
-.pay .how .lab{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
-  letter-spacing:.12em;font-size:11px;font-weight:700;color:var(--ink-3);
-  display:block;margin-bottom:3px}
+.lab{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;
+  font-size:11px;font-weight:700;color:var(--ink-3);display:block;margin-bottom:3px}
 .pay .addr{font-family:"IBM Plex Mono",monospace;font-size:14px;line-height:1.7;
-  background:var(--brass-lo);border:1px solid var(--brass-line);padding:12px 15px;
-  margin-top:10px;white-space:pre-line}
+  background:var(--brass-lo);border:1px solid var(--brass-line);padding:12px 15px;margin-top:10px;white-space:pre-line}
 .pay .warn{margin-top:10px;font-size:13.5px;color:var(--rust);background:var(--rust-lo);
   border:1px solid var(--rust-line);padding:10px 13px;line-height:1.55}
-.pay .box{width:15px;height:15px;border:1.6px solid var(--ink-3);display:inline-block;
-  margin-right:9px;vertical-align:-2px;border-radius:2px}
+.pay .act{margin-top:14px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 
-table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);
-  border:1px solid var(--rule)}
-th{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
-  font-size:11.5px;color:var(--ink-3);text-align:left;font-weight:700;
-  padding:10px 13px;border-bottom:1.5px solid var(--rule)}
+.btn{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line);border-radius:var(--r);
+  padding:9px 16px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.12em;font-size:14px;font-weight:700}
+.btn:hover{background:#F4E9CE;border-color:#C7AA6C}
+.btn.ghost{background:#fff;color:var(--ink-2);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--rule-2);color:var(--ink)}
+.btn.sm{padding:6px 12px;font-size:12.5px}
+.btn.go{background:var(--moss-lo);color:var(--moss);border-color:var(--moss-line)}
+.btn.go:hover{background:#DCEADF}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);border:1px solid var(--rule)}
+th{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-size:11.5px;
+  color:var(--ink-3);text-align:left;font-weight:700;padding:10px 13px;border-bottom:1.5px solid var(--rule)}
 td{padding:9px 13px;border-bottom:1px solid var(--rule-2);color:var(--ink-2)}
 td strong{color:var(--ink)}
 tr:last-child td{border-bottom:0}
@@ -80,252 +90,304 @@ tfoot td{background:#FCFBF9;font-weight:700;color:var(--ink);border-top:1.5px so
 .note{border-left:4px solid var(--brass);background:var(--brass-lo);padding:15px 18px;margin-top:14px}
 .note h3{font-size:13.5px;letter-spacing:.1em;margin-bottom:6px}
 .note p{margin:0;font-size:14.5px;color:var(--ink-2);line-height:1.6}
-.note p+p{margin-top:8px}
 
-footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--rule);
-  font-size:12.5px;color:var(--ink-3);text-align:center;line-height:1.9}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;
+  color:var(--ink-3);text-align:center;line-height:1.9}
+.who{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-weight:600}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);margin-right:7px}
+
+.gate{max-width:430px;margin:14vh auto;padding:0 20px;text-align:center}
+.gate .card{background:var(--card);border:1px solid #E8E2D4;border-radius:var(--r);padding:34px 28px;
+  box-shadow:0 1px 2px rgba(17,20,24,.03),0 18px 44px -30px rgba(110,85,32,.3)}
+.gate h1{font-size:40px;letter-spacing:.16em;color:#9A7B34}
+.gate p{color:var(--ink-2);font-size:14.5px;margin:14px 0 20px;line-height:1.6}
+.gate form{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.gate input{flex:1;min-width:190px;padding:10px 12px;font:inherit;font-size:15px;
+  border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink);text-align:left}
+.gate .err{margin-top:14px;font-size:13.5px;color:var(--rust)}
+
+dialog{border:1px solid var(--rule);border-radius:var(--r);padding:0;max-width:360px;width:92vw;
+  box-shadow:0 24px 60px -22px rgba(17,20,24,.3)}
+dialog::backdrop{background:rgba(90,86,78,.22)}
+dialog .dh{padding:16px 18px 0} dialog h3{font-size:14px;letter-spacing:.1em}
+dialog .db{padding:14px 18px;display:grid;gap:7px}
+dialog .db p{margin:0 0 6px;font-size:14px;color:var(--ink-2);line-height:1.55}
+dialog input{border:1px solid var(--rule);border-radius:var(--r);padding:8px 10px;font:inherit;font-size:14px}
+dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--rule-2)}
 
 .print{position:fixed;right:18px;bottom:18px;background:var(--brass-lo);color:var(--brass);
   border:1px solid var(--brass-line);border-radius:99px;padding:11px 22px;
   font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;
-  font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px -8px rgba(17,20,24,.3)}
+  font-size:14px;font-weight:700;box-shadow:0 6px 20px -8px rgba(17,20,24,.3)}
 .print:hover{background:#F4E9CE}
 
 @media print{
   body{background:#fff;font-size:10.5pt}
   .wrap{max-width:100%;padding:0}
-  .print{display:none}
+  .print,.pay .act,header .back{display:none}
   .pay,tr,.note{break-inside:avoid}
   h2.sec{break-after:avoid}
   @page{margin:14mm}
 }
-@media (max-width:560px){ .wrap{padding:26px 15px 70px} }
+@media (max-width:560px){ .wrap{padding:26px 15px 70px} header .back{position:static;display:block;margin-bottom:12px} }
 </style>
 </head>
 <body>
-<div class="wrap">
 
+<div class="gate" id="gate" hidden>
+  <div class="card">
+    <h1>Payments</h1>
+    <p>This page shows every amount and balance. Enter the passphrase, then your name so confirmations are attributed.</p>
+    <form id="gateForm">
+      <input type="password" id="gatePw" placeholder="Passphrase" autocomplete="off">
+      <input type="text" id="gateName" placeholder="Your name" maxlength="40">
+      <button class="btn" type="submit">Open</button>
+    </form>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+
+<div class="wrap" id="app" hidden>
   <header>
+    <a class="back" href="index.html">&#8592; Dashboard</a>
     <h1>Payment Schedule</h1>
     <div class="s">Joshua + Gabriel &middot; Sunday 6 September 2026<br>
       The American Theater &middot; Charleston, South Carolina</div>
   </header>
 
-  <div class="tally">
-    <div><div class="k">Contracted</div><div class="v num">$39,223</div></div>
-    <div><div class="k">Paid</div><div class="v paid num">$17,849</div></div>
-    <div><div class="k">Still owed</div><div class="v due num">$21,374</div></div>
-    <div><div class="k">Next due</div><div class="v due num">Aug 22</div></div>
-  </div>
+  <div class="tally" id="tally"></div>
 
-  <h2 class="sec">Still to pay</h2>
+  <h2 class="sec">Still to pay <em id="dueHint"></em></h2>
+  <div id="due"></div>
 
-  <div class="pay">
-    <div class="top">
-      <div><h3><span class="box"></span>Palmetto Strings</h3>
-        <div class="when">Due Saturday 22 August &middot; today</div></div>
-      <div class="amt">$650.00</div>
-    </div>
-    <div class="how">
-      <span class="lab">How to pay</span>
-      <b>Venmo &rarr; @palmettostrings</b><br>
-      Lauren Williams &middot; 843.532.8656 &middot; lauren@palmettostrings.com<br>
-      1051 Johnnie Dodds Blvd, Suite F, Mount Pleasant, SC 29464
-      <div class="warn"><b>If this is not received before the day of the event, the contract requires cash
-      to be handed to the performers before they start.</b> Returned check fee is $35.</div>
-    </div>
-  </div>
-
-  <div class="pay">
-    <div class="top">
-      <div><h3><span class="box"></span>Richard Bell Photography</h3>
-        <div class="when">Due Sunday 23 August</div></div>
-      <div class="amt">$2,800.00</div>
-    </div>
-    <div class="how">
-      <span class="lab">How to pay</span>
-      <b>Online through the 17hats client portal</b> &mdash; use the link in their payment reminder email,
-      subject &ldquo;Your Invoice is Coming Up for Payment&rdquo;.<br>
-      Invoice 17H1742217 &middot; info@richbell.com<br>
-      Mell Bell &middot; 864.320.2428<br>
-      672 Marina Dr, Suite 103, Charleston, SC 29492
-    </div>
-  </div>
-
-  <div class="pay">
-    <div class="top">
-      <div><h3><span class="box"></span>Patrick Properties Hospitality Group</h3>
-        <div class="when">Due Wednesday 26 August &middot; final payment and guest count</div></div>
-      <div class="amt">$17,109.37</div>
-    </div>
-    <div class="how">
-      <span class="lab">How to pay &mdash; cashier's check only</span>
-      A tracking number is required, so this <b>cannot go by regular USPS mail</b>.
-      Send it by <b>UPS or FedEx</b>.
-      <div class="addr">The American Theater
-ATTN: Olivia Nilsen
-456 King Street
-Charleston, SC 29403</div>
-      <div class="warn"><b>Check the street number before you ship.</b> The mailing instruction says
-      <b>456</b> King Street; the venue address on the BEO and every other document is
-      <b>446</b> King Street. Confirm with Olivia in writing which is correct &mdash;
-      a cashier's check sent to the wrong address is not easy to recover.</div>
-      <div style="margin-top:11px">
-        <span class="lab">Allow shipping time</span>
-        To land by the 26th, ship no later than <b>Monday 24 August</b> with overnight or two-day service.
-        Keep the tracking number.<br>
-        Olivia Nilsen &middot; 843.628.7116 &middot; olivia@pphgcharleston.com
-      </div>
-    </div>
-  </div>
-
-  <div class="pay">
-    <div class="top">
-      <div><h3><span class="box"></span>Snyder Events &mdash; linen balance</h3>
-        <div class="when">Due Tuesday 1 September</div></div>
-      <div class="amt">$814.50</div>
-    </div>
-    <div class="how">
-      <span class="lab">How to pay</span>
-      <b>ePay link</b> &mdash; Loraine sends it. The deposit went through the same way on 19 August.<br>
-      Order #349216-14 &middot; Snyder Events &middot; 843.766.3366<br>
-      3875 Meeting St, North Charleston, SC 29405<br>
-      <b>Loraine confirmed the balance is due the Tuesday before the event.</b>
-    </div>
-  </div>
-
-  <h2 class="sec">Already paid</h2>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Dream Day Charleston &mdash; DJ</h3>
-        <div class="when">Paid in full 21 August</div></div>
-      <div class="amt">$2,800.00</div>
-    </div>
-    <div class="how">$500 retainer, then $2,300 by Venmo. Dream Day confirmed a $0.00 balance for 23 August.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Invitation Only &mdash; planning and design</h3>
-        <div class="when">Paid in full</div></div>
-      <div class="amt">$5,734.75</div>
-    </div>
-    <div class="how">$2,825 on 1 December 2025, balance $2,909.75 in August. Invoice 00498.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Snyder Events &mdash; deposit</h3>
-        <div class="when">Received and confirmed 19 August</div></div>
-      <div class="amt">$814.50</div>
-    </div>
-    <div class="how">50% of order #349216-14. Balance of $814.50 still due 1 September.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Patrick Properties &mdash; deposits</h3>
-        <div class="when">Paid across three instalments</div></div>
-      <div class="amt">$6,500.00</div>
-    </div>
-    <div class="how">$2,000 venue rental and $500 damage deposit on 25 November 2025, then a
-      $4,000 catering deposit on 6 March 2026. All by Amex.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Palmetto Strings &mdash; deposit</h3>
-        <div class="when">Paid 22 July</div></div>
-      <div class="amt">$650.00</div>
-    </div>
-    <div class="how">Venmo to @palmettostrings. Non-refundable per the contract.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Richard Bell Photography &mdash; retainer</h3>
-        <div class="when">Paid 2 July</div></div>
-      <div class="amt">$1,000.00</div>
-    </div>
-    <div class="how">Against a $3,800 package. Balance of $2,800 due 23 August.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Publix &mdash; cake</h3>
-        <div class="when">Paid 7 August</div></div>
-      <div class="amt">$350.00</div>
-    </div>
-    <div class="how">Two tiers. Cut and served by PPHG at 8:15 PM.</div>
-  </div>
-
-  <div class="pay done">
-    <div class="top">
-      <div><h3>Florals</h3>
-        <div class="when">Paid</div></div>
-      <div class="amt">&mdash;</div>
-    </div>
-    <div class="how">Stephen, 301.549.8622. Amanda Cubello arranging and delivering at 1:00 PM,
-      443.848.9762.</div>
-  </div>
+  <h2 class="sec">Settled</h2>
+  <div id="settled"></div>
 
   <h2 class="sec">Everything at a glance</h2>
-
   <table>
-    <thead><tr><th>Vendor</th><th>What for</th><th class="n" style="text-align:right">Total</th>
-      <th class="n" style="text-align:right">Paid</th><th class="n" style="text-align:right">Owed</th>
-      <th>Due</th></tr></thead>
-    <tbody>
-      <tr><td><strong>Patrick Properties</strong></td><td>Venue, catering, bar, security</td>
-        <td class="n">$23,609.37</td><td class="n">$6,500.00</td>
-        <td class="n" style="color:var(--rust)">$17,109.37</td><td>26 Aug</td></tr>
-      <tr><td><strong>Invitation Only</strong></td><td>Planning and design</td>
-        <td class="n">$5,734.75</td><td class="n">$5,734.75</td><td class="n">$0.00</td><td>&mdash;</td></tr>
-      <tr><td><strong>Richard Bell Photography</strong></td><td>Photography, 2 shooters</td>
-        <td class="n">$3,800.00</td><td class="n">$1,000.00</td>
-        <td class="n" style="color:var(--rust)">$2,800.00</td><td>23 Aug</td></tr>
-      <tr><td><strong>Dream Day Charleston</strong></td><td>DJ and lighting</td>
-        <td class="n">$2,800.00</td><td class="n">$2,800.00</td><td class="n">$0.00</td><td>&mdash;</td></tr>
-      <tr><td><strong>Snyder Events</strong></td><td>Linens and napkins</td>
-        <td class="n">$1,629.00</td><td class="n">$814.50</td>
-        <td class="n" style="color:var(--rust)">$814.50</td><td>1 Sep</td></tr>
-      <tr><td><strong>Palmetto Strings</strong></td><td>Keyboard, sound, sound tech</td>
-        <td class="n">$1,300.00</td><td class="n">$650.00</td>
-        <td class="n" style="color:var(--rust)">$650.00</td><td>22 Aug</td></tr>
-      <tr><td><strong>Publix</strong></td><td>Cake, two tiers</td>
-        <td class="n">$350.00</td><td class="n">$350.00</td><td class="n">$0.00</td><td>&mdash;</td></tr>
-      <tr><td><strong>Father Will</strong></td><td>Officiant</td>
-        <td class="n">No charge</td><td class="n">&mdash;</td><td class="n">$0.00</td><td>&mdash;</td></tr>
-      <tr><td><strong>Anthony Rivera</strong></td><td>Videography</td>
-        <td class="n">No charge</td><td class="n">&mdash;</td><td class="n">$0.00</td><td>&mdash;</td></tr>
-      <tr><td><strong>Stephen &amp; Amanda Cubello</strong></td><td>Florals</td>
-        <td class="n">Paid</td><td class="n">&mdash;</td><td class="n">$0.00</td><td>&mdash;</td></tr>
-    </tbody>
-    <tfoot><tr><td colspan="2">Totals</td><td class="n">$39,223.12</td><td class="n">$17,849.25</td>
-      <td class="n" style="color:var(--rust)">$21,373.87</td><td></td></tr></tfoot>
+    <thead><tr><th>Vendor</th><th>What for</th><th style="text-align:right">Total</th>
+      <th style="text-align:right">Paid</th><th style="text-align:right">Owed</th><th>Due</th></tr></thead>
+    <tbody id="allRows"></tbody>
+    <tfoot id="allFoot"></tfoot>
   </table>
 
   <div class="note">
-    <h3>Four days, four payments</h3>
-    <p>Between <b>22 and 26 August</b> you owe <b>$20,559.37</b> across Palmetto Strings,
-      Richard Bell and Patrick Properties. The Snyder balance follows on 1 September.</p>
-    <p>The PPHG payment is by far the largest and the only one that has to travel physically.
-      Ship it by <b>Monday 24 August</b> at the latest.</p>
-  </div>
-
-  <div class="note">
     <h3>Not on this sheet</h3>
-    <p>The pool party at Restore at Carolina Park is being handled by Barbara and has no
-      figure attached here. Nothing has been set aside for vendor gratuities.</p>
+    <p>The pool party at Restore at Carolina Park is handled by Barbara and has no figure attached.
+      Nothing has been set aside for vendor gratuities.</p>
   </div>
 
   <footer>
-    Prepared 22 August 2026 &middot; figures from BEO E30749 rev. 19 Aug, Snyder order #349216-14,<br>
-    Richard Bell invoice 17H1742217, Invitation Only invoice 00498 and the Palmetto Strings contract
+    <span class="who"><span class="dot"></span><span id="whoMsg">&mdash;</span></span><br>
+    Figures pulled live from the board &middot; BEO E30749 rev. 19 Aug &middot; Snyder #349216-14 &middot;
+    Richard Bell 17H1742217 &middot; Invitation Only 00498 &middot; Palmetto Strings contract
   </footer>
 </div>
 
+<dialog id="confirmDlg">
+  <form method="dialog">
+    <div class="dh"><h3 id="cTitle">Confirm payment</h3></div>
+    <div class="db">
+      <p id="cBody"></p>
+      <span class="lab">Date paid</span>
+      <input type="date" id="cDate" required>
+      <span class="lab">Amount</span>
+      <input type="number" step="0.01" id="cAmt" required>
+      <span class="lab">Method</span>
+      <input type="text" id="cMethod">
+    </div>
+    <div class="df">
+      <button class="btn ghost" value="cancel">Cancel</button>
+      <button class="btn go" value="save">Save</button>
+    </div>
+  </form>
+</dialog>
+
 <button class="print" onclick="window.print()">Print</button>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const sb = createClient('https://ixtynzfktgfwjwlvdaho.supabase.co',
+                        'sb_publishable_Y1DyL0oNks-QYefEMXvVkg_-EU-RRWC');
+
+const PW = 'jgwedding';
+const NAME_KEY = 'wedding-ops-name', PW_KEY = 'wedding-ops-money';
+
+const $ = s => document.querySelector(s);
+const money  = n => n == null ? '\u2014' : '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money0 = n => '$' + Math.round(n).toLocaleString('en-US');
+const parseD = s => new Date(s + 'T12:00:00-04:00');
+const fmtD   = s => parseD(s).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+const shortD = s => parseD(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const daysTo = s => Math.ceil((parseD(s) - new Date()) / 86400000);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let me = null, V = [], P = [];
+
+function showGate(msg){
+  $('#app').hidden = true; $('#gate').hidden = false;
+  $('#gateName').value = localStorage.getItem(NAME_KEY) || '';
+  if (msg) $('#gateErr').textContent = msg;
+}
+
+$('#gateForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#gateName').value.trim();
+  if ($('#gatePw').value !== PW){ $('#gateErr').textContent = 'That is not the passphrase.'; return; }
+  if (!name){ $('#gateErr').textContent = 'Add your name so confirmations are attributed.'; return; }
+  sessionStorage.setItem(PW_KEY, PW);
+  localStorage.setItem(NAME_KEY, name);
+  enter(name);
+});
+
+async function init(){
+  const savedName = (localStorage.getItem(NAME_KEY) || '').trim();
+  if (sessionStorage.getItem(PW_KEY) === PW && savedName) enter(savedName);
+  else showGate();
+}
+
+async function enter(name){
+  me = name;
+  const ok = await load();
+  if (!ok){ showGate('Could not reach the board. Check your connection.'); return; }
+  $('#gate').hidden = true; $('#app').hidden = false;
+  $('#whoMsg').textContent = 'Live \u00b7 you are ' + me;
+  render();
+  sb.channel('pay').on('postgres_changes', { event:'*', schema:'public' },
+    async () => { await load(); render(); }).subscribe();
+}
+
+async function load(){
+  const [v,p] = await Promise.all([
+    sb.from('vendors').select('*').order('sort_order'),
+    sb.from('payments').select('*').order('paid_on')
+  ]);
+  if (v.error || p.error) return false;
+  V = v.data; P = p.data;
+  return true;
+}
+const paidFor = id => P.filter(x => x.vendor_id === id).reduce((a,x)=>a+Number(x.amount),0);
+const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
+
+function render(){
+  const priced = V.filter(v => v.total != null);
+  const total = priced.reduce((a,v)=>a+Number(v.total),0);
+  const paid  = priced.reduce((a,v)=>a+paidFor(v.id),0);
+  const due   = priced.filter(v => (owed(v)||0) > 0.005)
+                      .sort((a,b)=>(a.due_date||'9999')<(b.due_date||'9999')?-1:1);
+  const next  = due.find(v=>v.due_date);
+
+  $('#tally').innerHTML =
+    '<div><div class="k">Contracted</div><div class="v num">'+money0(total)+'</div></div>' +
+    '<div><div class="k">Paid</div><div class="v paid num">'+money0(paid)+'</div></div>' +
+    '<div><div class="k">Still owed</div><div class="v due num">'+money0(total-paid)+'</div></div>' +
+    '<div><div class="k">Next due</div><div class="v due num">'+(next?shortD(next.due_date):'\u2014')+'</div></div>';
+
+  $('#dueHint').textContent = due.length
+    ? due.length + ' outstanding \u00b7 ' + money0(due.reduce((a,v)=>a+owed(v),0))
+    : 'Everything is settled.';
+
+  $('#due').innerHTML = due.length ? due.map(v=>{
+    const o = owed(v);
+    const d = v.due_date ? daysTo(v.due_date) : null;
+    const late = d !== null && d < 0;
+    const when = v.due_date
+      ? 'Due ' + fmtD(v.due_date) + (late ? ' \u00b7 ' + Math.abs(d) + ' days late'
+          : d === 0 ? ' \u00b7 today' : ' \u00b7 ' + d + ' days')
+      : 'No due date on file';
+    const addr = v.id === 'pphg'
+      ? '<div class="addr">The American Theater\nATTN: Olivia Nilsen\n456 King Street\nCharleston, SC 29403</div>' +
+        '<div class="warn"><b>Check the street number before shipping.</b> The mailing instruction says ' +
+        '<b>456</b> King Street; the BEO and every other document say <b>446</b>. Confirm with Olivia in writing ' +
+        '\u2014 a cashier\u2019s check sent to a wrong address is hard to recover.</div>'
+      : '';
+    return '<div class="pay"><div class="top">' +
+      '<div><h3>' + esc(v.name) + '</h3><div class="when">' + when + '</div></div>' +
+      '<div class="amt">' + money(o) + '</div></div>' +
+      '<div class="how"><span class="lab">How to pay</span>' +
+      '<b>' + esc(v.pay_method || 'Method not recorded') + '</b>' +
+      (v.pay_detail ? '<div style="margin-top:6px">' + esc(v.pay_detail) + '</div>' : '') +
+      addr +
+      '<div class="act">' +
+        '<button class="btn go sm" data-pay="' + v.id + '">Confirm paid in full</button>' +
+        '<button class="btn ghost sm" data-part="' + v.id + '">Partial payment</button>' +
+      '</div></div></div>';
+  }).join('')
+  : '<div class="pay done"><div class="top"><div><h3>Nothing outstanding</h3>' +
+    '<div class="when">Every contracted vendor is paid in full</div></div></div></div>';
+
+  const settled = priced.filter(v => (owed(v)||0) <= 0.005);
+  $('#settled').innerHTML = settled.map(v=>{
+    const mine = P.filter(x=>x.vendor_id===v.id).sort((a,b)=>a.paid_on<b.paid_on?1:-1);
+    const last = mine[0];
+    const by = last && last.entered_by_name && last.entered_by_name !== 'seed'
+      ? ' \u00b7 confirmed by ' + esc(last.entered_by_name) : '';
+    return '<div class="pay done"><div class="top">' +
+      '<div><h3>' + esc(v.name) + '</h3><div class="when">Paid in full' +
+      (last ? ' \u00b7 last payment ' + shortD(last.paid_on) : '') + by + '</div></div>' +
+      '<div class="amt">' + money(v.total) + '</div></div>' +
+      '<div class="how">' + mine.map(x =>
+        shortD(x.paid_on) + ' \u2014 ' + money(x.amount) + (x.method ? ' \u00b7 ' + esc(x.method) : '')
+      ).join('<br>') + '</div></div>';
+  }).join('');
+
+  $('#allRows').innerHTML = V.map(v=>{
+    const o = owed(v);
+    const t = v.total == null ? (v.status === 'done' ? 'Paid' : 'No charge') : money(v.total);
+    return '<tr><td><strong>' + esc(v.name) + '</strong></td><td>' + esc(v.category||'') + '</td>' +
+      '<td class="n">' + t + '</td>' +
+      '<td class="n">' + (v.total==null ? '\u2014' : money(paidFor(v.id))) + '</td>' +
+      '<td class="n"' + (o>0.005 ? ' style="color:var(--rust)"' : '') + '>' +
+        (v.total==null ? '$0.00' : money(o)) + '</td>' +
+      '<td>' + (v.due_date && o>0.005 ? shortD(v.due_date) : '\u2014') + '</td></tr>';
+  }).join('');
+
+  $('#allFoot').innerHTML = '<tr><td colspan="2">Totals</td>' +
+    '<td class="n">' + money(total) + '</td><td class="n">' + money(paid) + '</td>' +
+    '<td class="n" style="color:var(--rust)">' + money(total-paid) + '</td><td></td></tr>';
+}
+
+document.addEventListener('click', e => {
+  const full = e.target.closest('[data-pay]');
+  const part = e.target.closest('[data-part]');
+  const el = full || part;
+  if (!el) return;
+  const v = V.find(x => x.id === (el.dataset.pay || el.dataset.part));
+  if (!v) return;
+  const o = owed(v);
+  const dlg = $('#confirmDlg');
+  dlg.dataset.vendor = v.id;
+  $('#cTitle').textContent = full ? 'Confirm paid in full' : 'Record a partial payment';
+  $('#cBody').innerHTML = full
+    ? 'This records a payment of <b>' + money(o) + '</b> to <b>' + esc(v.name) +
+      '</b> and shows your name against it on both pages.'
+    : 'Part of the <b>' + money(o) + '</b> owed to <b>' + esc(v.name) + '</b>.';
+  $('#cDate').value = new Date().toISOString().slice(0,10);
+  $('#cAmt').value = full ? o.toFixed(2) : '';
+  $('#cMethod').value = v.pay_method || '';
+  dlg.showModal();
+});
+
+let saving = false;
+$('#confirmDlg').addEventListener('close', async function(){
+  if (this.returnValue !== 'save' || saving) return;
+  const amount = parseFloat($('#cAmt').value);
+  if (isNaN(amount) || amount === 0) return;
+  const row = { vendor_id:this.dataset.vendor, paid_on:$('#cDate').value, amount,
+                method:$('#cMethod').value || null, entered_by_name: me };
+  const dupe = P.find(p => p.vendor_id===row.vendor_id && p.paid_on===row.paid_on && Number(p.amount)===amount);
+  if (dupe && !confirm('A payment of ' + money(amount) + ' on that date is already recorded. Add it again anyway?')) return;
+  saving = true;
+  try {
+    const res = await sb.from('payments').insert(row);
+    if (res.error) alert(res.error.code === '23505'
+      ? 'That exact payment is already recorded. Nothing was added.'
+      : 'Could not save: ' + res.error.message);
+  } finally { saving = false; }
+  await load(); render();
+});
+
+init();
+</script>
 </body>
 </html>

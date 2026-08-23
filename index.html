@@ -198,6 +198,25 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .fp .tn{font-size:9px}
 .fp .tc{font-size:7.5px;font-weight:600}
 
+.fptip{position:absolute;z-index:20;pointer-events:none;min-width:150px;max-width:230px;
+  background:var(--card);border:1px solid var(--rule);border-radius:var(--r);
+  box-shadow:0 10px 30px -12px rgba(17,20,24,.34);padding:11px 13px;
+  transform:translate(-50%,-100%);transition:opacity .09s ease}
+.fptip[hidden]{display:none}
+.fptip:after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;
+  border:6px solid transparent;border-top-color:var(--card);border-bottom:0;
+  filter:drop-shadow(0 1px 0 var(--rule))}
+.fptip h5{margin:0 0 7px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.13em;font-size:12px;font-weight:700;color:var(--brass);
+  display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.fptip h5 span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:0}
+.fptip ol{margin:0;padding-left:17px;font-size:13px;line-height:1.65;color:var(--ink-2)}
+.fptip .none{font-size:13px;color:var(--ink-3);font-style:italic}
+.fptip .d{font-size:9.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-left:4px}
+.fp g[data-table]:hover .tb{fill:var(--brass-lo)}
+.fp g[data-table]:hover .ch{opacity:1}
+
 .seatgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:12px;padding:16px}
 .tcard{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);padding:14px 15px}
 .tcard.full{border-color:var(--moss-line);background:var(--moss-lo)}
@@ -394,8 +413,13 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         <span><b style="background:var(--brass)"></b>Due later <span class="num" id="lgLater"></span></span>
       </div>
     </div></div>
+    <div class="share" style="margin-bottom:22px">
+      <div class="txt"><strong>Payment schedule</strong>
+        <span>Every amount, due date and how to pay it — printable, and confirmations sync with this page.</span></div>
+      <a class="btn" href="payments.html" target="_blank" rel="noopener">Open payment sheet</a>
+    </div>
     <div class="sec">
-      <div class="sec-h"><h2>Vendors</h2><span class="hint">Contracted amounts. Anyone can log a payment.</span></div>
+      <div class="sec-h"><h2>Vendors</h2><span class="hint">Contracted amounts. Confirmations show who recorded them.</span></div>
       <div class="vgrid" id="vgrid"></div>
     </div>
     <div class="sec">
@@ -507,8 +531,11 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
   <section class="panel" id="p-seating" hidden>
     <div class="sec">
-      <div class="sec-h"><h2>Ballroom floor plan</h2><span class="hint">Click a table to seat people at it. PPHG needs table and seat numbers by 26 August.</span></div>
-      <div class="card pad"><div id="floorplan"></div></div>
+      <div class="sec-h"><h2>Ballroom floor plan</h2><span class="hint">Hover a table to see who is at it. Click one to jump to its card. The sweetheart table is the small circle below the dance floor.</span></div>
+      <div class="card pad" style="position:relative">
+        <div id="floorplan"></div>
+        <div id="fptip" class="fptip" hidden></div>
+      </div>
     </div>
 
     <div class="sec">
@@ -921,7 +948,13 @@ function vendors(){
            : '')}
       <div class="when">${when}</div>
       ${v.note ? `<div class="note">${esc(v.note)}</div>` : ''}
-      <div class="act"><button class="btn ghost sm" data-pay="${v.id}" data-name="${esc(v.name)}">Record payment</button></div>
+      ${v.pay_method && o > 0.005 ? `<div class="note" style="margin-top:9px;font-size:12.5px;color:var(--ink-2)">
+        <span style="font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.11em;font-weight:700;color:var(--ink-3)">Pay via</span>
+        ${esc(v.pay_method)}</div>` : ''}
+      <div class="act" style="display:flex;gap:7px;flex-wrap:wrap">
+        ${o > 0.005 ? `<button class="btn sm" data-full="${v.id}">Confirm paid</button>` : ''}
+        <button class="btn ghost sm" data-pay="${v.id}" data-name="${esc(v.name)}">Record payment</button>
+      </div>
     </article>`;
   }).join('');
 }
@@ -931,7 +964,7 @@ function payments(){
   const name = id => (D.vendors.find(v=>v.id===id)||{}).name || id;
   $('#payBody').innerHTML = rows.map(p=>
     `<tr><td class="num">${fmtD(p.paid_on)}</td><td>${esc(name(p.vendor_id))}</td>
-     <td>${esc(p.method||'')}${p.entered_by_name && p.entered_by_name!=='seed' ? ` <span style="color:var(--ink-3)">· ${esc(p.entered_by_name)}</span>` : ''}</td>
+     <td>${esc(p.method||'')}${p.entered_by_name && p.entered_by_name!=='seed' ? `<div style="font-size:11.5px;color:var(--moss);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-top:2px">confirmed by ${esc(p.entered_by_name)}</div>` : ''}</td>
      <td class="n">${money(p.amount)}</td>
      <td style="text-align:right;white-space:nowrap"><button class="btn ghost sm" data-editpay="${p.id}">Correct</button>
        <button class="btn ghost sm" data-delpay="${p.id}" style="margin-left:5px;color:var(--rust)">Delete</button></td></tr>`
@@ -1211,6 +1244,43 @@ function floorplan(){
   </svg>`;
 }
 
+function wireTips(){
+  const host = $('#floorplan');
+  const tip  = $('#fptip');
+  if (!host || !tip) return;
+
+  const show = (no, gEl) => {
+    const at = D.guests.filter(g => g.table_no === no).sort((a,b)=>a.name.localeCompare(b.name));
+    const nm = tableName(no);
+    const cap = no === 0 ? 2 : SEATS_PER;
+    tip.innerHTML = `<h5>${esc(nm.full)}<span>${at.length}/${cap}</span></h5>` +
+      (at.length
+        ? `<ol>${at.map(g=>`<li>${esc(g.name)}${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol>`
+        : `<div class="none">Nobody seated yet.</div>`);
+
+    // position over the table, inside the card
+    const box = host.getBoundingClientRect();
+    const r   = gEl.getBoundingClientRect();
+    let x = r.left - box.left + r.width/2;
+    const y = r.top - box.top - 10;
+    tip.hidden = false;
+    const w = tip.offsetWidth;
+    x = Math.max(w/2 + 4, Math.min(x, box.width - w/2 - 4));
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  };
+
+  host.querySelectorAll('[data-table]').forEach(g => {
+    const no = Number(g.dataset.table);
+    g.addEventListener('mouseenter', () => show(no, g));
+    g.addEventListener('focus',      () => show(no, g));
+    g.addEventListener('mouseleave', () => { tip.hidden = true; });
+    g.addEventListener('blur',       () => { tip.hidden = true; });
+    g.setAttribute('tabindex','0');
+  });
+  host.addEventListener('mouseleave', () => { tip.hidden = true; });
+}
+
 function seatBoard(){
   const byTable = {};
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
@@ -1241,10 +1311,11 @@ function seatBoard(){
 
   $('#seatBoard').innerHTML =
     `<datalist id="unseatedList">${unseated.map(g=>`<option value="${esc(g.name)}"></option>`).join('')}</datalist>
-     <div class="seatgrid">${card(0,2)}${TABLES.map(t=>card(t.n,SEATS_PER)).join('')}</div>`;
+     <div class="seatgrid">${TABLES.map(t=>card(t.n,SEATS_PER)).join('')}</div>`;
 }
 
 async function seatByName(no, raw){
+  if (no === 0) return;
   const q = (raw||'').trim().toLowerCase();
   if (!q) return;
   const pool = D.guests.filter(g => g.table_no == null);
@@ -1271,7 +1342,7 @@ function rooms(){
     <div class="note">${r.d}</div></article>`).join('');
 }
 
-function seating(){ floorplan(); seatBoard(); rooms(); }
+function seating(){ floorplan(); wireTips(); seatBoard(); rooms(); }
 
 /* ---------- printable exports ---------- */
 const PRINT_CSS = `
@@ -1337,6 +1408,7 @@ function exportSeating(){
   const byTable = {};
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
   const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
+  const sweetheart = (byTable[0]||[]).sort((a,b)=>a.name.localeCompare(b.name));
   const restricted = D.guests.filter(g=>g.dietary).length;
 
   const block = no => {
@@ -1352,14 +1424,19 @@ function exportSeating(){
     <div class="sum">
       <div><div class="k">Guests</div><div class="v">${D.guests.length}</div></div>
       <div><div class="k">Seated</div><div class="v">${D.guests.length - unseated.length}</div></div>
-      <div><div class="k">Tables</div><div class="v">${TABLES.length}</div></div>
+      <div><div class="k">Guest tables</div><div class="v">${TABLES.length}</div></div>
       <div><div class="k">Restrictions</div><div class="v">${restricted}</div></div>
     </div>
-    <div class="grid">${block(0)}${TABLES.map(t=>block(t.n)).join('')}</div>
+    <div class="grid">${TABLES.map(t=>block(t.n)).join('')}</div>
     ${unseated.length ? `<div class="t" style="margin-top:18px;border-color:#E8B4A6">
       <h3 style="color:#8A2F1C">Not yet seated<em>${unseated.length}</em></h3>
       <ol>${unseated.map(g=>`<li><strong>${esc(g.name)}</strong>${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol></div>` : ''}
-    ` + PRINT_FOOT(`${restricted} dietary restrictions to relay to Patrick Properties`));
+    ` + (sweetheart.length
+        ? `<div class="t" style="margin-top:18px;border-color:#D8C08A;background:#FAF3E2">
+             <h3>Sweetheart table<em>${sweetheart.length}</em></h3>
+             <ol>${sweetheart.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>`
+        : '')
+      + PRINT_FOOT(`${restricted} dietary restrictions to relay to Patrick Properties`));
 }
 
 function exportGuests(){
@@ -1523,8 +1600,9 @@ document.addEventListener('click', async e=>{
   }
   const tbl = e.target.closest('[data-table]');
   if (tbl){
-    const cards = $$('#seatBoard .tcard');
-    const target = cards[Number(tbl.dataset.table)];   // index 0 is the sweetheart card
+    const no = Number(tbl.dataset.table);
+    if (no === 0) return;                       // sweetheart has no card
+    const target = document.querySelector(`[data-tcard="${no}"]`);
     if (target){
       target.scrollIntoView({ behavior:'smooth', block:'center' });
       target.style.outline = '2px solid var(--brass)';
@@ -1584,6 +1662,20 @@ document.addEventListener('click', async e=>{
       await sb.from('doc_labels').upsert({ storage_name:key, label, renamed_by:me });
     }
     await loadDocs(); renderDocs(); return;
+  }
+  const fp = e.target.closest('[data-full]');
+  if (fp){
+    const v = D.vendors.find(x => x.id === fp.dataset.full); if (!v) return;
+    const o = owed(v);
+    const dlg = $('#payDlg');
+    dlg.dataset.vendor = v.id; delete dlg.dataset.editId;
+    $('#payTitle').textContent = 'Confirm ' + v.name + ' paid in full';
+    $('#payDate').value = new Date().toISOString().slice(0,10);
+    $('#payAmt').value = o.toFixed(2);
+    $('#payMethod').value = v.pay_method || '';
+    $('#paySave').textContent = 'Confirm paid';
+    dlg.showModal();
+    return;
   }
   const pay = e.target.closest('[data-pay]');
   if (pay){
