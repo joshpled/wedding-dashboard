@@ -233,6 +233,9 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .tcard .seatadd{margin-top:11px;display:flex;gap:6px}
 .tcard .seatadd input{flex:1;min-width:0;font-size:13px;padding:6px 8px}
 .tcard .seatadd .btn{padding:6px 12px;font-size:12.5px}
+.tcard .trm{background:none;border:0;color:var(--ink-3);font-size:15px;line-height:1;
+  padding:1px 5px;margin-left:5px;border-radius:3px}
+.tcard .trm:hover{color:var(--rust);background:#fff}
 .tcard .tnm{cursor:pointer;border-bottom:1px dashed var(--rule)}
 .tcard .tnm:hover{color:var(--brass);border-bottom-color:var(--brass)}
 .tcard .diet{font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
@@ -540,7 +543,10 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
     <div class="sec">
       <div class="sec-h"><h2>Table assignments</h2><span class="hint" id="seatHint"></span>
-        <button class="btn ghost sm" id="expSeat" style="margin-left:auto">Print seating chart</button></div>
+        <span style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn ghost sm" id="addTable">+ Add table</button>
+          <button class="btn ghost sm" id="expSeat">Print seating chart</button>
+        </span></div>
       <div class="card"><div id="seatBoard"></div></div>
     </div>
 
@@ -854,13 +860,18 @@ async function load(){
     sb.from('tasks').select('*').order('due_date'),
     sb.from('guests').select('*').order('name'),
     sb.from('milestone_status').select('*'),
-    sb.from('table_names').select('*')
+    sb.from('table_names').select('*').order('table_no')
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
   const ms = {};
   if (!m.error) for (const r of (m.data || [])) ms[r.key] = r;
   const tnames = {};
-  if (!tn.error) for (const r of (tn.data || [])) if (r.name) tnames[r.table_no] = r.name;
+  let tlist = [];
+  if (!tn.error){
+    tlist = (tn.data || []).map(r => r.table_no).sort((a,b)=>a-b);
+    for (const r of (tn.data || [])) if (r.name) tnames[r.table_no] = r.name;
+  }
+  layoutTables(tlist);
   D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms, tnames };
   return {};
 }
@@ -1139,12 +1150,26 @@ function drawRoster(){
 /* ---------- seating ---------- */
 const SEATS_PER = 8;
 
-const TABLES = [
-  {n:1,x:100,y:206},{n:2,x:200,y:206},
-  {n:3,x:100,y:274},{n:4,x:200,y:274},
-  {n:5,x:100,y:342},{n:6,x:200,y:342},
-  {n:7,x:100,y:410},{n:8,x:200,y:410}
-];
+const MAX_TABLES = 10;
+const ROW_GAP = 68, FIRST_Y = 206, COUNT_OFF = 31, GAP_TO_BAR = 23, BAR_H = 58;
+
+let TABLES = [];       // [{n,x,y}] — rebuilt whenever the table list changes
+let PLAN = { barTop:464, roomBottom:522, height:536 };
+
+function layoutTables(nums){
+  const list = (nums && nums.length) ? nums : [];
+  const rows = Math.ceil(list.length / 2);
+  TABLES = list.map((n, i) => {
+    const row = Math.floor(i / 2);
+    const y = FIRST_Y + row * ROW_GAP;
+    const lastRowAlone = (row === rows - 1) && (list.length % 2 === 1) && (i === list.length - 1);
+    return { n, y, x: lastRowAlone ? 150 : (i % 2 === 0 ? 100 : 200) };
+  });
+  const lowest = rows ? FIRST_Y + (rows - 1) * ROW_GAP + COUNT_OFF : FIRST_Y;
+  const barTop = lowest + GAP_TO_BAR;
+  PLAN = { barTop, roomBottom: barTop + BAR_H, height: barTop + BAR_H + 14 };
+}
+layoutTables([1,2,3,4,5,6,7,8]);
 
 const ROOMS = [
   { n:'Ballroom', c:'Reception · 80 seated',
@@ -1189,7 +1214,7 @@ function floorplan(){
       <text class="tc" x="${t.x}" y="${t.y+31}">${c}/${SEATS_PER}</text></g>`;
   }).join('');
 
-  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 300 536" xmlns="http://www.w3.org/2000/svg"
+  $('#floorplan').innerHTML = `<svg class="fp" viewBox="0 0 300 ${PLAN.height}" xmlns="http://www.w3.org/2000/svg"
       role="img" aria-label="Ballroom floor plan">
     <defs><pattern id="chk" width="16" height="16" patternUnits="userSpaceOnUse">
       <rect width="16" height="16" fill="#FBFAF7"/>
@@ -1197,16 +1222,16 @@ function floorplan(){
       <rect x="8" y="8" width="8" height="8" fill="#EFECE4"/>
     </pattern></defs>
 
-    <rect class="rm" x="30" y="14" width="240" height="508"/>
+    <rect class="rm" x="30" y="14" width="240" height="${PLAN.roomBottom-14}"/>
 
     <rect class="fx" x="62" y="14" width="176" height="30"/>
     <text class="lbl big" x="150" y="34" text-anchor="middle">STAGE</text>
 
     <rect x="66" y="50" width="168" height="26" fill="#fff" stroke="#3D434D" stroke-width="1.2"/>
-    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">8 TABLES · SEATS 64</text>
+    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">${TABLES.length} TABLE${TABLES.length===1?"":"S"} · SEATS ${TABLES.length*SEATS_PER}</text>
     <text class="lbl" x="150" y="71" text-anchor="middle" style="fill:#3D434D">+ SWEETHEART TABLE</text>
 
-    <rect x="46" y="96" width="208" height="356" fill="url(#chk)"/>
+    <rect x="46" y="96" width="208" height="${Math.max(60, PLAN.barTop-108)}" fill="url(#chk)"/>
 
     <circle class="fx" cx="46" cy="106" r="13"/>
     <text class="lbl" x="46" y="109" text-anchor="middle" style="font-size:7px">CAKE</text>
@@ -1220,27 +1245,27 @@ function floorplan(){
       <text class="lbl" x="150" y="159" text-anchor="middle" style="fill:#6E5520;font-size:8px">SH</text>
     </g>
 
-    <text class="lbl big" x="150" y="308" text-anchor="middle" transform="rotate(-90 150 308)"
+    <text class="lbl big" x="150" y="${Math.round((96+PLAN.barTop)/2)}" text-anchor="middle" transform="rotate(-90 150 ${Math.round((96+PLAN.barTop)/2)})"
       style="fill:#878D99;letter-spacing:.34em">BALLROOM</text>
 
     ${tables}
 
-    <rect class="fx" x="32" y="272" width="14" height="80"/>
-    <text class="lbl" x="39" y="312" text-anchor="middle" transform="rotate(-90 39 312)">STATION 3</text>
-    <rect class="fx" x="254" y="214" width="14" height="80"/>
-    <text class="lbl" x="261" y="254" text-anchor="middle" transform="rotate(-90 261 254)">STATION 2</text>
-    <rect class="fx" x="254" y="332" width="14" height="80"/>
-    <text class="lbl" x="261" y="372" text-anchor="middle" transform="rotate(-90 261 372)">STATION 1</text>
+    <rect class="fx" x="32" y="${Math.round((96+PLAN.barTop)/2)-40}" width="14" height="80"/>
+    <text class="lbl" x="39" y="${Math.round((96+PLAN.barTop)/2)}" text-anchor="middle" transform="rotate(-90 39 ${Math.round((96+PLAN.barTop)/2)})">STATION 3</text>
+    <rect class="fx" x="254" y="${Math.round((96+PLAN.barTop)/2)-98}" width="14" height="80"/>
+    <text class="lbl" x="261" y="${Math.round((96+PLAN.barTop)/2)-58}" text-anchor="middle" transform="rotate(-90 261 ${Math.round((96+PLAN.barTop)/2)-58})">STATION 2</text>
+    <rect class="fx" x="254" y="${Math.round((96+PLAN.barTop)/2)+20}" width="14" height="80"/>
+    <text class="lbl" x="261" y="${Math.round((96+PLAN.barTop)/2)+60}" text-anchor="middle" transform="rotate(-90 261 ${Math.round((96+PLAN.barTop)/2)+60})">STATION 1</text>
 
-    <rect x="30" y="464" width="240" height="58" fill="#E7E3DA"/>
-    <rect class="fx" x="112" y="474" width="76" height="14" rx="1"/>
-    <text class="lbl" x="150" y="484" text-anchor="middle">BAR</text>
-    <rect class="fx" x="112" y="498" width="76" height="14" rx="1"/>
-    <text class="lbl" x="150" y="508" text-anchor="middle">BAR</text>
-    <circle class="cok" cx="72" cy="479" r="9"/><text class="lbl" x="72" y="482" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="228" cy="479" r="9"/><text class="lbl" x="228" y="482" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="72" cy="503" r="9"/><text class="lbl" x="72" y="506" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="228" cy="503" r="9"/><text class="lbl" x="228" y="506" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <rect x="30" y="${PLAN.barTop}" width="240" height="58" fill="#E7E3DA"/>
+    <rect class="fx" x="112" y="${PLAN.barTop+10}" width="76" height="14" rx="1"/>
+    <text class="lbl" x="150" y="${PLAN.barTop+20}" text-anchor="middle">BAR</text>
+    <rect class="fx" x="112" y="${PLAN.barTop+34}" width="76" height="14" rx="1"/>
+    <text class="lbl" x="150" y="${PLAN.barTop+44}" text-anchor="middle">BAR</text>
+    <circle class="cok" cx="72" cy="${PLAN.barTop+15}" r="9"/><text class="lbl" x="72" y="${PLAN.barTop+18}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="228" cy="${PLAN.barTop+15}" r="9"/><text class="lbl" x="228" y="${PLAN.barTop+18}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="72" cy="${PLAN.barTop+39}" r="9"/><text class="lbl" x="72" y="${PLAN.barTop+42}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="228" cy="${PLAN.barTop+39}" r="9"/><text class="lbl" x="228" y="${PLAN.barTop+42}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
   </svg>`;
 }
 
@@ -1286,9 +1311,16 @@ function seatBoard(){
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
   const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
 
-  $('#seatHint').textContent = unseated.length
-    ? `${unseated.length} still unseated of ${D.guests.length}.`
-    : 'Everyone is seated.';
+  const cap = TABLES.length * SEATS_PER;
+  const toSeat = D.guests.filter(g => g.table_no !== 0).length;
+  $('#seatHint').textContent =
+    (unseated.length ? `${unseated.length} still unseated of ${toSeat}. ` : 'Everyone is seated. ') +
+    `${TABLES.length} tables, ${cap} places${cap < toSeat ? ` — ${toSeat - cap} short` : `, ${cap - toSeat} spare`}.`;
+  const addBtn = $('#addTable');
+  if (addBtn){
+    addBtn.disabled = TABLES.length >= MAX_TABLES;
+    addBtn.textContent = TABLES.length >= MAX_TABLES ? 'Maximum 10 tables' : '+ Add table';
+  }
   const b = $('#bSeat');
   if (b){ b.textContent = unseated.length; b.classList.toggle('hot', unseated.length > 0); }
 
@@ -1298,7 +1330,8 @@ function seatBoard(){
     const cls = at.length > cap ? 'over' : at.length === cap ? 'full' : '';
     return `<div class="tcard ${cls}" data-tcard="${no}">
       <h4><span class="tnm" data-rename-table="${no}" title="Click to rename">${esc(nm.full)}</span>
-          <span>${at.length}/${cap}</span></h4>
+          <span>${at.length}/${cap}
+            <button class="trm" data-deltable="${no}" title="Remove this table">&times;</button></span></h4>
       ${at.length
         ? `<ul>${at.map(g=>`<li><span>${esc(g.name)}${g.dietary?` <span class="diet">${esc(g.dietary)}</span>`:''}</span>
              <button data-unseat="${g.id}" title="Remove">&times;</button></li>`).join('')}</ul>`
@@ -1576,6 +1609,20 @@ document.addEventListener('click', async e=>{
   const de = e.target.closest('[data-doneedit]');
   if (de){ editing.delete(de.dataset.doneedit); drawRoster(); return; }
 
+  const dtb = e.target.closest('[data-deltable]');
+  if (dtb){
+    const no = Number(dtb.dataset.deltable);
+    const at = D.guests.filter(g => g.table_no === no);
+    const nm = tableName(no).full;
+    if (at.length && !confirm(
+      `${nm} has ${at.length} ${at.length === 1 ? 'person' : 'people'} seated.\n\n` +
+      `Removing it will send them back to the unseated list. Continue?`)) return;
+    if (!at.length && !confirm(`Remove ${nm}?`)) return;
+    if (at.length) await sb.from('guests').update({ table_no:null, seat_no:null }).eq('table_no', no);
+    await sb.from('table_names').delete().eq('table_no', no);
+    await load(); seating(); guestRoster();
+    return;
+  }
   const rt = e.target.closest('[data-rename-table]');
   if (rt){
     const no = Number(rt.dataset.renameTable);
@@ -1737,6 +1784,17 @@ $('#ngAdd').onclick = async ()=>{
   await load(); guestRoster();
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
+$('#addTable').onclick = async () => {
+  if (TABLES.length >= MAX_TABLES) return;
+  const used = new Set(TABLES.map(t => t.n));
+  let next = 1;
+  while (used.has(next)) next++;          // reuse the lowest free number
+  if (next > MAX_TABLES) return;
+  const { error } = await sb.from('table_names').insert({ table_no: next, name: null });
+  if (error){ alert('Could not add the table: ' + error.message); return; }
+  await load(); seating(); guestRoster();
+};
+
 $('#expSeat').onclick = exportSeating;
 $('#expGuests').onclick = exportGuests;
 
