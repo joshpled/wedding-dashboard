@@ -245,6 +245,10 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .tcard .trm{background:none;border:0;color:var(--ink-3);font-size:15px;line-height:1;
   padding:1px 5px;margin-left:5px;border-radius:3px}
 .tcard .trm:hover{color:var(--rust);background:#fff}
+.tcard .trm[data-swaptable]{font-size:14px}
+.tcard .trm[data-swaptable]:hover{color:var(--brass);background:#fff}
+#swTarget{width:100%;padding:8px 10px;font:inherit;font-size:14px;
+  border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink)}
 .tcard .tnm{cursor:pointer;border-bottom:1px dashed var(--rule)}
 .tcard .tnm:hover{color:var(--brass);border-bottom-color:var(--brass)}
 .tcard .diet{font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
@@ -604,6 +608,21 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <span><button class="btn ghost" id="switchName">Not you?</button></span>
   </footer>
 </div>
+
+<dialog id="swapDlg">
+  <form method="dialog">
+    <div class="dh"><h3 id="swTitle">Swap tables</h3></div>
+    <div class="db">
+      <p id="swBody" style="margin:0 0 4px;font-size:14px;color:var(--ink-2);line-height:1.55"></p>
+      <select id="swTarget"></select>
+      <p id="swPreview" style="margin:2px 0 0;font-size:13px;color:var(--brass);line-height:1.5"></p>
+    </div>
+    <div class="df">
+      <button class="btn ghost" value="cancel">Cancel</button>
+      <button class="btn" value="save" id="swGo">Swap</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="payDlg">
   <form method="dialog">
@@ -1359,6 +1378,7 @@ function seatBoard(){
     return `<div class="tcard ${cls}" data-tcard="${no}">
       <h4><span class="tnm" data-rename-table="${no}" title="Click to rename">${esc(nm.full)}</span>
           <span>${at.length}/${cap}
+            <button class="trm" data-swaptable="${no}" title="Swap with another table">&#8644;</button>
             <button class="trm" data-deltable="${no}" title="Remove this table">&times;</button></span></h4>
       ${at.length
         ? `<ul>${at.map(g=>`<li><span>${esc(g.name)}${g.dietary?` <span class="diet">${esc(g.dietary)}</span>`:''}</span>
@@ -1641,6 +1661,22 @@ document.addEventListener('click', async e=>{
   const de = e.target.closest('[data-doneedit]');
   if (de){ editing.delete(de.dataset.doneedit); drawRoster(); return; }
 
+  const swp = e.target.closest('[data-swaptable]');
+  if (swp){
+    const from = Number(swp.dataset.swaptable);
+    const others = TABLES.filter(t => t.n !== from);
+    if (!others.length){ alert('There is only one table.'); return; }
+    const countAt = n => D.guests.filter(g => g.table_no === n).length;
+    const dlg = $('#swapDlg');
+    dlg.dataset.from = from;
+    $('#swTitle').textContent = 'Swap ' + tableName(from).full;
+    $('#swBody').innerHTML = `Everyone at <b>${esc(tableName(from).full)}</b> (${countAt(from)}) moves to the table you pick, and everyone there moves back.`;
+    $('#swTarget').innerHTML = others.map(t =>
+      `<option value="${t.n}">${esc(tableName(t.n).full)} — ${countAt(t.n)} seated</option>`).join('');
+    updateSwapPreview();
+    dlg.showModal();
+    return;
+  }
   const dtb = e.target.closest('[data-deltable]');
   if (dtb){
     const no = Number(dtb.dataset.deltable);
@@ -1816,6 +1852,43 @@ $('#ngAdd').onclick = async ()=>{
   await load(); guestRoster();
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
+function updateSwapPreview(){
+  const from = Number($('#swapDlg').dataset.from);
+  const to   = Number($('#swTarget').value);
+  if (!to) return;
+  const a = D.guests.filter(g => g.table_no === from).length;
+  const b = D.guests.filter(g => g.table_no === to).length;
+  const fn = tableName(from).full, tn = tableName(to).full;
+  $('#swPreview').textContent = b === 0
+    ? `${fn} empties and its ${a} ${a === 1 ? 'guest moves' : 'guests move'} to ${tn}.`
+    : `${fn} gets ${tn}'s ${b}, and ${tn} gets ${fn}'s ${a}.`;
+  $('#swGo').textContent = b === 0 ? 'Move' : 'Swap';
+}
+$('#swTarget').addEventListener('change', updateSwapPreview);
+
+let swapping = false;
+$('#swapDlg').addEventListener('close', async function(){
+  if (this.returnValue !== 'save' || swapping) return;
+  const from = Number(this.dataset.from);
+  const to   = Number($('#swTarget').value);
+  if (!to || to === from) return;
+  swapping = true;
+  try {
+    // park one side on a number no table uses, then cross over
+    const park = -1;
+    let r = await sb.from('guests').update({ table_no: park }).eq('table_no', from);
+    if (r.error) throw r.error;
+    r = await sb.from('guests').update({ table_no: from }).eq('table_no', to);
+    if (r.error) throw r.error;
+    r = await sb.from('guests').update({ table_no: to }).eq('table_no', park);
+    if (r.error) throw r.error;
+  } catch (err) {
+    alert('The swap did not complete: ' + (err.message || err) +
+          '\n\nCheck both tables before trying again.');
+  } finally { swapping = false; }
+  await load(); seating(); guestRoster();
+});
+
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
 
 $('#addTable').onclick = async () => {
