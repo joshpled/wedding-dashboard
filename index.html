@@ -394,6 +394,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="runsheet" aria-selected="false">Day of</button>
     <button role="tab" data-tab="guests" aria-selected="false">Guests<span class="badge" id="bGuests">0</span></button>
     <button role="tab" data-tab="seating" aria-selected="false">Seating<span class="badge" id="bSeat">0</span></button>
+    <button role="tab" data-tab="pool" aria-selected="false">Pool party<span class="badge" id="bPool">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
     <a href="payments.html" target="_blank" rel="noopener"
@@ -580,6 +581,34 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           allow="xr-spatial-tracking" style="display:block;border:0"
           src="https://my.matterport.com/show/?m=nEGwfwfq6yu&brand=0"></iframe>
       </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-pool" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Saturday 5 September &middot; 4:00 &ndash; 9:00 PM</h2>
+        <span class="hint">Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes from the venue.</span></div>
+      <div class="card"><div class="calc" id="poolCount"></div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>Invited</h2><span class="hint" id="poolHint"></span>
+        <button class="btn ghost sm" id="expPool" style="margin-left:auto">Print list</button></div>
+      <div class="card">
+        <div id="poolList"></div>
+        <div class="addrow">
+          <input list="weddingGuests" name="title" id="npName" placeholder="Type a name — or pick from the wedding list…" autocomplete="off">
+          <input name="title" id="npNote" placeholder="Note (optional)" style="min-width:150px;flex:0 1 200px">
+          <button class="btn" id="npAdd">Add</button>
+        </div>
+        <datalist id="weddingGuests"></datalist>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>On the wedding list, not invited here</h2>
+        <span class="hint">Tap to add. This is the wedding guest list minus everyone above.</span></div>
+      <div class="card pad"><div class="roster" id="poolPool"></div></div>
     </div>
   </section>
 
@@ -854,7 +883,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
 let sideFilter = 'all';
-let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{} }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{}, pool:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
 const PW_KEY = 'wedding-ops-money';
@@ -894,13 +923,14 @@ $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate()
 
 /* ---------- data ---------- */
 async function load(){
-  const [v,p,t,g,m,tn] = await Promise.all([
+  const [v,p,t,g,m,tn,pg] = await Promise.all([
     sb.from('vendors').select('*').order('sort_order'),
     sb.from('payments').select('*').order('paid_on'),
     sb.from('tasks').select('*').order('due_date'),
     sb.from('guests').select('*').order('name'),
     sb.from('milestone_status').select('*'),
-    sb.from('table_names').select('*').order('table_no')
+    sb.from('table_names').select('*').order('table_no'),
+    sb.from('pool_guests').select('*').order('name')
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
   const ms = {};
@@ -912,7 +942,8 @@ async function load(){
     for (const r of (tn.data || [])) if (r.name) tnames[r.table_no] = r.name;
   }
   layoutTables(tlist);
-  D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms, tnames };
+  D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms, tnames,
+        pool: pg && !pg.error ? pg.data : [] };
   return {};
 }
 async function loadDocs(){
@@ -930,7 +961,7 @@ const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
 
 /* ---------- render ---------- */
 function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
-  menu(); runsheet(); guestRoster(); seating(); people(); renderDocs(); }
+  menu(); runsheet(); guestRoster(); seating(); poolParty(); people(); renderDocs(); }
 
 function applyMoneyLock(){
   $('#moneyLock').hidden = moneyOpen;
@@ -1427,6 +1458,38 @@ async function seatByName(no, raw){
   await load(); seating(); guestRoster();
 }
 
+function poolParty(){
+  const list = [...(D.pool||[])].sort((a,b)=>a.name.localeCompare(b.name));
+  const invited = new Set(list.map(p => p.name.toLowerCase()));
+  const rest = D.guests.filter(g => !invited.has(g.name.toLowerCase()))
+                       .sort((a,b)=>a.name.localeCompare(b.name));
+
+  $('#poolCount').innerHTML = [
+    ['Invited', list.length, 'Coming to the pool party.'],
+    ['Wedding guests', D.guests.length, 'The full Sunday list.'],
+    ['Not invited here', rest.length, 'On the wedding list only.'],
+    ['Runs', '4–9 PM', 'Straight after the 2:00 rehearsal.']
+  ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
+
+  $('#poolHint').textContent = list.length
+    ? `${list.length} ${list.length === 1 ? 'person' : 'people'}.`
+    : 'Nobody added yet.';
+  $('#bPool').textContent = list.length;
+
+  $('#poolList').innerHTML = list.length ? list.map(p=>`<div class="task">
+      <div class="body"><div class="title">${esc(p.name)}</div>
+        <div class="meta">${[p.notes ? esc(p.notes) : '',
+          p.added_by && p.added_by !== 'seed' ? `added by ${esc(p.added_by)}` : ''].filter(Boolean).join('')}</div></div>
+      <button class="x" data-delpool="${p.id}" title="Remove">&times;</button></div>`).join('')
+    : `<div class="task"><div class="body"><div class="title" style="color:var(--ink-3)">Nobody on the list yet. Add names below.</div></div></div>`;
+
+  $('#poolPool').innerHTML = rest.length
+    ? rest.map(g=>`<button class="g" data-addpool="${esc(g.name)}" style="cursor:pointer;border:1px solid var(--rule-2);font:inherit">${esc(g.name)} <span class="tag">+</span></button>`).join('')
+    : `<span style="color:var(--ink-3)">Everyone on the wedding list is invited.</span>`;
+
+  $('#weddingGuests').innerHTML = rest.map(g=>`<option value="${esc(g.name)}"></option>`).join('');
+}
+
 function rooms(){
   $('#roomCards').innerHTML = ROOMS.map(r=>`<article class="v">
     <div><h3>${r.n}</h3><div class="cat">${r.c}</div></div>
@@ -1528,6 +1591,25 @@ function exportSeating(){
              <ol>${sweetheart.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>`
         : '')
       + PRINT_FOOT(`${restricted} dietary restrictions to relay to Patrick Properties`));
+}
+
+function exportPool(){
+  const list = [...(D.pool||[])].sort((a,b)=>a.name.localeCompare(b.name));
+  const half = Math.ceil(list.length / 2);
+  const col = arr => `<ol>${arr.map(p=>`<li><strong>${esc(p.name)}</strong>${p.notes?`<span class="d">${esc(p.notes)}</span>`:''}</li>`).join('')}</ol>`;
+  openPrint('Pool party', `<header><h1>Pool Party</h1>
+    <div class="s">Saturday 5 September 2026 &middot; 4:00 &ndash; 9:00 PM<br>
+      Restore at Carolina Park &middot; 1588 Bloom St, Mt Pleasant, SC 29466</div></header>
+    <div class="sum">
+      <div><div class="k">Invited</div><div class="v">${list.length}</div></div>
+      <div><div class="k">Starts</div><div class="v">4:00 PM</div></div>
+      <div><div class="k">Ends</div><div class="v">9:00 PM</div></div>
+    </div>
+    ${list.length
+      ? `<div class="grid"><div class="t"><h3>Guests<em>${half}</em></h3>${col(list.slice(0,half))}</div>
+         <div class="t"><h3>&nbsp;<em>${list.length-half}</em></h3>${col(list.slice(half))}</div></div>`
+      : '<div class="t"><div class="none">Nobody on the list yet.</div></div>'}
+    ` + PRINT_FOOT('Rehearsal at 2:00 PM at The American Theater, 446 King Street'));
 }
 
 function exportGuests(){
@@ -1682,6 +1764,15 @@ document.addEventListener('click', async e=>{
     updateSwapPreview();
     dlg.showModal();
     return;
+  }
+  const ap = e.target.closest('[data-addpool]');
+  if (ap){ await addPool(ap.dataset.addpool, ''); return; }
+  const dp2 = e.target.closest('[data-delpool]');
+  if (dp2){
+    const row = (D.pool||[]).find(p => String(p.id) === dp2.dataset.delpool); if (!row) return;
+    if (!confirm(`Remove ${row.name} from the pool party list?`)) return;
+    await sb.from('pool_guests').delete().eq('id', row.id);
+    await load(); poolParty(); return;
   }
   const dtb = e.target.closest('[data-deltable]');
   if (dtb){
@@ -1920,6 +2011,27 @@ $('#swapDlg').addEventListener('close', async function(){
 });
 
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
+
+async function addPool(name, note){
+  const nm = (name||'').trim(); if (!nm) return;
+  if ((D.pool||[]).some(p => p.name.toLowerCase() === nm.toLowerCase())){
+    alert(`${nm} is already on the pool party list.`); return;
+  }
+  const match = D.guests.find(g => g.name.toLowerCase() === nm.toLowerCase());
+  const { error } = await sb.from('pool_guests').insert({
+    name: match ? match.name : nm, guest_id: match ? match.id : null,
+    notes: (note||'').trim() || null, added_by: me });
+  if (error){ alert('Could not add: ' + error.message); return; }
+  await load(); poolParty();
+}
+
+$('#npAdd').onclick = async () => {
+  await addPool($('#npName').value, $('#npNote').value);
+  $('#npName').value = ''; $('#npNote').value = ''; $('#npName').focus();
+};
+$('#npName').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
+$('#npNote').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
+$('#expPool').onclick = exportPool;
 
 $('#addTable').onclick = async () => {
   if (TABLES.length >= MAX_TABLES) return;
