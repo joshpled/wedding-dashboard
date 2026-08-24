@@ -790,11 +790,17 @@ const FLAGS = [
     'If the flowers are being shipped they need to land <strong>before</strong> Amanda arranges them, not on the morning she delivers at 1:00 PM. Get a delivery date as well as a cost.',
     '<strong>Wedding party flowers</strong> are with Barbara and still have no vendor. They must be on site before <strong>4:00 PM</strong>, when the party is photographed.'] },
 
+  { lvl:'warn', h:'The projector has no time, no contact and no venue sign-off', p:[
+    '<strong>Aaron (DJ BlkByte)</strong> is booked at <strong>$200</strong> for day-of projector and video coordination. There is no phone number, no email and no arrival time.',
+    'He has to be set up before <strong>doors open at 4:30</strong>, and after Palmetto Strings load in at 3:30 so they are not working over each other.',
+    'PPHG does not know about him. Their BEO has <strong>no AV line</strong> since Jacob was cancelled, and the Cinema is contracted for the ceremony only. Tell Olivia what is being projected and where before the 26th.'] },
+
   { lvl:'warn', h:'Loose ends with a cost attached', p:[
     '<strong>Palmetto Strings</strong> — $650 due 22 August.',
     '<strong>Richard Bell</strong> — $2,800 due 23 August.',
     '<strong>Snyder</strong> — $814.50 balance due 1 September.',
-    '<strong>Pool party</strong> — Barbara handling, no figure tracked.'] },
+    '<strong>Pool party</strong> — Barbara handling, no figure tracked.',
+    '<strong>Aaron</strong> — $200 for the projector, payment method not agreed.'] },
 
   { lvl:'warn', h:'Day-after plans still undecided', p:[
     'No brunch, and no alternative chosen. Worth settling while people still have flights to book.'] }
@@ -804,6 +810,7 @@ const DECISIONS = [
   { q:'Guest count 66 vs 80', s:'BEO bills 66; the contract note still says 80 confirmed at six months', impact:'$2,285 already off the balance', by:'26 Aug' },
   { q:'Cake flavours', s:'BEO reads "Not Noted". No anniversary tier.', impact:'None', by:'26 Aug' },
   { q:'Getaway send-off', s:'Last blank on the BEO vendor list', impact:'Unknown', by:'26 Aug' },
+  { q:'Projector — what and where', s:'Aaron booked at $200. Cinema is ceremony-only; anything in the Ballroom needs PPHG sign-off.', impact:'$200 plus any venue AV charge', by:'29 Aug' },
   { q:'Floral shipping', s:'$1,138 quoted for the flowers themselves; shipping excluded and unpriced', impact:'Unknown on top of $1,138', by:'29 Aug' },
   { q:'Wedding party florals', s:'Barbara arranging. No vendor, no cost, must land before 4:00 PM.', impact:'Unknown', by:'29 Aug' },
   { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'29 Aug' }
@@ -901,6 +908,7 @@ const RUNSHEET = [
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
   { t:'3:30 PM',  e:'Palmetto Strings load in', w:'Keyboard, speakers, mics and their own sound tech · booked 4:30 – 6:00' },
+  { t:'TBC',      e:'Aaron (DJ BlkByte) sets up the projector', w:'Arrival time not set · must be in before doors open at 4:30' },
   { t:'3:35 PM',  e:'Grooms arrive — final details walkthrough', w:'Final touches in Stars Lounge · venue reveal' },
   { t:'4:00 PM',  e:'Wedding party and photographers arrive', w:'Party partially ready · Richard Bell begins the complimentary half hour' },
   { t:'4:15 PM',  e:'Getting-ready coverage in Stars Lounge', w:'Finishing touches and detail shots · rings, invitation suite, florals' },
@@ -945,6 +953,7 @@ const PEOPLE = [
   { r:'Photography · lead', n:'Mell Bell', o:'Richard Bell Photography', t:'864.320.2428', e:'info@richbell.com' },
   { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest — no charge' },
   { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
+  { r:'Projector and video', n:'Aaron — DJ BlkByte', x:'No contact details yet · $200 · arrival time TBC' },
   { r:'Ceremony music and sound', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com', t:'843.532.8656' },
   { r:'Officiant', n:'Father Will', t:'336.340.8183', x:'Officiating free of charge' },
   { r:'Florist · ceremony and reception', n:'Stephen', t:'301.549.8622', x:'$1,138 quoted, shipping extra' },
