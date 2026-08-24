@@ -267,6 +267,44 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .dcard ul{margin:10px 0 0;padding:10px 0 0;list-style:none;border-top:1px solid var(--rule-2);font-size:14px;color:var(--ink-2);line-height:1.75}
 .dcard .srv{margin-top:10px;font-size:12.5px;color:var(--ink-3);font-style:italic;line-height:1.45}
 
+.prow{display:flex;gap:7px;padding:13px 15px;border-bottom:1px solid var(--rule);background:#FCFBF9;flex-wrap:wrap}
+.prow input{flex:1;min-width:170px;font-size:13.5px;padding:7px 9px}
+.prow .btn{padding:7px 14px;font-size:13px}
+
+.pgroup{border-bottom:1px solid var(--rule-2)}
+.pgroup:last-child{border-bottom:0}
+.phead{display:flex;align-items:center;gap:9px;padding:10px 15px;flex-wrap:wrap;
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
+  font-size:12.5px;font-weight:700;color:var(--ink-2);background:#FCFBF9}
+.phead em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+  color:var(--ink-3);letter-spacing:0}
+.phead .phint{font-family:"Public Sans",sans-serif;text-transform:none;letter-spacing:0;
+  font-size:12px;color:var(--ink-3);font-weight:400;margin-left:auto}
+details.pgroup summary{list-style:none;cursor:pointer}
+details.pgroup summary::-webkit-details-marker{display:none}
+details.pgroup summary:before{content:"\25B8";color:var(--ink-3);font-size:10px;margin-right:2px}
+details.pgroup[open] summary:before{content:"\25BE"}
+.dotm{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.dotm.inv{background:var(--moss)} .dotm.und{background:var(--brass)} .dotm.skp{background:var(--ink-3)}
+
+.pchips{display:flex;flex-wrap:wrap;gap:5px;padding:11px 15px 14px}
+.pchips:empty:after{content:"None";color:var(--ink-3);font-size:13px;font-style:italic}
+.pc{display:inline-flex;align-items:center;gap:0;border-radius:99px;overflow:hidden;
+  border:1px solid var(--rule-2);background:#fff;font-size:13px;line-height:1}
+.pc .nm{padding:5px 4px 5px 11px;color:var(--ink-2);white-space:nowrap}
+.pc .nm b{font-weight:400;color:var(--ink)}
+.pc .nt{font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.07em;font-weight:700;padding-left:5px}
+.pc button{background:none;border:0;color:var(--ink-3);font-size:14px;padding:5px 8px 5px 5px;line-height:1}
+.pc button:hover{color:var(--rust);background:var(--rust-lo)}
+.pc.inv{border-color:var(--moss-line);background:var(--moss-lo)}
+.pc.inv .nm b{color:var(--moss)}
+.pc.skp{border-color:var(--rule);background:#FBFAF8;opacity:.75}
+.pc.skp .nm b{color:var(--ink-3);text-decoration:line-through}
+.pc.und{cursor:pointer;border-style:dashed;border-color:var(--brass-line)}
+.pc.und:hover{background:var(--brass-lo)}
+.pc.und .add{color:var(--brass);font-weight:700;padding:5px 9px 5px 4px;font-size:13px}
+
 .roster{display:flex;flex-wrap:wrap;gap:7px}
 .g{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--rule-2);background:#FDFCFA;border-radius:99px;padding:6px 13px;font-size:14px;color:var(--ink-2)}
 .g.flagged{border-color:var(--brass-line);background:var(--brass-lo);color:var(--ink)}
@@ -587,28 +625,36 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   <section class="panel" id="p-pool" hidden>
     <div class="sec">
       <div class="sec-h"><h2>Saturday 5 September &middot; 4:00 &ndash; 9:00 PM</h2>
-        <span class="hint">Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes from the venue.</span></div>
+        <span class="hint">Restore at Carolina Park, 1588 Bloom St, Mt Pleasant &middot; 25 min from the venue</span>
+        <button class="btn ghost sm" id="expPool" style="margin-left:auto">Print list</button></div>
       <div class="card"><div class="calc" id="poolCount"></div></div>
     </div>
 
     <div class="sec">
-      <div class="sec-h"><h2>Invited</h2><span class="hint" id="poolHint"></span>
-        <button class="btn ghost sm" id="expPool" style="margin-left:auto">Print list</button></div>
       <div class="card">
-        <div id="poolList"></div>
-        <div class="addrow">
-          <input list="weddingGuests" name="title" id="npName" placeholder="Type a name — or pick from the wedding list…" autocomplete="off">
-          <input name="title" id="npNote" placeholder="Note (optional)" style="min-width:150px;flex:0 1 200px">
-          <button class="btn" id="npAdd">Add</button>
+        <div class="prow">
+          <input list="weddingGuests" id="npName" placeholder="Add a name&hellip;" autocomplete="off">
+          <input id="npNote" placeholder="Note" style="flex:0 1 140px;min-width:110px">
+          <button class="btn sm" id="npAdd">Add</button>
         </div>
         <datalist id="weddingGuests"></datalist>
-      </div>
-    </div>
 
-    <div class="sec">
-      <div class="sec-h"><h2>On the wedding list, not invited here</h2>
-        <span class="hint">Tap to add. This is the wedding guest list minus everyone above.</span></div>
-      <div class="card pad"><div class="roster" id="poolPool"></div></div>
+        <div class="pgroup">
+          <div class="phead"><span class="dotm inv"></span>Invited <em id="cInv">0</em></div>
+          <div class="pchips" id="poolInvited"></div>
+        </div>
+
+        <div class="pgroup" id="grpUnd">
+          <div class="phead"><span class="dotm und"></span>Not decided <em id="cUnd">0</em>
+            <span class="phint">Tap a name to invite, or &times; if they are not needed</span></div>
+          <div class="pchips" id="poolUndecided"></div>
+        </div>
+
+        <details class="pgroup" id="grpSkip">
+          <summary class="phead"><span class="dotm skp"></span>No need <em id="cSkip">0</em></summary>
+          <div class="pchips" id="poolSkipped"></div>
+        </details>
+      </div>
     </div>
   </section>
 
@@ -1459,35 +1505,40 @@ async function seatByName(no, raw){
 }
 
 function poolParty(){
-  const list = [...(D.pool||[])].sort((a,b)=>a.name.localeCompare(b.name));
-  const invited = new Set(list.map(p => p.name.toLowerCase()));
-  const rest = D.guests.filter(g => !invited.has(g.name.toLowerCase()))
+  const rows = D.pool || [];
+  const inv  = rows.filter(p => p.status !== 'skip').sort((a,b)=>a.name.localeCompare(b.name));
+  const skip = rows.filter(p => p.status === 'skip').sort((a,b)=>a.name.localeCompare(b.name));
+  const known = new Set(rows.map(p => p.name.toLowerCase()));
+  const und  = D.guests.filter(g => !known.has(g.name.toLowerCase()))
                        .sort((a,b)=>a.name.localeCompare(b.name));
 
   $('#poolCount').innerHTML = [
-    ['Invited', list.length, 'Coming to the pool party.'],
-    ['Wedding guests', D.guests.length, 'The full Sunday list.'],
-    ['Not invited here', rest.length, 'On the wedding list only.'],
-    ['Runs', '4–9 PM', 'Straight after the 2:00 rehearsal.']
+    ['Invited', inv.length, 'Coming Saturday.'],
+    ['Not decided', und.length, 'On the wedding list, no answer yet.'],
+    ['No need', skip.length, 'Deliberately not invited.'],
+    ['Wedding guests', D.guests.length, 'The full Sunday list.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  $('#poolHint').textContent = list.length
-    ? `${list.length} ${list.length === 1 ? 'person' : 'people'}.`
-    : 'Nobody added yet.';
-  $('#bPool').textContent = list.length;
+  const chip = (p, cls) => `<span class="pc ${cls}"><span class="nm"><b>${esc(p.name)}</b>${
+      p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}</span>` +
+    (cls === 'inv'
+      ? `<button data-poolskip="${p.id}" title="Not needed">&times;</button>`
+      : `<button data-poolinv="${p.id}" title="Invite after all">&#8634;</button>`) + `</span>`;
 
-  $('#poolList').innerHTML = list.length ? list.map(p=>`<div class="task">
-      <div class="body"><div class="title">${esc(p.name)}</div>
-        <div class="meta">${[p.notes ? esc(p.notes) : '',
-          p.added_by && p.added_by !== 'seed' ? `added by ${esc(p.added_by)}` : ''].filter(Boolean).join('')}</div></div>
-      <button class="x" data-delpool="${p.id}" title="Remove">&times;</button></div>`).join('')
-    : `<div class="task"><div class="body"><div class="title" style="color:var(--ink-3)">Nobody on the list yet. Add names below.</div></div></div>`;
+  $('#poolInvited').innerHTML  = inv.map(p => chip(p,'inv')).join('');
+  $('#poolSkipped').innerHTML  = skip.map(p => chip(p,'skp')).join('');
+  $('#poolUndecided').innerHTML = und.map(g =>
+    `<span class="pc und"><span class="nm" data-addpool="${esc(g.name)}"><b>${esc(g.name)}</b></span>` +
+    `<span class="add" data-addpool="${esc(g.name)}">+</span>` +
+    `<button data-poolno="${esc(g.name)}" title="Not needed">&times;</button></span>`).join('');
 
-  $('#poolPool').innerHTML = rest.length
-    ? rest.map(g=>`<button class="g" data-addpool="${esc(g.name)}" style="cursor:pointer;border:1px solid var(--rule-2);font:inherit">${esc(g.name)} <span class="tag">+</span></button>`).join('')
-    : `<span style="color:var(--ink-3)">Everyone on the wedding list is invited.</span>`;
-
-  $('#weddingGuests').innerHTML = rest.map(g=>`<option value="${esc(g.name)}"></option>`).join('');
+  $('#cInv').textContent  = inv.length;
+  $('#cUnd').textContent  = und.length;
+  $('#cSkip').textContent = skip.length;
+  $('#grpUnd').hidden  = und.length === 0;
+  $('#grpSkip').hidden = skip.length === 0;
+  $('#bPool').textContent = inv.length;
+  $('#weddingGuests').innerHTML = und.map(g=>`<option value="${esc(g.name)}"></option>`).join('');
 }
 
 function rooms(){
@@ -1594,7 +1645,7 @@ function exportSeating(){
 }
 
 function exportPool(){
-  const list = [...(D.pool||[])].sort((a,b)=>a.name.localeCompare(b.name));
+  const list = (D.pool||[]).filter(p => p.status !== 'skip').sort((a,b)=>a.name.localeCompare(b.name));
   const half = Math.ceil(list.length / 2);
   const col = arr => `<ol>${arr.map(p=>`<li><strong>${esc(p.name)}</strong>${p.notes?`<span class="d">${esc(p.notes)}</span>`:''}</li>`).join('')}</ol>`;
   openPrint('Pool party', `<header><h1>Pool Party</h1>
@@ -1766,12 +1817,20 @@ document.addEventListener('click', async e=>{
     return;
   }
   const ap = e.target.closest('[data-addpool]');
-  if (ap){ await addPool(ap.dataset.addpool, ''); return; }
-  const dp2 = e.target.closest('[data-delpool]');
-  if (dp2){
-    const row = (D.pool||[]).find(p => String(p.id) === dp2.dataset.delpool); if (!row) return;
-    if (!confirm(`Remove ${row.name} from the pool party list?`)) return;
-    await sb.from('pool_guests').delete().eq('id', row.id);
+  if (ap){ await addPool(ap.dataset.addpool, '', 'invited'); return; }
+
+  const pn = e.target.closest('[data-poolno]');
+  if (pn){ await addPool(pn.dataset.poolno, '', 'skip'); return; }
+
+  const ps = e.target.closest('[data-poolskip]');
+  if (ps){
+    await sb.from('pool_guests').update({ status:'skip', added_by: me }).eq('id', ps.dataset.poolskip);
+    await load(); poolParty(); return;
+  }
+
+  const pi = e.target.closest('[data-poolinv]');
+  if (pi){
+    await sb.from('pool_guests').update({ status:'invited', added_by: me }).eq('id', pi.dataset.poolinv);
     await load(); poolParty(); return;
   }
   const dtb = e.target.closest('[data-deltable]');
@@ -2012,21 +2071,27 @@ $('#swapDlg').addEventListener('close', async function(){
 
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
 
-async function addPool(name, note){
+async function addPool(name, note, status){
   const nm = (name||'').trim(); if (!nm) return;
-  if ((D.pool||[]).some(p => p.name.toLowerCase() === nm.toLowerCase())){
-    alert(`${nm} is already on the pool party list.`); return;
+  const existing = (D.pool||[]).find(p => p.name.toLowerCase() === nm.toLowerCase());
+  if (existing){
+    if (existing.status === (status || 'invited')){
+      alert(`${nm} is already ${existing.status === 'skip' ? 'marked as not needed' : 'invited'}.`);
+      return;
+    }
+    await sb.from('pool_guests').update({ status: status || 'invited', added_by: me }).eq('id', existing.id);
+    await load(); poolParty(); return;
   }
   const match = D.guests.find(g => g.name.toLowerCase() === nm.toLowerCase());
   const { error } = await sb.from('pool_guests').insert({
     name: match ? match.name : nm, guest_id: match ? match.id : null,
-    notes: (note||'').trim() || null, added_by: me });
+    notes: (note||'').trim() || null, added_by: me, status: status || 'invited' });
   if (error){ alert('Could not add: ' + error.message); return; }
   await load(); poolParty();
 }
 
 $('#npAdd').onclick = async () => {
-  await addPool($('#npName').value, $('#npNote').value);
+  await addPool($('#npName').value, $('#npNote').value, 'invited');
   $('#npName').value = ''; $('#npNote').value = ''; $('#npName').focus();
 };
 $('#npName').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
