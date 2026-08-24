@@ -195,6 +195,7 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .fp .sh{fill:var(--brass-lo);stroke:var(--brass);stroke-width:1.6}
 .fp .ch{fill:var(--ink);opacity:.72}
 .fp .cok{fill:var(--ink);opacity:.82}
+.fp .vt{fill:#FBFAF8;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:4 2}
 .fp .tn{font-size:9px}
 .fp .tc{font-size:7.5px;font-weight:600}
 
@@ -650,7 +651,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
   <section class="panel" id="p-pool" hidden>
     <div class="sec">
-      <div class="sec-h"><h2>Saturday 5 September &middot; 4:00 &ndash; 9:00 PM</h2>
+      <div class="sec-h"><h2>Saturday 5 September &middot; 5:00 &ndash; 9:00 PM</h2>
         <span class="hint">Restore at Carolina Park, 1588 Bloom St, Mt Pleasant &middot; 25 min from the venue</span>
         <button class="btn ghost sm" id="expPool" style="margin-left:auto">Print list</button></div>
       <div class="card"><div class="calc" id="poolCount"></div></div>
@@ -762,54 +763,45 @@ const MILESTONES = [
   { k:'photo',    date:'2026-08-23', title:'Richard Bell Photography balance', amount:2800, detail:'Invoice 17H1742217.' },
   { k:'dj',       date:'2026-08-23', title:'Dream Day Charleston balance', amount:2300, detail:'A mailed check must be postmarked by this date.' },
   { k:'seating',  date:'2026-08-24', title:'Seating chart done', amount:null, detail:'PPHG needs table and seat numbers against every dietary restriction.' },
-  { k:'pphg',     date:'2026-08-26', title:'PPHG final guest count and final payment', amount:17109.37, detail:'Largest single payment of the wedding.' },
+  { k:'pphg',     date:'2026-08-26', title:'PPHG final guest count and final payment', amount:14824.57, detail:'Largest single payment of the wedding.' },
   { k:'linenout', date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
   { k:'rehearsal',date:'2026-09-05', title:'Rehearsal, 2:00 PM', amount:null, detail:'The American Theater, 446 King Street. Loraine runs it.' },
-  { k:'pool',     date:'2026-09-05', title:'Pool party, 4:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes away.' },
+  { k:'pool',     date:'2026-09-05', title:'Pool party, 5:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes away.' },
   { k:'wedding',  date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
   { k:'linenback',date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
 ];
 
 const FLAGS = [
-  { lvl:'hot', h:'The Snyder quote expires today', p:[
-    'Order #349216-14 is <strong>$1,629 and not yet secured</strong>. It needs the CCRA on file and a <strong>50% deposit of $814.50</strong>.',
-    'The BEO now depends on it — the place setting reads <strong>Black Napkin (Snyder)</strong>. No linen order, no napkins. The sweetheart linens are also a specialty order that has to be brought in.'] },
+  { lvl:'hot', h:'26 August — final payment and count', p:[
+    'The 24 August BEO bills <strong>66 guests</strong> and the balance is now <strong>$14,824.57</strong>, down $2,285 from the 80-guest version.',
+    'One thing to square with Olivia: the notes still read <strong>Contract Guest Count: 80 (Confirmed 80 at 6 months)</strong> while the order bills 66. Their paperwork, their call — but get the 66 confirmed in writing before you send the cashier\u2019s check.',
+    'Ship it by <strong>Monday 24 August</strong>, UPS or FedEx with tracking. No regular USPS.'] },
 
-  { lvl:'hot', h:'26 August is the wall', p:[
-    'Final guest count and <strong>$17,109.37</strong> to PPHG, both due that day. Largest single payment of the wedding and the last date anything about the catering can move.',
-    'The <strong>seating chart</strong> has to land before it — PPHG needs table and seat numbers against all eleven dietary restrictions.'] },
+  { lvl:'warn', h:'Two blanks left on the BEO', p:[
+    '<strong>Cake flavours</strong> read \u201cNot Noted\u201d, and the anniversary tier is marked NO. Publix needs the flavours.',
+    '<strong>Getaway send-off</strong> is the last empty line on the vendor list. If the answer is none, tell Olivia that rather than leaving it blank.'] },
 
-  { lvl:'warn', h:'Three payments land in four days', p:[
-    '22 August: $650 to Palmetto Strings. 23 August: $2,800 to Richard Bell and $2,300 to Dream Day. 26 August: $17,109.37 to PPHG.',
-    'That is <strong>$22,859 between the 22nd and the 26th</strong>, plus the Snyder deposit before then.'] },
+  { lvl:'warn', h:'Both florists are still unquoted', p:[
+    '<strong>Stephen</strong> covers ceremony and reception florals, delivered by Amanda Cubello at 1:00 PM. Nothing priced, nothing paid. PPHG now lists Amanda on their vendor sheet.',
+    '<strong>Wedding party flowers</strong> are with Barbara and have no vendor. They have to be on site before <strong>4:00 PM</strong>, when the party is photographed.'] },
 
-  { lvl:'warn', h:'Palmetto is booked to 6:00 and the room needs them to 5:55', p:[
-    'Their contract covers <strong>4:30 to 6:00 PM</strong> — prelude and ceremony only. The all-guest photo runs to 5:40 and couple portraits to 5:55, all in the Cinema where their gear is.',
-    'It fits, but with five minutes to spare. Anything past 6:00 costs <strong>$25 per 15 minutes per person</strong>, and they can decline to stay at all.'] },
+  { lvl:'warn', h:'Loose ends with a cost attached', p:[
+    '<strong>Palmetto Strings</strong> — $650 due 22 August.',
+    '<strong>Richard Bell</strong> — $2,800 due 23 August.',
+    '<strong>Snyder</strong> — $814.50 balance due 1 September.',
+    '<strong>Pool party</strong> — Barbara handling, no figure tracked.'] },
 
-  { lvl:'warn', h:'PPHG still has gaps in their own paperwork', p:[
-    'Their vendor list has blanks for <strong>floral, videographer, lighting, transportation and send-off</strong>. Floral matters — Stephen and Amanda deliver at 1:00 PM and PPHG has no record of them. The rest are genuinely nil; tell Olivia that rather than leaving her guessing.',
-    'Also still blank: <strong>Gabriel’s drink of choice</strong>, and the vendor meal location.',
-    'Their timeline sheet still reads <strong>3:45PM Grooms Arrive</strong> and <strong>0:00PM First Look</strong>. You are arriving at 3:30 and there is no first look.'] },
-
-  { lvl:'warn', h:'Both florists are unquoted, and one has no vendor', p:[
-    '<strong>Stephen</strong> is covering ceremony and reception florals, delivered by Amanda Cubello at 1:00 PM. Nothing is priced and nothing is paid.',
-    '<strong>Wedding party flowers</strong> — bouquets, boutonnieres and personal pieces — are with Barbara, and the vendor is not chosen yet.',
-    'The wedding party is photographed from <strong>4:00 PM</strong>, so their flowers have to be on site before then. That is the tighter of the two deadlines.'] },
-
-  { lvl:'warn', h:'Two things still have no number', p:[
-    '<strong>The pool party</strong> — Barbara is handling it, but nothing is quoted or tracked.',
-    '<strong>Day-after plans</strong> — no brunch, and no decision on an alternative.'] }
+  { lvl:'warn', h:'Day-after plans still undecided', p:[
+    'No brunch, and no alternative chosen. Worth settling while people still have flights to book.'] }
 ];
 
 const DECISIONS = [
-  { q:'Snyder deposit', s:'$814.50 plus the CCRA, or the quote lapses — and the BEO names Snyder for the napkins', impact:'$1,629 order at risk', by:'Today' },
-  { q:'Seating chart', s:'Needed with table and seat numbers for all eleven dietary restrictions', impact:'Blocks the 26 Aug handoff', by:'24 Aug' },
-  { q:'Family formal list', s:'Needed in shooting order — the portrait window is 5:55 to 6:30', impact:'Protects the reception', by:'25 Aug' },
-  { q:'Gabriel’s drink of choice', s:'Still blank on the BEO after four revisions', impact:'None', by:'26 Aug' },
-  { q:'Ceremony musicians', s:'BEO lists "Palmetto Strings + Friends of Grooms" — who are the friends?', impact:'None, meals are covered at 6', by:'26 Aug' },
-  { q:'Vendor meal location', s:'Still TBD on the BEO', impact:'None', by:'26 Aug' },
-  { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'26 Aug' }
+  { q:'Guest count 66 vs 80', s:'BEO bills 66; the contract note still says 80 confirmed at six months', impact:'$2,285 already off the balance', by:'26 Aug' },
+  { q:'Cake flavours', s:'BEO reads "Not Noted". No anniversary tier.', impact:'None', by:'26 Aug' },
+  { q:'Getaway send-off', s:'Last blank on the BEO vendor list', impact:'Unknown', by:'26 Aug' },
+  { q:'Ceremony and reception florals', s:'Stephen booked, nothing quoted or paid', impact:'Unknown', by:'29 Aug' },
+  { q:'Wedding party florals', s:'Barbara arranging. No vendor, no cost, must land before 4:00 PM.', impact:'Unknown', by:'29 Aug' },
+  { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'29 Aug' }
 ];
 
 const CLOSED = [
@@ -827,7 +819,7 @@ const CLOSED = [
   'Cake paid — Publix, two tiers, cut and served by PPHG',
   'Childcare — not being offered, all six families notified',
   'Rehearsal confirmed for 2:00 PM Saturday at the venue',
-  'Pool party 4:00 – 9:00 PM at Restore at Carolina Park',
+  'Pool party 5:00 – 9:00 PM at Restore at Carolina Park',
   'Grooms arrive 3:30 for the details walkthrough; wedding party and photographers at 4:00',
   'Photography 4:00 – 9:30 PM — 5 contracted hours plus a complimentary 30 minutes',
   'No send-off — photographers leave at 9:30 and the party runs to 10:30',
@@ -840,44 +832,53 @@ const CLOSED = [
   'PPHG providing bar and station signs',
   'Linen pick-up and return handled by Invitation Only',
   'Setup access from 9:00 AM the day of the event',
-  'All 69 RSVPs in and accounted for'
+  'All RSVPs in and accounted for',
+  'Rehearsal confirmed 2:00 PM on the BEO',
+  'Drinks of choice — Joshua white wine, Gabriel red wine',
+  'Bar opens 5:40 after the all-guest photo',
+  'Bars: Stars Lounge for cocktail hour, Ballroom for dinner',
+  'Stations placed — 1 and 2 ballroom right, 3 ballroom left',
+  'Vendor meals at the vendor table in the Ballroom',
+  'Nine guest tables, 66 chivari chairs, 6 cocktail tables',
+  'Videographer, floral, lighting and transport all filled in on the BEO'
 ];
 
 const MENU = [
   { c:'Displays', t:'4:30 PM · Concession stand', items:[
-    { n:'Buttered Popcorn', d:'PPHG provides a 2oz bag per guest', q:80, p:6 } ] },
-  { c:'Cocktail hour', t:'5:30 PM · Stars Lounge · passed', items:[
+    { n:'Buttered Popcorn', d:'PPHG provides a 2oz bag per guest', q:66, p:6 } ] },
+  { c:'Cocktail hour', t:'5:40 PM · Stars Lounge · passed', items:[
     { n:'J.I. Tomato Pie', d:'basil oil', tags:['Vegetarian'], q:50, p:4.50 },
     { n:'Chicken + Waffle', d:'mini belgian waffle, fried chicken, hot honey glaze, tomato remoulade', q:50, p:4.50 },
     { n:'Bacon Wrapped Shrimp', d:'chile lime crema', tags:['Gluten free'], q:50, p:6.50 },
     { n:'Lobster Hushpuppy', d:'honey butter', q:50, p:5.50 },
     { n:'Deviled Egg', d:'pimento cheese, crispy prosciutto', q:50, p:4.00 } ] },
-  { c:'Bar', t:'5:30 PM · five hours · hosted', items:[
-    { n:'Reserve Wine', d:'House Red · House White', q:80, p:18 },
-    { n:'Grand Cru Wine Varietal', d:'Arte Latino Cava', q:80, p:4 },
-    { n:'Grand Cru Beer', d:'Mich Ultra · Stella Artois · Westbrook IPA', tags:['Upgraded'], q:80, p:18 },
-    { n:'Non-Alcoholic Package', d:'sweet tea, unsweet tea, lemonade, full mixer selection', tags:['Required with beer & wine'], q:80, p:10 } ] },
+  { c:'Bar', t:'5:40 PM · five hours · hosted · Stars Lounge then Ballroom', items:[
+    { n:'Reserve Wine', d:'House Red · House White', q:66, p:18 },
+    { n:'Grand Cru Wine Varietal', d:'Arte Latino Cava', q:66, p:4 },
+    { n:'Grand Cru Beer', d:'Mich Ultra · Stella Artois · Westbrook IPA', tags:['Upgraded'], q:66, p:18 },
+    { n:'Non-Alcoholic Package', d:'sweet tea, unsweet tea, lemonade, full mixer selection', tags:['Required with beer & wine'], q:66, p:10 } ] },
   { c:'Composed petite plates', t:'7:00 PM · 90 minutes · full seating', items:[
-    { n:'Petite Filet', d:'yukon fondue, broccolini florets, bordelaise', tags:['Gluten free','Station 1'], q:77, p:26 },
-    { n:'Buttermilk Fried Chicken', d:'three cheese mac, collard greens, pepper vinegar', tags:['Station 2'], q:77, p:20 },
-    { n:'Ricotta Ravioli', d:'poached asparagus, goat cheese, lemon beurre blanc', tags:['Vegetarian','Station 3'], q:77, p:18 },
-    { n:'Glazed Butternut Squash', d:'cider glaze, warm chickpea salad', tags:['Vegan','Gluten free'], q:3, p:38 } ] },
+    { n:'Petite Filet', d:'yukon fondue, broccolini florets, bordelaise', tags:['Gluten free','Station 1 · right'], q:63, p:26 },
+    { n:'Buttermilk Fried Chicken', d:'three cheese mac, collard greens, pepper vinegar', tags:['Station 2 · right'], q:63, p:20 },
+    { n:'Ricotta Ravioli', d:'poached asparagus, goat cheese, lemon beurre blanc', tags:['Vegetarian','Station 3 · left'], q:63, p:18 },
+    { n:'Glazed Butternut Squash', d:'cider glaze, warm chickpea salad, broccolini florets', tags:['Vegan','Gluten free'], q:3, p:38 } ] },
   { c:'Toast', t:'7:50 PM · passed', items:[
-    { n:'Champagne Toast', d:'Arte Latino Cava, passed to every guest, served in a champagne coupe', tags:['Complimentary'], q:80, p:0 } ] },
+    { n:'Champagne Toast', d:'Arte Latino Cava, passed to every guest, served in a champagne coupe', tags:['Complimentary'], q:66, p:0 } ] },
   { c:'Cake', t:'8:15 PM', items:[
-    { n:'Publix — two tiers', d:'Set on the left side of the stage, cut and served by PPHG onto salad plates. Baker supplies the stand and any anniversary-tier box; delivery must be same day.', tags:['Confirmed'], q:1, p:0 } ] },
+    { n:'Publix — two tiers', d:'Left side of the stage, cut and served by PPHG onto salad plates. No anniversary tier. Flavours still to be given to Publix.', tags:['Confirmed'], q:1, p:0 } ] },
   { c:'Vendor meals', t:'7:30 PM · one hour after stations open', items:[
-    { n:'Stations, two plates max', d:'2 photo · 1 DJ · 3 planner. Cut from 8 — the AV tech and ceremony musicians are no longer covered.', q:6, p:25 } ] }
+    { n:'Stations, two plates max', d:'2 photo · 1 DJ · 3 planner. Served at the vendor table in the Ballroom.', q:6, p:25 } ] }
 ];
 
 const MENU_NOTES = [
   'Preset: iced water at every seat.',
-  'Place setting: highball glass, universal wine glass, dinner fork, dinner knife and a black Snyder napkin.',
+  'Place setting: highball glass, universal wine glass, dinner fork, dinner knife and a black napkin.',
   'Dinner wines poured tableside: house red and house white.',
-  'Joshua’s drink of choice: water and white wine. Gabriel’s: still to be chosen.',
+  'Drinks of choice — Joshua: white wine. Gabriel: red wine.',
   'Three station attendants and two additional servers for wine and water service.',
-  'PPHG supplies all china, silver and glassware: 160 salad plates, 160 pasta bowls, 80 dinner forks, 200 salad forks, 80 dinner knives, 80 salad knives, 275 champagne coupes, 360 wine glasses and 324 highballs.',
-  'Ballroom set with 80 gold chivari chairs, 10 guest tables, a sweetheart and a cake table, 3 station tables, 2 bars and 4 cocktail tables.',
+  'PPHG supplies all china, silver and glassware: 130 salad plates, 130 pasta bowls, 66 dinner forks, 155 salad forks, 66 dinner knives, 80 salad knives, 275 champagne coupes, 324 wine glasses and 288 highballs.',
+  'Ballroom set with 66 gold chivari chairs, 9 guest tables, a sweetheart and a cake table, 3 station tables, 2 bars and 6 cocktail tables.',
+  'Bars: Stars Lounge for cocktail hour, Ballroom for dinner and the reception.',
   'Linens and napkins come from Snyder. Everything else on the table is PPHG’s.',
   'PPHG provides the bar and station signs. Posters are client provided.',
   'Setup can begin at 9:00 AM. Earlier access needs approval a month out and may require a parking buyout.'
@@ -886,7 +887,7 @@ const MENU_NOTES = [
 const RUNSHEET = [
   { t:'Thu 3 Sep', e:'Invitation Only collects the linens', w:'Snyder, 3875 Meeting St · returned Tue 8 Sep' },
   { t:'Sat 2:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · run by Loraine' },
-  { t:'Sat 4–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant' },
+  { t:'Sat 5–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant' },
   { t:'9:00 AM',  e:'Venue opens', w:'Earliest permitted setup' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
   { t:'11:00 AM', e:'Linens on site and set', w:'Brought in by Invitation Only from Thursday’s pick-up' },
@@ -895,19 +896,19 @@ const RUNSHEET = [
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
   { t:'3:30 PM',  e:'Palmetto Strings load in', w:'Keyboard, speakers, mics and their own sound tech · booked 4:30 – 6:00' },
-  { t:'3:30 PM',  e:'Grooms arrive — final details walkthrough', w:'Venue reveal before anyone else is in the room' },
+  { t:'3:35 PM',  e:'Grooms arrive — final details walkthrough', w:'Final touches in Stars Lounge · venue reveal' },
   { t:'4:00 PM',  e:'Wedding party and photographers arrive', w:'Party partially ready · Richard Bell begins the complimentary half hour' },
   { t:'4:15 PM',  e:'Getting-ready coverage in Stars Lounge', w:'Finishing touches and detail shots · rings, invitation suite, florals' },
   { t:'4:30 PM',  e:'Doors open — guests arrive', w:'Preludes playing · popcorn at the concession stand in the lobby' },
   { t:'5:00 PM',  e:'Ceremony', w:'In the Cinema · Father Will · up to 30 minutes' },
   { t:'5:30 PM',  e:'All-guest photo in the Cinema', w:'Everyone stays seated after the ceremony — about ten minutes' },
-  { t:'5:40 PM',  e:'Cocktail hour', w:'Stars Lounge, flipped from the getting-ready room · family portraits here',
+  { t:'5:40 PM',  e:'Bar opens · cocktail hour', w:'Stars Lounge bar · family portraits here',
     sub:['Cava passed as guests arrive','Five passed hors d’oeuvres','Bar opens — wine, beer and non-alcoholic'] },
   { t:'6:30 PM',  e:'Guests move to the Ballroom', w:'Find seating' },
   { t:'6:45 PM',  e:'Formalities',
-    sub:['Introduction of the wedding party','Introduction of the couple','First dance','Parent dances','Welcome and thank you','Blessing of the food'] },
+    sub:['Introductions','First dances — two of them','Welcome and thank you','Blessing of the food'] },
   { t:'7:00 PM',  e:'Dinner stations open', w:'Three petite-plate stations, 90 minutes' },
-  { t:'7:30 PM',  e:'Vendor meals', w:'Location TBD · 6 covered — 2 photo, 1 DJ, 3 planner' },
+  { t:'7:30 PM',  e:'Vendor meals', w:'Vendor table in the Ballroom · 6 covered — 2 photo, 1 DJ, 3 planner' },
   { t:'7:50 PM',  e:'PPHG passes champagne', w:'Served in champagne coupes' },
   { t:'7:55 PM',  e:'Roasts and toasts' },
   { t:'8:15 PM',  e:'Cutting of the cake', w:'Left side of the stage · PPHG cuts and serves onto salad plates' },
@@ -946,7 +947,7 @@ const PEOPLE = [
   { r:'Florist · wedding party', n:'To be confirmed', x:'Barbara arranging — bouquets, boutonnieres, personal flowers' },
   { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216-14' },
   { r:'Cake and pool party', n:'Barbara Taylor', e:'warriorbjtaylor@hotmail.com' },
-  { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 4:00 – 9:00 PM' }
+  { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 5:00 – 9:00 PM' }
 ];
 
 /* ---------- helpers ---------- */
@@ -1300,7 +1301,7 @@ function drawRoster(){
 const SEATS_PER = 8;
 
 const MAX_TABLES = 10;
-const ROW_GAP = 68, FIRST_Y = 206, COUNT_OFF = 31, GAP_TO_BAR = 23, BAR_H = 58;
+const ROW_GAP = 68, FIRST_Y = 206, COUNT_OFF = 31, GAP_TO_BAR = 34, BAR_H = 72;
 
 let TABLES = [];       // [{n,x,y}] — rebuilt whenever the table list changes
 let PLAN = { barTop:464, roomBottom:522, height:536 };
@@ -1322,7 +1323,7 @@ layoutTables([1,2,3,4,5,6,7,8]);
 
 const ROOMS = [
   { n:'Ballroom', c:'Reception · 80 seated',
-    d:'Stage at the north end with the dance floor in front of it. Ten 4x4 guest tables in two columns, sweetheart table between them, cake table on the west wall. Three stations along the side walls, two bars and four cocktail tables at the south end.' },
+    d:'Stage at the north end with the dance floor in front of it. Nine 4x4 guest tables, sweetheart table below the dance floor, cake table on the west wall. Stations 1 and 2 on the right, station 3 on the left. Two bars, six cocktail tables and a vendor table at the south end.' },
   { n:'Cinema', c:'Ceremony · stadium seating',
     d:'Fixed stadium rows, so there is no seating chart to make. The all-guest photo happens here straight after the ceremony, then couple portraits once the room clears.' },
   { n:'Stars Lounge', c:'Cocktail hour · 24 ft 11 in × 17 ft',
@@ -1384,7 +1385,7 @@ function floorplan(){
     <text class="lbl big" x="150" y="34" text-anchor="middle">STAGE</text>
 
     <rect x="66" y="50" width="168" height="26" fill="#fff" stroke="#3D434D" stroke-width="1.2"/>
-    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">${TABLES.length} TABLE${TABLES.length===1?"":"S"} · SEATS ${TABLES.length*SEATS_PER}</text>
+    <text class="lbl" x="150" y="61" text-anchor="middle" style="fill:#3D434D">SEATING FOR ${TABLES.length*SEATS_PER} · SWEETHEART · VENDOR TABLE</text>
     <text class="lbl" x="150" y="71" text-anchor="middle" style="fill:#3D434D">+ SWEETHEART TABLE</text>
 
     <rect x="46" y="96" width="208" height="${Math.max(60, PLAN.barTop-108)}" fill="url(#chk)"/>
@@ -1413,15 +1414,21 @@ function floorplan(){
     <rect class="fx" x="254" y="${Math.round((96+PLAN.barTop)/2)+20}" width="14" height="80"/>
     <text class="lbl" x="261" y="${Math.round((96+PLAN.barTop)/2)+60}" text-anchor="middle" transform="rotate(-90 261 ${Math.round((96+PLAN.barTop)/2)+60})">STATION 1</text>
 
-    <rect x="30" y="${PLAN.barTop}" width="240" height="58" fill="#E7E3DA"/>
-    <rect class="fx" x="112" y="${PLAN.barTop+10}" width="76" height="14" rx="1"/>
-    <text class="lbl" x="150" y="${PLAN.barTop+20}" text-anchor="middle">BAR</text>
-    <rect class="fx" x="112" y="${PLAN.barTop+34}" width="76" height="14" rx="1"/>
-    <text class="lbl" x="150" y="${PLAN.barTop+44}" text-anchor="middle">BAR</text>
-    <circle class="cok" cx="72" cy="${PLAN.barTop+15}" r="9"/><text class="lbl" x="72" y="${PLAN.barTop+18}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="228" cy="${PLAN.barTop+15}" r="9"/><text class="lbl" x="228" y="${PLAN.barTop+18}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="72" cy="${PLAN.barTop+39}" r="9"/><text class="lbl" x="72" y="${PLAN.barTop+42}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
-    <circle class="cok" cx="228" cy="${PLAN.barTop+39}" r="9"/><text class="lbl" x="228" y="${PLAN.barTop+42}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <rect x="30" y="${PLAN.barTop}" width="240" height="72" fill="#E7E3DA"/>
+    <circle class="cok" cx="86" cy="${PLAN.barTop-9}" r="9"/><text class="lbl" x="86" y="${PLAN.barTop-6}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="150" cy="${PLAN.barTop-9}" r="9"/><text class="lbl" x="150" y="${PLAN.barTop-6}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="214" cy="${PLAN.barTop-9}" r="9"/><text class="lbl" x="214" y="${PLAN.barTop-6}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <rect class="fx" x="96" y="${PLAN.barTop+12}" width="76" height="14" rx="1"/>
+    <text class="lbl" x="134" y="${PLAN.barTop+22}" text-anchor="middle">BAR</text>
+    <rect class="fx" x="96" y="${PLAN.barTop+38}" width="76" height="14" rx="1"/>
+    <text class="lbl" x="134" y="${PLAN.barTop+48}" text-anchor="middle">BAR</text>
+    <circle class="cok" cx="52" cy="${PLAN.barTop+12}" r="9"/><text class="lbl" x="52" y="${PLAN.barTop+15}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="52" cy="${PLAN.barTop+36}" r="9"/><text class="lbl" x="52" y="${PLAN.barTop+39}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <circle class="cok" cx="52" cy="${PLAN.barTop+60}" r="9"/><text class="lbl" x="52" y="${PLAN.barTop+63}" text-anchor="middle" style="font-size:7px;fill:#fff">C</text>
+    <g>
+      <rect class="vt" x="212" y="${PLAN.barTop+22}" width="34" height="34" rx="3" transform="rotate(45 229 ${PLAN.barTop+39})"/>
+      <text class="lbl" x="229" y="${PLAN.barTop+42}" text-anchor="middle" style="font-size:7px;fill:var(--ink-2)">VENDOR</text>
+    </g>
   </svg>`;
 }
 
@@ -1571,7 +1578,8 @@ function poolParty(){
     ['Invited', inv.length, 'Coming Saturday.'],
     ['Not decided', und.length, 'On the wedding list, no answer yet.'],
     ['No need', skip.length, 'Deliberately not invited.'],
-    ['Wedding guests', D.guests.length, 'The full Sunday list.']
+    ['Wedding guests', D.guests.length, 'The full Sunday list.'],
+    ['Runs', '5–9 PM', 'Saturday, after the 2:00 rehearsal.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
   $('#poolInvited').innerHTML = inv.map(p=>`<div class="pn">
@@ -1706,11 +1714,11 @@ function exportPool(){
   const half = Math.ceil(list.length / 2);
   const col = arr => `<ol>${arr.map(p=>`<li><strong>${esc(p.name)}</strong>${p.notes?`<span class="d">${esc(p.notes)}</span>`:''}</li>`).join('')}</ol>`;
   openPrint('Pool party', `<header><h1>Pool Party</h1>
-    <div class="s">Saturday 5 September 2026 &middot; 4:00 &ndash; 9:00 PM<br>
+    <div class="s">Saturday 5 September 2026 &middot; 5:00 &ndash; 9:00 PM<br>
       Restore at Carolina Park &middot; 1588 Bloom St, Mt Pleasant, SC 29466</div></header>
     <div class="sum">
       <div><div class="k">Invited</div><div class="v">${list.length}</div></div>
-      <div><div class="k">Starts</div><div class="v">4:00 PM</div></div>
+      <div><div class="k">Starts</div><div class="v">5:00 PM</div></div>
       <div><div class="k">Ends</div><div class="v">9:00 PM</div></div>
     </div>
     ${list.length
