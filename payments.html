@@ -296,10 +296,11 @@ function render(){
           : d === 0 ? ' \u00b7 today' : ' \u00b7 ' + d + ' days')
       : 'No due date on file';
     const addr = v.id === 'pphg'
-      ? '<div class="addr">The American Theater\nATTN: Olivia Nilsen\n456 King Street\nCharleston, SC 29403</div>' +
-        '<div class="warn"><b>Check the street number before shipping.</b> The mailing instruction says ' +
-        '<b>456</b> King Street; the BEO and every other document say <b>446</b>. Confirm with Olivia in writing ' +
-        '\u2014 a cashier\u2019s check sent to a wrong address is hard to recover.</div>'
+      ? '<div class="addr">William Aiken House\nATTN: Olivia Nilsen\n456 King Street\nCharleston, SC 29403</div>' +
+        '<div class="warn"><b>Payable to The American Theater</b>, but delivered to the ' +
+        '<b>William Aiken House at 456 King Street</b> — the offices, not the venue at 446. ' +
+        'Buzz at the King Street door or the Ann Street gate after 9am. Olivia Nilsen 843.853.1810 ext. 310.' +
+        '<br><a href="check-delivery.html" target="_blank" rel="noopener" style="color:var(--rust);font-weight:700">Full step-by-step instructions &#8599;</a></div>'
       : '';
     return '<div class="pay"><div class="top">' +
       '<div><h3>' + esc(v.name) + '</h3><div class="when">' + when + '</div></div>' +

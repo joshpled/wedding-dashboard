@@ -462,8 +462,12 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="pool" aria-selected="false">Pool party<span class="badge" id="bPool">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
+    <a href="check-delivery.html" target="_blank" rel="noopener"
+       style="margin-left:auto;align-self:center;padding:9px 14px;color:var(--rust);text-decoration:none;
+              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+              font-size:14.5px;font-weight:600">Check drop &#8599;</a>
     <a href="payments.html" target="_blank" rel="noopener"
-       style="margin-left:auto;align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
+       style="align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
               font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
               font-size:14.5px;font-weight:600">Payments &#8599;</a>
     <a href="timeline.html" target="_blank" rel="noopener"
@@ -781,9 +785,10 @@ const FLAGS = [
     '<strong>Cake flavours</strong> read \u201cNot Noted\u201d, and the anniversary tier is marked NO. Publix needs the flavours.',
     '<strong>Getaway send-off</strong> is the last empty line on the vendor list. If the answer is none, tell Olivia that rather than leaving it blank.'] },
 
-  { lvl:'warn', h:'Both florists are still unquoted', p:[
-    '<strong>Stephen</strong> covers ceremony and reception florals, delivered by Amanda Cubello at 1:00 PM. Nothing priced, nothing paid. PPHG now lists Amanda on their vendor sheet.',
-    '<strong>Wedding party flowers</strong> are with Barbara and have no vendor. They have to be on site before <strong>4:00 PM</strong>, when the party is photographed.'] },
+  { lvl:'warn', h:'Florals are quoted but shipping is not', p:[
+    '<strong>Stephen</strong> quoted <strong>$1,138</strong> for ceremony and reception florals, <strong>excluding shipping</strong>. Nothing is paid yet, and the shipping figure is still unknown.',
+    'If the flowers are being shipped they need to land <strong>before</strong> Amanda arranges them, not on the morning she delivers at 1:00 PM. Get a delivery date as well as a cost.',
+    '<strong>Wedding party flowers</strong> are with Barbara and still have no vendor. They must be on site before <strong>4:00 PM</strong>, when the party is photographed.'] },
 
   { lvl:'warn', h:'Loose ends with a cost attached', p:[
     '<strong>Palmetto Strings</strong> — $650 due 22 August.',
@@ -799,7 +804,7 @@ const DECISIONS = [
   { q:'Guest count 66 vs 80', s:'BEO bills 66; the contract note still says 80 confirmed at six months', impact:'$2,285 already off the balance', by:'26 Aug' },
   { q:'Cake flavours', s:'BEO reads "Not Noted". No anniversary tier.', impact:'None', by:'26 Aug' },
   { q:'Getaway send-off', s:'Last blank on the BEO vendor list', impact:'Unknown', by:'26 Aug' },
-  { q:'Ceremony and reception florals', s:'Stephen booked, nothing quoted or paid', impact:'Unknown', by:'29 Aug' },
+  { q:'Floral shipping', s:'$1,138 quoted for the flowers themselves; shipping excluded and unpriced', impact:'Unknown on top of $1,138', by:'29 Aug' },
   { q:'Wedding party florals', s:'Barbara arranging. No vendor, no cost, must land before 4:00 PM.', impact:'Unknown', by:'29 Aug' },
   { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'29 Aug' }
 ];
@@ -942,7 +947,7 @@ const PEOPLE = [
   { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
   { r:'Ceremony music and sound', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com', t:'843.532.8656' },
   { r:'Officiant', n:'Father Will', t:'336.340.8183', x:'Officiating free of charge' },
-  { r:'Florist · ceremony and reception', n:'Stephen', t:'301.549.8622', x:'Not quoted yet' },
+  { r:'Florist · ceremony and reception', n:'Stephen', t:'301.549.8622', x:'$1,138 quoted, shipping extra' },
   { r:'Florals · delivery 1:00 PM', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
   { r:'Florist · wedding party', n:'To be confirmed', x:'Barbara arranging — bouquets, boutonnieres, personal flowers' },
   { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216-14' },
