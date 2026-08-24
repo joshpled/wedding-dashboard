@@ -287,6 +287,32 @@ details.pgroup[open] summary:before{content:"\25BE"}
 .dotm{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
 .dotm.inv{background:var(--moss)} .dotm.und{background:var(--brass)} .dotm.skp{background:var(--ink-3)}
 
+.psort{display:inline-flex;margin-left:auto;border:1px solid var(--rule);border-radius:var(--r);
+  overflow:hidden;background:#fff}
+.psort button{background:none;border:0;border-right:1px solid var(--rule-2);padding:4px 9px;
+  color:var(--ink-3);font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.09em;font-size:11px;font-weight:700;white-space:nowrap}
+.psort button:last-child{border-right:0}
+.psort button:hover{color:var(--ink);background:var(--rule-2)}
+.psort button[aria-pressed="true"]{background:var(--brass-lo);color:var(--brass)}
+
+.pnames{columns:190px auto;column-gap:22px;padding:12px 15px 15px}
+.pnames:empty:after{content:"None";color:var(--ink-3);font-size:13px;font-style:italic}
+.pn{break-inside:avoid;display:flex;align-items:center;gap:6px;padding:4px 0;
+  font-size:14px;line-height:1.4;border-bottom:1px solid var(--rule-2)}
+.pn:last-child{border-bottom:0}
+.pn .nm{flex:1;min-width:0;overflow-wrap:anywhere;color:var(--ink)}
+.pn .nt{font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.07em;font-weight:700;white-space:nowrap}
+.pn button{background:none;border:0;color:var(--ink-3);font-size:14px;line-height:1;
+  padding:3px 6px;border-radius:3px;flex:0 0 auto}
+.pn button:hover{color:var(--rust);background:var(--rust-lo)}
+.pn .go:hover{color:var(--moss);background:var(--moss-lo)}
+
+.pnames.pick .pn{cursor:pointer;border-bottom-style:dashed}
+.pnames.pick .pn:hover{background:var(--brass-lo)}
+.pnames.pick .pn:hover .nm{color:var(--brass)}
+
 .pchips{display:flex;flex-wrap:wrap;gap:5px;padding:11px 15px 14px}
 .pchips:empty:after{content:"None";color:var(--ink-3);font-size:13px;font-style:italic}
 .pc{display:inline-flex;align-items:center;gap:0;border-radius:99px;overflow:hidden;
@@ -640,14 +666,20 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         <datalist id="weddingGuests"></datalist>
 
         <div class="pgroup">
-          <div class="phead"><span class="dotm inv"></span>Invited <em id="cInv">0</em></div>
-          <div class="pchips" id="poolInvited"></div>
+          <div class="phead"><span class="dotm inv"></span>Invited <em id="cInv">0</em>
+            <span class="psort" id="poolSort">
+              <button data-sort="first-asc">First A&ndash;Z</button>
+              <button data-sort="first-desc">First Z&ndash;A</button>
+              <button data-sort="last-asc">Last A&ndash;Z</button>
+              <button data-sort="last-desc">Last Z&ndash;A</button>
+            </span></div>
+          <div class="pnames" id="poolInvited"></div>
         </div>
 
         <div class="pgroup" id="grpUnd">
           <div class="phead"><span class="dotm und"></span>Not decided <em id="cUnd">0</em>
             <span class="phint">Tap a name to invite, or &times; if they are not needed</span></div>
-          <div class="pchips" id="poolUndecided"></div>
+          <div class="pnames pick" id="poolUndecided"></div>
         </div>
 
         <details class="pgroup" id="grpSkip">
@@ -1504,13 +1536,36 @@ async function seatByName(no, raw){
   await load(); seating(); guestRoster();
 }
 
+let poolSort = 'first-asc';
+
+// "Mary Anne Van Dyke" -> last name is the final word; single-word names sort as themselves
+function nameParts(full){
+  const bits = String(full).trim().split(/\s+/);
+  return { first: bits[0] || '', last: bits.length > 1 ? bits[bits.length - 1] : (bits[0] || '') };
+}
+function sortNames(arr){
+  const [key, dir] = poolSort.split('-');
+  const mul = dir === 'desc' ? -1 : 1;
+  return [...arr].sort((a,b)=>{
+    const A = nameParts(a.name), B = nameParts(b.name);
+    const primary = key === 'last'
+      ? A.last.localeCompare(B.last, undefined, {sensitivity:'base'})
+      : A.first.localeCompare(B.first, undefined, {sensitivity:'base'});
+    if (primary) return primary * mul;
+    // tie-break on the other part so the order is stable and readable
+    const secondary = key === 'last'
+      ? A.first.localeCompare(B.first, undefined, {sensitivity:'base'})
+      : A.last.localeCompare(B.last, undefined, {sensitivity:'base'});
+    return secondary * mul;
+  });
+}
+
 function poolParty(){
   const rows = D.pool || [];
-  const inv  = rows.filter(p => p.status !== 'skip').sort((a,b)=>a.name.localeCompare(b.name));
-  const skip = rows.filter(p => p.status === 'skip').sort((a,b)=>a.name.localeCompare(b.name));
+  const inv  = sortNames(rows.filter(p => p.status !== 'skip'));
+  const skip = sortNames(rows.filter(p => p.status === 'skip'));
   const known = new Set(rows.map(p => p.name.toLowerCase()));
-  const und  = D.guests.filter(g => !known.has(g.name.toLowerCase()))
-                       .sort((a,b)=>a.name.localeCompare(b.name));
+  const und  = sortNames(D.guests.filter(g => !known.has(g.name.toLowerCase())));
 
   $('#poolCount').innerHTML = [
     ['Invited', inv.length, 'Coming Saturday.'],
@@ -1519,18 +1574,19 @@ function poolParty(){
     ['Wedding guests', D.guests.length, 'The full Sunday list.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  const chip = (p, cls) => `<span class="pc ${cls}"><span class="nm"><b>${esc(p.name)}</b>${
-      p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}</span>` +
-    (cls === 'inv'
-      ? `<button data-poolskip="${p.id}" title="Not needed">&times;</button>`
-      : `<button data-poolinv="${p.id}" title="Invite after all">&#8634;</button>`) + `</span>`;
+  $('#poolInvited').innerHTML = inv.map(p=>`<div class="pn">
+      <span class="nm">${esc(p.name)}</span>
+      ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
+      <button data-poolskip="${p.id}" title="Not needed">&times;</button></div>`).join('');
 
-  $('#poolInvited').innerHTML  = inv.map(p => chip(p,'inv')).join('');
-  $('#poolSkipped').innerHTML  = skip.map(p => chip(p,'skp')).join('');
-  $('#poolUndecided').innerHTML = und.map(g =>
-    `<span class="pc und"><span class="nm" data-addpool="${esc(g.name)}"><b>${esc(g.name)}</b></span>` +
-    `<span class="add" data-addpool="${esc(g.name)}">+</span>` +
-    `<button data-poolno="${esc(g.name)}" title="Not needed">&times;</button></span>`).join('');
+  $('#poolUndecided').innerHTML = und.map(g=>`<div class="pn" data-addpool="${esc(g.name)}" title="Tap to invite">
+      <span class="nm">${esc(g.name)}</span>
+      <button class="go" data-addpool="${esc(g.name)}" title="Invite">+</button>
+      <button data-poolno="${esc(g.name)}" title="Not needed">&times;</button></div>`).join('');
+
+  $('#poolSkipped').innerHTML = skip.map(p=>`<span class="pc skp">
+      <span class="nm"><b>${esc(p.name)}</b></span>
+      <button data-poolinv="${p.id}" title="Invite after all">&#8634;</button></span>`).join('');
 
   $('#cInv').textContent  = inv.length;
   $('#cUnd').textContent  = und.length;
@@ -1539,6 +1595,7 @@ function poolParty(){
   $('#grpSkip').hidden = skip.length === 0;
   $('#bPool').textContent = inv.length;
   $('#weddingGuests').innerHTML = und.map(g=>`<option value="${esc(g.name)}"></option>`).join('');
+  $$('#poolSort button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === poolSort)));
 }
 
 function rooms(){
@@ -1645,7 +1702,7 @@ function exportSeating(){
 }
 
 function exportPool(){
-  const list = (D.pool||[]).filter(p => p.status !== 'skip').sort((a,b)=>a.name.localeCompare(b.name));
+  const list = sortNames((D.pool||[]).filter(p => p.status !== 'skip'));
   const half = Math.ceil(list.length / 2);
   const col = arr => `<ol>${arr.map(p=>`<li><strong>${esc(p.name)}</strong>${p.notes?`<span class="d">${esc(p.notes)}</span>`:''}</li>`).join('')}</ol>`;
   openPrint('Pool party', `<header><h1>Pool Party</h1>
@@ -2097,6 +2154,7 @@ $('#npAdd').onclick = async () => {
 $('#npName').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
 $('#npNote').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
 $('#expPool').onclick = exportPool;
+$$('#poolSort button').forEach(b => b.onclick = () => { poolSort = b.dataset.sort; poolParty(); });
 
 $('#addTable').onclick = async () => {
   if (TABLES.length >= MAX_TABLES) return;
