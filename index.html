@@ -685,6 +685,11 @@ const FLAGS = [
     'Also still blank: <strong>Gabriel’s drink of choice</strong>, and the vendor meal location.',
     'Their timeline sheet still reads <strong>3:45PM Grooms Arrive</strong> and <strong>0:00PM First Look</strong>. You are arriving at 3:30 and there is no first look.'] },
 
+  { lvl:'warn', h:'Both florists are unquoted, and one has no vendor', p:[
+    '<strong>Stephen</strong> is covering ceremony and reception florals, delivered by Amanda Cubello at 1:00 PM. Nothing is priced and nothing is paid.',
+    '<strong>Wedding party flowers</strong> — bouquets, boutonnieres and personal pieces — are with Barbara, and the vendor is not chosen yet.',
+    'The wedding party is photographed from <strong>4:00 PM</strong>, so their flowers have to be on site before then. That is the tighter of the two deadlines.'] },
+
   { lvl:'warn', h:'Two things still have no number', p:[
     '<strong>The pool party</strong> — Barbara is handling it, but nothing is quoted or tracked.',
     '<strong>Day-after plans</strong> — no brunch, and no decision on an alternative.'] }
@@ -720,7 +725,6 @@ const CLOSED = [
   'Photography 4:00 – 9:30 PM — 5 contracted hours plus a complimentary 30 minutes',
   'No send-off — photographers leave at 9:30 and the party runs to 10:30',
   'AV tech cancelled — the Palmetto package already includes a sound tech',
-  'Florals paid — Stephen, with Amanda Cubello arranging and delivering at 1:00 PM',
   'Father Will officiating free of charge',
   'Videography free — Anthony Rivera attending as a guest',
   'All glassware from PPHG — 275 champagne coupes, 360 wine glasses, 324 highballs',
@@ -779,7 +783,8 @@ const RUNSHEET = [
   { t:'9:00 AM',  e:'Venue opens', w:'Earliest permitted setup' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
   { t:'11:00 AM', e:'Linens on site and set', w:'Brought in by Invitation Only from Thursday’s pick-up' },
-  { t:'1:00 PM',  e:'Florals delivered and set', w:'Amanda Cubello, arranging for Stephen' },
+  { t:'1:00 PM',  e:'Ceremony and reception florals delivered', w:'Amanda Cubello, arranging for Stephen' },
+  { t:'Before 4:00 PM', e:'Wedding party flowers on site', w:'Bouquets and boutonnieres · Barbara arranging · vendor TBC' },
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
   { t:'3:30 PM',  e:'Palmetto Strings load in', w:'Keyboard, speakers, mics and their own sound tech · booked 4:30 – 6:00' },
@@ -829,8 +834,9 @@ const PEOPLE = [
   { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
   { r:'Ceremony music and sound', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com', t:'843.532.8656' },
   { r:'Officiant', n:'Father Will', t:'336.340.8183', x:'Officiating free of charge' },
-  { r:'Florist', n:'Stephen', t:'301.549.8622', x:'Paid · Amanda Cubello arranging and delivering' },
+  { r:'Florist · ceremony and reception', n:'Stephen', t:'301.549.8622', x:'Not quoted yet' },
   { r:'Florals · delivery 1:00 PM', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
+  { r:'Florist · wedding party', n:'To be confirmed', x:'Barbara arranging — bouquets, boutonnieres, personal flowers' },
   { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216-14' },
   { r:'Cake and pool party', n:'Barbara Taylor', e:'warriorbjtaylor@hotmail.com' },
   { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 4:00 – 9:00 PM' }
@@ -1682,12 +1688,36 @@ document.addEventListener('click', async e=>{
     const no = Number(dtb.dataset.deltable);
     const at = D.guests.filter(g => g.table_no === no);
     const nm = tableName(no).full;
-    if (at.length && !confirm(
-      `${nm} has ${at.length} ${at.length === 1 ? 'person' : 'people'} seated.\n\n` +
-      `Removing it will send them back to the unseated list. Continue?`)) return;
-    if (!at.length && !confirm(`Remove ${nm}?`)) return;
-    if (at.length) await sb.from('guests').update({ table_no:null, seat_no:null }).eq('table_no', no);
-    await sb.from('table_names').delete().eq('table_no', no);
+    const above = TABLES.filter(t => t.n > no).length;
+    const shiftNote = above
+      ? `\n\nTables above it shift down — ${TABLES.length} tables becomes ${TABLES.length - 1}, numbered 1 to ${TABLES.length - 1}.`
+      : '';
+    const msg = at.length
+      ? `${nm} has ${at.length} ${at.length === 1 ? 'person' : 'people'} seated.\n\n` +
+        `They go back to the unseated list.${shiftNote}\n\nContinue?`
+      : `Remove ${nm}?${shiftNote}`;
+    if (!confirm(msg)) return;
+
+    try {
+      if (at.length){
+        const r = await sb.from('guests').update({ table_no:null, seat_no:null }).eq('table_no', no);
+        if (r.error) throw r.error;
+      }
+      let r = await sb.from('table_names').delete().eq('table_no', no);
+      if (r.error) throw r.error;
+
+      // close the gap: every table above steps down one, guests follow
+      const highest = TABLES.reduce((m,t) => Math.max(m, t.n), 0);
+      for (let k = no + 1; k <= highest; k++){
+        r = await sb.from('guests').update({ table_no: k - 1 }).eq('table_no', k);
+        if (r.error) throw r.error;
+        r = await sb.from('table_names').update({ table_no: k - 1 }).eq('table_no', k);
+        if (r.error) throw r.error;
+      }
+    } catch (err) {
+      alert('The table was not fully removed: ' + (err.message || err) +
+            '\n\nRefresh and check the numbering before changing anything else.');
+    }
     await load(); seating(); guestRoster();
     return;
   }
@@ -1893,9 +1923,7 @@ $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.sid
 
 $('#addTable').onclick = async () => {
   if (TABLES.length >= MAX_TABLES) return;
-  const used = new Set(TABLES.map(t => t.n));
-  let next = 1;
-  while (used.has(next)) next++;          // reuse the lowest free number
+  const next = TABLES.length + 1;         // numbers stay contiguous
   if (next > MAX_TABLES) return;
   const { error } = await sb.from('table_names').insert({ table_no: next, name: null });
   if (error){ alert('Could not add the table: ' + error.message); return; }
