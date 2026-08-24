@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joshua &amp; Gabriel · 6 September 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111418; --ink-2:#3D434D; --ink-3:#565D68;
+  --paper:#FAF9F6; --card:#fff; --rule:#D5D0C6; --rule-2:#EAE7E0;
+  --brass:#6E5520; --brass-lo:#FAF3E2; --brass-line:#D8C08A;
+  --rust:#8A2F1C; --rust-lo:#FDEEEA; --rust-line:#E8B4A6;
+  --moss:#26492F; --moss-lo:#E9F2EB; --moss-line:#A9C7B1;
+  --r:4px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.65 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px 90px}
+h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+button{font:inherit;cursor:pointer}
+a{color:var(--brass)}
+header.hero{text-align:center;padding:52px 0 0}
+header.hero h1{font-size:clamp(34px,8vw,62px);letter-spacing:.15em;line-height:.98}
+header.hero .amp{display:block;font-size:.5em;color:var(--brass);letter-spacing:.3em;margin:6px 0}
+header.hero .s{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.22em;font-size:12.5px;color:var(--ink-3);font-weight:600;margin-top:16px;line-height:2}
+header.hero .rule{height:2px;background:var(--brass-line);margin:22px 0 0}
+h2.sec{font-size:14px;letter-spacing:.2em;color:var(--brass);border-bottom:1px solid var(--brass-line);padding-bottom:9px;margin:40px 0 18px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);box-shadow:0 1px 2px rgba(17,20,24,.04),0 10px 26px -18px rgba(17,20,24,.18)}
+.pad{padding:20px 22px}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-top:0;border-radius:0 0 var(--r) var(--r);overflow:hidden}
+.strip div{background:var(--card);padding:13px 15px;text-align:center}
+.strip .k{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:10.5px;color:var(--ink-3);font-weight:700}
+.strip .v{font-weight:700;margin-top:3px;font-size:15px}
+.row{display:grid;grid-template-columns:88px 1fr;gap:18px;padding:15px 0;border-bottom:1px solid var(--rule-2);align-items:start}
+.row:last-child{border-bottom:0}
+.row .t{font-family:"IBM Plex Mono",monospace;font-size:14.5px;font-weight:600;color:var(--brass);white-space:nowrap;padding-top:1px}
+.row .e{font-weight:700;font-size:16px;line-height:1.35}
+.row .w{font-size:14.5px;color:var(--ink-2);margin-top:3px;line-height:1.55}
+.row.key{background:var(--brass-lo);margin:0 -14px;padding:15px 14px;border-radius:var(--r);border-bottom-color:transparent}
+.row.key .e{color:var(--brass)}
+.dish{padding:11px 0;border-bottom:1px solid var(--rule-2)}
+.dish:last-child{border-bottom:0}
+.dish .n{font-weight:700;font-size:15.5px}
+.dish .d{font-size:14px;color:var(--ink-2);margin-top:2px;line-height:1.5}
+.tag{display:inline-block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;margin-right:5px;margin-top:6px}
+.tag.v{background:var(--moss-lo);color:var(--moss);border:1px solid var(--moss-line)}
+.tag.g{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line)}
+.course h3{font-size:13px;letter-spacing:.16em;color:var(--brass);margin-bottom:3px}
+.course .when{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:11.5px;color:var(--ink-3);font-weight:600;margin-bottom:9px}
+.course{margin-bottom:24px}
+.course:last-child{margin-bottom:0}
+.note{border-left:4px solid var(--brass);background:var(--brass-lo);padding:15px 18px;border-radius:0 var(--r) var(--r) 0;margin-top:14px}
+.note h3{font-size:13px;letter-spacing:.1em;margin-bottom:6px}
+.note p{margin:0;font-size:14.5px;color:var(--ink-2);line-height:1.6}
+.note p+p{margin-top:8px}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.info .b{border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;background:var(--card)}
+.info .b h4{margin:0 0 4px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-size:12px;color:var(--brass)}
+.info .b p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.55}
+.info .b a{text-decoration:none;font-weight:600}
+label.f{display:block;margin-bottom:13px}
+label.f span{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-size:11.5px;font-weight:700;color:var(--ink-3);margin-bottom:5px}
+label.f input,label.f textarea,label.f select{width:100%;border:1px solid var(--rule);border-radius:var(--r);padding:10px 12px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+label.f textarea{min-height:74px;resize:vertical}
+label.f .hint{font-family:"Public Sans",sans-serif;text-transform:none;letter-spacing:0;font-size:12.5px;color:var(--ink-3);font-weight:400;margin-top:4px}
+.btn{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line);border-radius:var(--r);padding:11px 20px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:14.5px;font-weight:700}
+.btn:hover{background:#F4E9CE}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.msg{margin-top:14px;padding:13px 16px;border-radius:var(--r);font-size:14.5px;line-height:1.55}
+.msg.ok{background:var(--moss-lo);color:var(--moss);border:1px solid var(--moss-line)}
+.msg.err{background:var(--rust-lo);color:var(--rust);border:1px solid var(--rust-line)}
+.msg.info{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line)}
+footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3);text-align:center;line-height:1.9}
+@media(max-width:560px){.wrap{padding:0 15px 70px}.row{grid-template-columns:74px 1fr;gap:13px}header.hero{padding-top:34px}}
+@media print{.noprint{display:none}body{background:#fff}}
+
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Joshua<span class="amp">&amp;</span>Gabriel</h1>
+    <div class="s">Sunday, the sixth of September, two thousand and twenty-six<br>
+      The American Theater &middot; Charleston, South Carolina</div>
+    <div class="rule"></div>
+  </header>
+
+  <div class="strip">
+    <div><div class="k">Doors</div><div class="v">4:30 PM</div></div>
+    <div><div class="k">Ceremony</div><div class="v">5:00 PM</div></div>
+    <div><div class="k">Dinner</div><div class="v">7:00 PM</div></div>
+    <div><div class="k">Ends</div><div class="v">10:30 PM</div></div>
+  </div>
+
+  <h2 class="sec">How the evening runs</h2>
+  <div class="card pad">
+    <div class="row"><div class="t">4:30</div>
+      <div><div class="e">Doors open</div>
+        <div class="w">Come in, grab popcorn in the lobby, find a seat in the theatre.
+          Music playing. No need to be early.</div></div></div>
+    <div class="row key"><div class="t">5:00</div>
+      <div><div class="e">Ceremony</div>
+        <div class="w">In the Cinema. About thirty minutes.</div></div></div>
+    <div class="row"><div class="t">5:30</div>
+      <div><div class="e">A photo with everyone</div>
+        <div class="w"><strong>Please stay in your seat when the ceremony ends.</strong>
+          We are taking one photograph with all of you in it before anyone moves. Ten minutes.</div></div></div>
+    <div class="row key"><div class="t">5:40</div>
+      <div><div class="e">Cocktail hour</div>
+        <div class="w">Through to Stars Lounge. Bar opens, cava and canapes passed round.
+          We will be having photos taken and will join you shortly.</div></div></div>
+    <div class="row"><div class="t">6:30</div>
+      <div><div class="e">Into the Ballroom</div>
+        <div class="w">Find your table. There will be a seating chart.</div></div></div>
+    <div class="row"><div class="t">6:45</div>
+      <div><div class="e">Introductions and first dances</div>
+        <div class="w">Then a quick welcome and the blessing.</div></div></div>
+    <div class="row key"><div class="t">7:00</div>
+      <div><div class="e">Dinner</div>
+        <div class="w">Three stations open around the room. Help yourself, go back for more.</div></div></div>
+    <div class="row"><div class="t">7:45</div>
+      <div><div class="e">Champagne and toasts</div>
+        <div class="w">Glasses passed round, then a few words.</div></div></div>
+    <div class="row"><div class="t">8:15</div>
+      <div><div class="e">Cake</div></div></div>
+    <div class="row key"><div class="t">8:30</div>
+      <div><div class="e">Dancing</div>
+        <div class="w">The rest of the night.</div></div></div>
+    <div class="row"><div class="t">10:30</div>
+      <div><div class="e">Last song and goodnight</div>
+        <div class="w">Music stops and the bar closes at half past.</div></div></div>
+  </div>
+
+  <div class="note">
+    <h3>Two things worth knowing</h3>
+    <p><strong>Stay seated after the ceremony.</strong> The all-guest photo only works
+      if nobody moves. It takes ten minutes and then the bar opens.</p>
+    <p><strong>Dinner is stations, not plated.</strong> Nothing is brought to you and
+      nothing runs out &mdash; go up whenever you are hungry.</p>
+  </div>
+
+
+  <h2 class="sec">What you will be eating</h2>
+  <div class="card pad">
+
+    <div class="course">
+      <h3>As you arrive</h3><div class="when">4:30 &middot; Lobby</div>
+      <div class="dish"><div class="n">Buttered popcorn</div>
+        <div class="d">At the concession stand. It is an old theatre &mdash; we could not resist.</div></div>
+    </div>
+
+    <div class="course">
+      <h3>Cocktail hour</h3><div class="when">5:40 &middot; Stars Lounge</div>
+      <div class="dish"><div class="n">Passed cava</div>
+        <div class="d">Arte Latino Cava, handed round as you come out of the ceremony.</div></div>
+      <div class="dish"><div class="n">J.I. Tomato Pie</div><div class="d">basil oil</div>
+        <span class="tag v">Vegetarian</span></div>
+      <div class="dish"><div class="n">Chicken &amp; Waffle</div>
+        <div class="d">mini belgian waffle, fried chicken, hot honey glaze, tomato remoulade</div></div>
+      <div class="dish"><div class="n">Bacon Wrapped Shrimp</div><div class="d">chile lime crema</div>
+        <span class="tag g">Gluten free</span></div>
+      <div class="dish"><div class="n">Lobster Hushpuppy</div><div class="d">honey butter</div></div>
+      <div class="dish"><div class="n">Deviled Egg</div><div class="d">pimento cheese, crispy prosciutto</div></div>
+    </div>
+
+    <div class="course">
+      <h3>Dinner &mdash; three stations</h3><div class="when">7:00 &middot; Ballroom</div>
+      <div class="dish"><div class="n">Petite Filet</div>
+        <div class="d">yukon fondue, broccolini florets, bordelaise &middot; right side of the room</div>
+        <span class="tag g">Gluten free</span></div>
+      <div class="dish"><div class="n">Buttermilk Fried Chicken</div>
+        <div class="d">three cheese mac, collard greens, pepper vinegar &middot; right side of the room</div></div>
+      <div class="dish"><div class="n">Ricotta Ravioli</div>
+        <div class="d">poached asparagus, goat cheese, lemon beurre blanc &middot; left side of the room</div>
+        <span class="tag v">Vegetarian</span></div>
+      <div class="dish"><div class="n">Glazed Butternut Squash</div>
+        <div class="d">cider glaze, warm chickpea salad, broccolini &middot; plated for anyone who needs it</div>
+        <span class="tag v">Vegan</span><span class="tag g">Gluten free</span></div>
+      <div class="note" style="margin-top:16px"><p>Go up and help yourself &mdash; the stations stay open
+        for about ninety minutes, so there is no rush and no fixed order.</p></div>
+    </div>
+
+    <div class="course">
+      <h3>Bar</h3><div class="when">5:40 until 10:30</div>
+      <div class="dish"><div class="n">Wine</div><div class="d">house red and white, poured at the table with dinner</div></div>
+      <div class="dish"><div class="n">Beer</div><div class="d">Michelob Ultra, Stella Artois, Westbrook IPA</div></div>
+      <div class="dish"><div class="n">Non-alcoholic</div>
+        <div class="d">sweet tea, unsweet tea, lemonade, sodas, juices and bottled water</div></div>
+      <div class="d" style="font-size:13.5px;color:var(--ink-3);margin-top:9px">
+        Two bars &mdash; Stars Lounge during cocktail hour, then the Ballroom for the rest of the night.
+        Everything is on us.</div>
+    </div>
+
+    <div class="course">
+      <h3>Cake</h3><div class="when">8:15</div>
+      <div class="dish"><div class="n">Two tiers, cut and served</div>
+        <div class="d">Brought round to you at the tables.</div></div>
+    </div>
+  </div>
+
+
+
+  <h2 class="sec">One thing we need from you</h2>
+  <div class="card" id="formCard">
+    <div class="pad">
+      <p style="margin:0 0 18px;color:var(--ink-2);line-height:1.6">
+        The kitchen needs final numbers, so if you have an allergy or something you do not eat,
+        tell us here. We are also missing phone numbers and email addresses for a few people.
+        Type your name and we will show you what we still need.</p>
+
+      <label class="f"><span>Your name</span>
+        <input id="gName" type="text" placeholder="First and last" autocomplete="name">
+      </label>
+      <button class="btn" id="lookupBtn" type="button">Look me up</button>
+      <div class="msg" id="formMsg" hidden></div>
+
+      <div id="formFields" hidden style="margin-top:22px;padding-top:20px;border-top:1px solid var(--rule-2)">
+        <label class="f"><span>Email</span>
+          <input id="gEmail" type="email" autocomplete="email" placeholder="Only if we do not have it">
+        </label>
+        <label class="f"><span>Mobile</span>
+          <input id="gPhone" type="tel" autocomplete="tel" placeholder="In case we need you on the day">
+        </label>
+        <label class="f"><span>Allergies or dietary needs</span>
+          <textarea id="gDiet" placeholder="Vegan, gluten free, nut allergy, anything at all"></textarea>
+          <span class="hint">Tell us even if you think you have mentioned it before.</span>
+        </label>
+        
+        <label class="f"><span>Anything else</span>
+          <textarea id="gNotes" placeholder="Optional"></textarea>
+        </label>
+        <button class="btn" id="submitBtn" type="button">Send</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <h2 class="sec">Getting there</h2>
+  <div class="info">
+    <div class="b"><h4>The venue</h4>
+      <p>The American Theater<br>446 King Street<br>Charleston, SC 29403</p></div>
+    <div class="b"><h4>Parking</h4>
+      <p>King Street metering is tight. The Visitor Center garage on Mary Street
+        and the Marion Square garage are both a short walk.</p></div>
+    <div class="b"><h4>Dress</h4>
+      <p>Cocktail attire. It is Charleston in September &mdash; warm and humid outside,
+        properly air conditioned inside.</p></div>
+    <div class="b"><h4>Questions on the day</h4>
+      <p>Loraine Cook, our planner<br><a href="tel:8436958884">843.695.8884</a></p></div>
+  </div>
+
+
+  <footer>
+    Any questions before the day, text Josh or Gabriel.<br>
+    On the day, Loraine Cook &middot; 843.695.8884
+  </footer>
+
+</div>
+<script>
+const FN = 'https://ixtynzfktgfwjwlvdaho.supabase.co/functions/v1/guest-info';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function call(payload){
+  const r = await fetch(FN, {
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) throw new Error('Request failed');
+  return r.json();
+}
+
+let matched = null;
+
+$('#lookupBtn').onclick = async () => {
+  const name = $('#gName').value.trim();
+  if (!name){ show('Type your name first.','err'); return; }
+  $('#lookupBtn').disabled = true;
+  try {
+    const res = await call({ action:'lookup', name });
+    if (res.found){
+      matched = res.name;
+      const miss = Object.entries(res.missing).filter(([,v])=>v).map(([k])=>k);
+      show(miss.length
+        ? `Found you, ${esc(res.name)}. We are missing your <strong>${miss.join(', ')}</strong> — fill in what you can below.`
+        : `Found you, ${esc(res.name)}. We have everything, but update anything below if it has changed.`,
+        'ok');
+    } else {
+      matched = null;
+      show('We could not match that name exactly — no problem. Fill in the form and we will sort it out.','info');
+    }
+    $('#formFields').hidden = false;
+  } catch {
+    show('Could not reach the form right now. Try again in a moment.','err');
+    $('#formFields').hidden = false;
+  }
+  $('#lookupBtn').disabled = false;
+};
+
+$('#gName').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); $('#lookupBtn').click(); } });
+
+$('#submitBtn').onclick = async () => {
+  const name = $('#gName').value.trim();
+  if (!name){ show('Type your name first.','err'); return; }
+  const payload = {
+    action:'submit', name,
+    email: $('#gEmail').value, phone: $('#gPhone').value,
+    dietary: $('#gDiet').value, notes: $('#gNotes').value
+  };
+  const rsvp = $('#gRsvp');
+  if (rsvp) payload.pool_rsvp = rsvp.value;
+  if (!payload.email && !payload.phone && !payload.dietary && !payload.notes && !payload.pool_rsvp){
+    show('Add at least one thing before sending.','err'); return;
+  }
+  $('#submitBtn').disabled = true;
+  $('#submitBtn').textContent = 'Sending…';
+  try {
+    await call(payload);
+    $('#formCard').innerHTML =
+      '<div class="pad" style="text-align:center;padding:38px 24px">' +
+      '<h3 style="font-size:15px;letter-spacing:.16em;color:var(--moss);margin-bottom:9px">Thank you</h3>' +
+      '<p style="margin:0;color:var(--ink-2);font-size:15px;line-height:1.6">' +
+      'Got it. Josh and Gabriel will see this. If anything else comes up, just text them.</p></div>';
+  } catch {
+    show('That did not send. Check your connection and try again.','err');
+    $('#submitBtn').disabled = false;
+    $('#submitBtn').textContent = 'Send';
+  }
+};
+
+function show(html, kind){
+  const el = $('#formMsg');
+  el.className = 'msg ' + kind;
+  el.innerHTML = html;
+  el.hidden = false;
+}
+
+</script>
+</body>
+</html>

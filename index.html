@@ -462,8 +462,16 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="pool" aria-selected="false">Pool party<span class="badge" id="bPool">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
+    <a href="guests.html" target="_blank" rel="noopener"
+       style="margin-left:auto;align-self:center;padding:9px 12px;color:var(--brass);text-decoration:none;
+              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+              font-size:14.5px;font-weight:600">Guest page &#8599;</a>
+    <a href="weekend.html" target="_blank" rel="noopener"
+       style="align-self:center;padding:9px 12px;color:var(--brass);text-decoration:none;
+              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+              font-size:14.5px;font-weight:600">Family page &#8599;</a>
     <a href="check-delivery.html" target="_blank" rel="noopener"
-       style="margin-left:auto;align-self:center;padding:9px 14px;color:var(--rust);text-decoration:none;
+       style="align-self:center;padding:9px 12px;color:var(--rust);text-decoration:none;
               font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
               font-size:14.5px;font-weight:600">Check drop &#8599;</a>
     <a href="payments.html" target="_blank" rel="noopener"
@@ -593,6 +601,12 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <div class="sec-h"><h2>Dietary restrictions</h2><span class="hint">PPHG needs these with table and seat numbers by 26 August.</span></div>
       <div class="dietgrid" id="dietGrid"></div>
     </div>
+    <div class="sec" id="subSec" hidden>
+      <div class="sec-h"><h2>From guests</h2>
+        <span class="hint">Sent through the guest page. Apply writes it to the guest list.</span></div>
+      <div class="card"><div id="subList"></div></div>
+    </div>
+
     <div class="sec">
       <div class="sec-h"><h2>Guest list</h2><span class="hint">Click any field to edit. Pick a restriction from the dropdown, or choose “Add another…” for one that isn’t listed. Changes sync to everyone.</span></div>
       <div class="rfilter">
@@ -976,7 +990,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
 let sideFilter = 'all';
-let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{}, pool:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{}, pool:[], subs:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
 const PW_KEY = 'wedding-ops-money';
@@ -1016,14 +1030,15 @@ $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate()
 
 /* ---------- data ---------- */
 async function load(){
-  const [v,p,t,g,m,tn,pg] = await Promise.all([
+  const [v,p,t,g,m,tn,pg,gs] = await Promise.all([
     sb.from('vendors').select('*').order('sort_order'),
     sb.from('payments').select('*').order('paid_on'),
     sb.from('tasks').select('*').order('due_date'),
     sb.from('guests').select('*').order('name'),
     sb.from('milestone_status').select('*'),
     sb.from('table_names').select('*').order('table_no'),
-    sb.from('pool_guests').select('*').order('name')
+    sb.from('pool_guests').select('*').order('name'),
+    sb.from('guest_submissions').select('*').eq('applied', false).order('created_at', { ascending:false })
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
   const ms = {};
@@ -1036,7 +1051,8 @@ async function load(){
   }
   layoutTables(tlist);
   D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms, tnames,
-        pool: pg && !pg.error ? pg.data : [] };
+        pool: pg && !pg.error ? pg.data : [],
+        subs: gs && !gs.error ? gs.data : [] };
   return {};
 }
 async function loadDocs(){
@@ -1054,7 +1070,7 @@ const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
 
 /* ---------- render ---------- */
 function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
-  menu(); runsheet(); guestRoster(); seating(); poolParty(); people(); renderDocs(); }
+  menu(); runsheet(); guestRoster(); seating(); poolParty(); submissions(); people(); renderDocs(); }
 
 function applyMoneyLock(){
   $('#moneyLock').hidden = moneyOpen;
@@ -1266,7 +1282,9 @@ function guestRoster(){
   }).join('');
 
   drawRoster();
-  $('#bGuests').textContent = flagged.length;
+  const pending = (D.subs||[]).length;
+  $('#bGuests').textContent = pending ? `${flagged.length}+${pending}` : flagged.length;
+  $('#bGuests').classList.toggle('hot', pending > 0);
 }
 
 const editing = new Set();
@@ -1579,6 +1597,32 @@ function sortNames(arr){
       : A.last.localeCompare(B.last, undefined, {sensitivity:'base'});
     return secondary * mul;
   });
+}
+
+function submissions(){
+  const list = D.subs || [];
+  $('#subSec').hidden = list.length === 0;
+  if (!list.length) return;
+  $('#subList').innerHTML = list.map(r=>{
+    const bits = [
+      r.email   ? `<strong>Email</strong> ${esc(r.email)}` : '',
+      r.phone   ? `<strong>Phone</strong> ${esc(r.phone)}` : '',
+      r.dietary ? `<strong>Dietary</strong> ${esc(r.dietary)}` : '',
+      r.pool_rsvp ? `<strong>Pool party</strong> ${esc(r.pool_rsvp)}` : '',
+      r.notes   ? `<strong>Note</strong> ${esc(r.notes)}` : ''
+    ].filter(Boolean).join(' &middot; ');
+    const when = new Date(r.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<div class="task">
+      <div class="body">
+        <div class="title">${esc(r.typed_name)}
+          ${r.guest_id ? '' : '<span class="pill tbd" style="margin-left:7px">no match</span>'}</div>
+        <div class="meta" style="text-transform:none;letter-spacing:0;font-family:'Public Sans',sans-serif;font-size:13px;color:var(--ink-2)">${bits}</div>
+        <div class="meta">${when}</div>
+      </div>
+      ${r.guest_id ? `<button class="btn ghost sm" data-applysub="${r.id}">Apply</button>` : ''}
+      <button class="x" data-dropsub="${r.id}" title="Dismiss">&times;</button>
+    </div>`;
+  }).join('');
 }
 
 function poolParty(){
@@ -1894,6 +1938,27 @@ document.addEventListener('click', async e=>{
     updateSwapPreview();
     dlg.showModal();
     return;
+  }
+  const asub = e.target.closest('[data-applysub]');
+  if (asub){
+    const r = (D.subs||[]).find(x => String(x.id) === asub.dataset.applysub); if (!r || !r.guest_id) return;
+    const patch = {};
+    if (r.email)   patch.email   = r.email;
+    if (r.phone)   patch.phone   = r.phone;
+    if (r.dietary) patch.dietary = r.dietary;
+    if (Object.keys(patch).length) await sb.from('guests').update(patch).eq('id', r.guest_id);
+    if (r.pool_rsvp === 'yes'){
+      const g = D.guests.find(x => x.id === r.guest_id);
+      if (g && !(D.pool||[]).some(p => p.name.toLowerCase() === g.name.toLowerCase()))
+        await sb.from('pool_guests').insert({ name:g.name, guest_id:g.id, added_by:me, status:'invited' });
+    }
+    await sb.from('guest_submissions').update({ applied:true }).eq('id', r.id);
+    await load(); guestRoster(); poolParty(); submissions(); return;
+  }
+  const dsub = e.target.closest('[data-dropsub]');
+  if (dsub){
+    await sb.from('guest_submissions').update({ applied:true }).eq('id', dsub.dataset.dropsub);
+    await load(); submissions(); return;
   }
   const ap = e.target.closest('[data-addpool]');
   if (ap){ await addPool(ap.dataset.addpool, '', 'invited'); return; }
