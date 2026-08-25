@@ -1325,25 +1325,35 @@ function drawRoster(){
 const SEATS_PER = 8;
 
 const MAX_TABLES = 10;
-const ROW_GAP = 68, FIRST_Y = 206, COUNT_OFF = 31, GAP_TO_BAR = 34, BAR_H = 72;
+const ROW_GAP = 58, FIRST_Y = 196, COUNT_OFF = 30, GAP_TO_BAR = 36, BAR_H = 72;
+const X_LEFT = 96, X_RIGHT = 204, X_MID = 150;
 
-let TABLES = [];       // [{n,x,y}] — rebuilt whenever the table list changes
+let TABLES = [];
 let PLAN = { barTop:464, roomBottom:522, height:536 };
 
+// zigzag: a flanking pair, then one down the middle, repeating —
+// matches the venue layout rather than two straight columns
 function layoutTables(nums){
   const list = (nums && nums.length) ? nums : [];
-  const rows = Math.ceil(list.length / 2);
-  TABLES = list.map((n, i) => {
-    const row = Math.floor(i / 2);
+  TABLES = [];
+  let i = 0, row = 0;
+  while (i < list.length){
     const y = FIRST_Y + row * ROW_GAP;
-    const lastRowAlone = (row === rows - 1) && (list.length % 2 === 1) && (i === list.length - 1);
-    return { n, y, x: lastRowAlone ? 150 : (i % 2 === 0 ? 100 : 200) };
-  });
-  const lowest = rows ? FIRST_Y + (rows - 1) * ROW_GAP + COUNT_OFF : FIRST_Y;
+    if (row % 2 === 0){                      // paired row
+      TABLES.push({ n:list[i++], x:X_LEFT,  y });
+      if (i < list.length) TABLES.push({ n:list[i++], x:X_RIGHT, y });
+    } else {                                 // single, centred
+      TABLES.push({ n:list[i++], x:X_MID, y });
+    }
+    row++;
+  }
+  const lowest = TABLES.length
+    ? TABLES.reduce((m,t)=>Math.max(m,t.y),0) + COUNT_OFF
+    : FIRST_Y;
   const barTop = lowest + GAP_TO_BAR;
   PLAN = { barTop, roomBottom: barTop + BAR_H, height: barTop + BAR_H + 14 };
 }
-layoutTables([1,2,3,4,5,6,7,8]);
+layoutTables([1,2,3,4,5,6,7,8,9]);
 
 const ROOMS = [
   { n:'Ballroom', c:'Reception · 80 seated',
@@ -1379,7 +1389,7 @@ function floorplan(){
     let out = '';
     for (let i=0;i<8;i++){
       const a = (Math.PI/4)*i + Math.PI/8;
-      out += `<circle class="ch" cx="${(x+Math.cos(a)*r).toFixed(1)}" cy="${(y+Math.sin(a)*r).toFixed(1)}" r="3.1"/>`;
+      out += `<circle class="ch" cx="${(x+Math.cos(a)*r).toFixed(1)}" cy="${(y+Math.sin(a)*r).toFixed(1)}" r="3"/>`;
     }
     return out;
   };
@@ -1389,7 +1399,7 @@ function floorplan(){
     const cls = c > SEATS_PER ? 'over' : c === SEATS_PER ? 'full' : '';
     const nm = tableName(t.n);
     return `<g data-table="${t.n}" class="${matchesSide(t.n) ? '' : 'dim'}" style="cursor:pointer">
-      ${chairs(t.x,t.y,20)}
+      ${chairs(t.x,t.y,19)}
       <rect class="tb ${cls}" x="${t.x-13}" y="${t.y-13}" width="26" height="26" transform="rotate(45 ${t.x} ${t.y})"/>
       <text class="tn" x="${t.x}" y="${t.y+3}">${esc(nm.short)}</text>
       <text class="tc" x="${t.x}" y="${t.y+31}">${c}/${SEATS_PER}</text></g>`;
@@ -1417,13 +1427,13 @@ function floorplan(){
     <circle class="fx" cx="46" cy="106" r="13"/>
     <text class="lbl" x="46" y="109" text-anchor="middle" style="font-size:7px">CAKE</text>
 
-    <rect x="98" y="92" width="104" height="36" fill="none" stroke="#3D434D" stroke-width="1.2" stroke-dasharray="5 3"/>
-    <text class="lbl" x="150" y="107" text-anchor="middle" style="fill:#3D434D">DANCE</text>
-    <text class="lbl" x="150" y="118" text-anchor="middle" style="fill:#3D434D">AREA</text>
+    <rect x="96" y="96" width="108" height="42" fill="none" stroke="#3D434D" stroke-width="1.3" stroke-dasharray="6 3"/>
+    <text class="lbl" x="150" y="113" text-anchor="middle" style="fill:#3D434D">DANCE</text>
+    <text class="lbl" x="150" y="126" text-anchor="middle" style="fill:#3D434D">AREA</text>
 
     <g data-table="0" style="cursor:pointer">
-      <circle class="sh" cx="150" cy="156" r="14"/>
-      <text class="lbl" x="150" y="159" text-anchor="middle" style="fill:#6E5520;font-size:8px">SH</text>
+      <circle class="sh" cx="150" cy="${FIRST_Y}" r="15"/>
+      <text class="lbl" x="150" y="${FIRST_Y+3}" text-anchor="middle" style="fill:#6E5520;font-size:8.5px">SH</text>
     </g>
 
     <text class="lbl big" x="150" y="${Math.round((96+PLAN.barTop)/2)}" text-anchor="middle" transform="rotate(-90 150 ${Math.round((96+PLAN.barTop)/2)})"
