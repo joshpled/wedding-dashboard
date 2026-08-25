@@ -662,7 +662,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   <section class="panel" id="p-pool" hidden>
     <div class="sec">
       <div class="sec-h"><h2>Saturday 5 September &middot; 5:00 &ndash; 9:00 PM</h2>
-        <span class="hint">Restore at Carolina Park, 1588 Bloom St, Mt Pleasant &middot; 25 min from the venue</span>
+        <span class="hint">Restore at Carolina Park, 1588 Bloom St, Mount Pleasant &middot; 25 min from the venue &middot; pizza provided, BYOB cans only</span>
         <button class="btn ghost sm" id="expPool" style="margin-left:auto">Print list</button></div>
       <div class="card"><div class="calc" id="poolCount"></div></div>
     </div>
@@ -776,7 +776,7 @@ const MILESTONES = [
   { k:'pphg',     date:'2026-08-26', title:'PPHG final guest count and final payment', amount:14824.57, detail:'Largest single payment of the wedding.' },
   { k:'linenout', date:'2026-09-03', title:'Invitation Only collects the linens', amount:null, detail:'Snyder, 3875 Meeting St. Held on the pick-up date only.' },
   { k:'rehearsal',date:'2026-09-05', title:'Rehearsal, 2:00 PM', amount:null, detail:'The American Theater, 446 King Street. Loraine runs it.' },
-  { k:'pool',     date:'2026-09-05', title:'Pool party, 5:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant. About 25 minutes away.' },
+  { k:'pool',     date:'2026-09-05', title:'Pool party, 5:00 – 9:00 PM', amount:null, detail:'Restore at Carolina Park, 1588 Bloom St, Mount Pleasant. Pizza provided, BYOB — cans only, no glass. About 25 minutes away.' },
   { k:'wedding',  date:'2026-09-06', title:'Wedding day', amount:null, detail:'Ceremony in the Cinema. Reception 5:00 – 10:30 PM.' },
   { k:'linenback',date:'2026-09-08', title:'Linens returned to Snyder', amount:null, detail:'Handled by Invitation Only.' }
 ];
@@ -791,10 +791,10 @@ const FLAGS = [
     '<strong>Cake flavours</strong> read \u201cNot Noted\u201d, and the anniversary tier is marked NO. Publix needs the flavours.',
     '<strong>Getaway send-off</strong> is the last empty line on the vendor list. If the answer is none, tell Olivia that rather than leaving it blank.'] },
 
-  { lvl:'warn', h:'Florals are quoted but shipping is not', p:[
-    '<strong>Stephen</strong> quoted <strong>$1,138</strong> for ceremony and reception florals, <strong>excluding shipping</strong>. Nothing is paid yet, and the shipping figure is still unknown.',
-    'If the flowers are being shipped they need to land <strong>before</strong> Amanda arranges them, not on the morning she delivers at 1:00 PM. Get a delivery date as well as a cost.',
-    '<strong>Wedding party flowers</strong> are with Barbara and still have no vendor. They must be on site before <strong>4:00 PM</strong>, when the party is photographed.'] },
+  { lvl:'warn', h:'Both florists are booked. Neither has a delivery time.', p:[
+    '<strong>Stephen</strong> — $1,138 for ceremony and reception florals, <strong>excluding shipping</strong>, which is still unpriced. If the flowers ship they must land <em>before</em> Amanda Cubello arranges them, not on the morning she delivers at 1:00 PM.',
+    '<strong>Branch Flower Shop</strong> — $640 for the wedding party: 2 boutonnieres, 7 bridesmaid bouquets, the pastor\u2019s boutonniere, 3 small pieces for the grandkids and 2 corsages for the moms. Fifteen pieces, no delivery or pick-up time set.',
+    'Branch is the tighter deadline. Those flowers are worn in photographs from <strong>4:00 PM</strong>, so they have to be at the theatre and pinned before then \u2014 not delivered at 4:00.'] },
 
   { lvl:'warn', h:'The projector has no time, no contact and no venue sign-off', p:[
     '<strong>Aaron (DJ BlkByte)</strong> is booked at <strong>$200</strong> for day-of projector and video coordination. There is no phone number, no email and no arrival time.',
@@ -818,7 +818,7 @@ const DECISIONS = [
   { q:'Getaway send-off', s:'Last blank on the BEO vendor list', impact:'Unknown', by:'26 Aug' },
   { q:'Projector — what and where', s:'Aaron booked at $200. Cinema is ceremony-only; anything in the Ballroom needs PPHG sign-off.', impact:'$200 plus any venue AV charge', by:'29 Aug' },
   { q:'Floral shipping', s:'$1,138 quoted for the flowers themselves; shipping excluded and unpriced', impact:'Unknown on top of $1,138', by:'29 Aug' },
-  { q:'Wedding party florals', s:'Barbara arranging. No vendor, no cost, must land before 4:00 PM.', impact:'Unknown', by:'29 Aug' },
+  { q:'Branch delivery or pick-up', s:'$640 booked. No time set, and the pieces are worn in photos from 4:00 PM.', impact:'None if handled', by:'29 Aug' },
   { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'29 Aug' }
 ];
 
@@ -837,7 +837,7 @@ const CLOSED = [
   'Cake paid — Publix, two tiers, cut and served by PPHG',
   'Childcare — not being offered, all six families notified',
   'Rehearsal confirmed for 2:00 PM Saturday at the venue',
-  'Pool party 5:00 – 9:00 PM at Restore at Carolina Park',
+  'Pool party 5:00 – 9:00 PM at Restore at Carolina Park — pizza provided, BYOB cans only',
   'Grooms arrive 3:30 for the details walkthrough; wedding party and photographers at 4:00',
   'Photography 4:00 – 9:30 PM — 5 contracted hours plus a complimentary 30 minutes',
   'No send-off — photographers leave at 9:30 and the party runs to 10:30',
@@ -863,7 +863,7 @@ const CLOSED = [
 
 const MENU = [
   { c:'Displays', t:'4:30 PM · Concession stand', items:[
-    { n:'Buttered Popcorn', d:'PPHG provides a 2oz bag per guest', q:66, p:6 } ] },
+    { n:'Popcorn', d:'PPHG provides a 2oz bag per guest', q:66, p:6 } ] },
   { c:'Cocktail hour', t:'5:40 PM · Stars Lounge · passed', items:[
     { n:'J.I. Tomato Pie', d:'basil oil', tags:['Vegetarian'], q:50, p:4.50 },
     { n:'Chicken + Waffle', d:'mini belgian waffle, fried chicken, hot honey glaze, tomato remoulade', q:50, p:4.50 },
@@ -905,12 +905,12 @@ const MENU_NOTES = [
 const RUNSHEET = [
   { t:'Thu 3 Sep', e:'Invitation Only collects the linens', w:'Snyder, 3875 Meeting St · returned Tue 8 Sep' },
   { t:'Sat 2:00 PM', e:'Rehearsal', w:'The American Theater, 446 King Street · run by Loraine' },
-  { t:'Sat 5–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mt Pleasant' },
+  { t:'Sat 5–9 PM', e:'Pool party', w:'Restore at Carolina Park, 1588 Bloom St, Mount Pleasant · pizza provided, BYOB cans only' },
   { t:'9:00 AM',  e:'Venue opens', w:'Earliest permitted setup' },
   { t:'10:00 AM', e:'Planning team arrives — part 1', w:'Invitation Only' },
   { t:'11:00 AM', e:'Linens on site and set', w:'Brought in by Invitation Only from Thursday’s pick-up' },
   { t:'1:00 PM',  e:'Ceremony and reception florals delivered', w:'Amanda Cubello, arranging for Stephen' },
-  { t:'Before 4:00 PM', e:'Wedding party flowers on site', w:'Bouquets and boutonnieres · Barbara arranging · vendor TBC' },
+  { t:'Before 4:00 PM', e:'Wedding party flowers on site', w:'Branch Flower Shop · 15 pieces · Barbara arranging · time TBC' },
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
   { t:'3:30 PM',  e:'Palmetto Strings load in', w:'Keyboard, speakers, mics and their own sound tech · booked 4:30 – 6:00' },
@@ -964,10 +964,10 @@ const PEOPLE = [
   { r:'Officiant', n:'Father Will', t:'336.340.8183', x:'Officiating free of charge' },
   { r:'Florist · ceremony and reception', n:'Stephen', t:'301.549.8622', x:'$1,138 quoted, shipping extra' },
   { r:'Florals · delivery 1:00 PM', n:'Amanda Cubello', e:'amandacubello@yahoo.com', t:'443.848.9762' },
-  { r:'Florist · wedding party', n:'To be confirmed', x:'Barbara arranging — bouquets, boutonnieres, personal flowers' },
+  { r:'Florist · wedding party', n:'Branch Flower Shop', o:'Mount Pleasant', x:'Barbara arranging · $640 · phone to be confirmed' },
   { r:'Rentals', n:'Snyder Events', o:'3875 Meeting St, N. Charleston', t:'843.766.3366', x:'Order #349216-14' },
   { r:'Cake and pool party', n:'Barbara Taylor', e:'warriorbjtaylor@hotmail.com' },
-  { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mt Pleasant, SC 29466', x:'Saturday 5:00 – 9:00 PM' }
+  { r:'Pool party venue', n:'Restore at Carolina Park', o:'1588 Bloom St, Mount Pleasant, SC 29466', x:'Saturday 5:00 – 9:00 PM' }
 ];
 
 /* ---------- helpers ---------- */
@@ -1775,7 +1775,7 @@ function exportPool(){
   const col = arr => `<ol>${arr.map(p=>`<li><strong>${esc(p.name)}</strong>${p.notes?`<span class="d">${esc(p.notes)}</span>`:''}</li>`).join('')}</ol>`;
   openPrint('Pool party', `<header><h1>Pool Party</h1>
     <div class="s">Saturday 5 September 2026 &middot; 5:00 &ndash; 9:00 PM<br>
-      Restore at Carolina Park &middot; 1588 Bloom St, Mt Pleasant, SC 29466</div></header>
+      Restore at Carolina Park &middot; 1588 Bloom St, Mount Pleasant, SC 29466</div></header>
     <div class="sum">
       <div><div class="k">Invited</div><div class="v">${list.length}</div></div>
       <div><div class="k">Starts</div><div class="v">5:00 PM</div></div>
