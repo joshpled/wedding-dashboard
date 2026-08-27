@@ -1459,12 +1459,13 @@ const LINK_RELS = [
 ];
 const INVERSE = Object.fromEntries(LINK_RELS);
 
-// the side and relationship columns already say "Gabriel's friend" —
-// a Friend-of link to a groom just repeats it
-const REDUNDANT_TO_GROOM = new Set(['Friend of']);
+// Side plus Relationship already states how someone relates to their groom —
+// "Side: Josh, Relationship: Mother" is exactly "Mother of Josh". Linking to a
+// groom would say it twice, so those links are not offered at all.
 const isGroom = g => !!g && (g.relationship === 'Groom' ||
   g.name === 'Joshua Perez Leduc' || g.name === 'Gabriel Taylor');
 const grooms = () => D.guests.filter(isGroom);
+const GROOM_LABEL = g => g.side === 'gabriel' ? 'Gabriel' : g.side === 'josh' ? 'Josh' : null;
 
 const REL_OPTS = ['Groom','Matron of Honor','Maid of Honor','Bridesmaid','Best Man','Groomsman',
   'Flower girl','Ring bearer','Usher','Officiant','Mother','Father','Brother','Sister','Grandmother','Grandfather',
@@ -2671,13 +2672,6 @@ function makeCombo(wrapSel, getItems){
     const o = filtered[i]; if (!o) return;
     chosen = o; input.value = o.label; input.classList.add('ok'); close();
     if (wrapSel === '#cboRel'){
-      const note = $('#lkNote');
-      if (note){
-        const red = REDUNDANT_TO_GROOM.has(o.value);
-        note.hidden = !red;
-        if (red) note.textContent =
-          'Josh and Gabriel are not in this list — their side and relationship columns already cover that.';
-      }
       const w = $('#cboWho');
       if (w){ w.querySelector('input').value = ''; w.querySelector('input').classList.remove('ok'); w.querySelector('input').focus(); }
     }
@@ -2723,15 +2717,23 @@ function openLinks(id){
   if (!comboRel) comboRel = makeCombo('#cboRel', () => LINK_RELS.map(([r]) => ({ label:r, value:r })));
   if (!comboWho) comboWho = makeCombo('#cboWho', () => {
     const self = Number($('#linkDlg').dataset.gid);
-    const rel  = comboRel && comboRel.value();
-    const hideGrooms = rel && REDUNDANT_TO_GROOM.has(rel.value);
     return D.guests
-      .filter(x => x.id !== self && !(hideGrooms && isGroom(x)))
+      .filter(x => x.id !== self && !isGroom(x))
       .sort((a,b)=>a.name.localeCompare(b.name))
       .map(x => ({ label:x.name, value:x.id }));
   });
   comboRel.reset(); comboWho.reset();
-  if ($('#lkNote')) $('#lkNote').hidden = true;
+  const note = $('#lkNote');
+  if (note){
+    const side = GROOM_LABEL(g);
+    note.hidden = false;
+    note.innerHTML = side && g.relationship
+      ? `Josh and Gabriel are not in this list. <strong>${esc(g.name)}</strong> is already recorded as
+         <strong>${esc(side)}\u2019s ${esc(g.relationship.toLowerCase())}</strong> in the Side and
+         Relationship columns \u2014 a link would say it twice.`
+      : `Josh and Gabriel are not in this list. Use the <strong>Side</strong> and
+         <strong>Relationship</strong> columns for how someone relates to a groom.`;
+  }
   renderLinks(id);
   dlg.showModal();
   setTimeout(() => comboRel.focus(), 60);
@@ -2776,9 +2778,12 @@ $('#linkDlg').addEventListener('close', async function(){
 
   const target = D.guests.find(g => g.id === to);
   const source = D.guests.find(g => g.id === from);
-  if (REDUNDANT_TO_GROOM.has(rel) && (isGroom(target) || isGroom(source))){
-    alert('No need for that one.\n\nSet the guest\u2019s Side to Josh or Gabriel and their ' +
-          'Relationship to Friend — that already says it, without a link.');
+  if (isGroom(target) || isGroom(source)){
+    const other = isGroom(target) ? source : target;
+    alert('Links to Josh or Gabriel are not needed.\n\n' +
+          `Set ${other ? other.name + '\u2019s' : 'the guest\u2019s'} Side to Josh or Gabriel and ` +
+          'their Relationship to whatever they are \u2014 mother, cousin, friend. ' +
+          'That already says it, without a second entry.');
     return;
   }
   const inv = INVERSE[rel] || rel;
