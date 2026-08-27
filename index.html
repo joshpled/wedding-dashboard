@@ -845,6 +845,9 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           <input type="text" id="lkRel" placeholder="Type a relationship&hellip;" autocomplete="off" role="combobox" aria-expanded="false">
           <div class="cbo-list" hidden></div>
         </div>
+        <p id="lkNote" hidden style="margin:7px 0 0;font-size:12.5px;color:var(--brass);
+          background:var(--brass-lo);border:1px solid var(--brass-line);border-radius:var(--r);
+          padding:8px 10px;line-height:1.45"></p>
         <div class="cbo" id="cboWho" style="margin-top:7px">
           <input type="text" id="lkWho" placeholder="Type a name&hellip;" autocomplete="off" role="combobox" aria-expanded="false">
           <div class="cbo-list" hidden></div>
@@ -1431,13 +1434,32 @@ const LINK_RELS = [
   ['Aunt of','Niece or nephew of'], ['Uncle of','Niece or nephew of'],
   ['Niece or nephew of','Aunt or uncle of'],
   ['Cousin of','Cousin of'],
+  ['Mother-in-law of','Child-in-law of'], ['Father-in-law of','Child-in-law of'],
+  ['Parent-in-law of','Child-in-law of'], ['Child-in-law of','Parent-in-law of'],
+  ['Son-in-law of','Parent-in-law of'], ['Daughter-in-law of','Parent-in-law of'],
+  ['Brother-in-law of','Sibling-in-law of'], ['Sister-in-law of','Sibling-in-law of'],
+  ['Sibling-in-law of','Sibling-in-law of'],
+  ['Grandparent of','Grandchild of'], ['Aunt or uncle of','Niece or nephew of'],
+  ['Step-parent of','Step-child of'], ['Brought as a guest by','Plus one of'],
+  ['Step-mother of','Step-child of'], ['Step-father of','Step-child of'],
+  ['Step-child of','Step-parent of'], ['Step-sibling of','Step-sibling of'],
   ['Plus one of','Brought as a guest by'],
   ['Friend of','Friend of']
 ];
 const INVERSE = Object.fromEntries(LINK_RELS);
 
+// the side and relationship columns already say "Gabriel's friend" —
+// a Friend-of link to a groom just repeats it
+const REDUNDANT_TO_GROOM = new Set(['Friend of']);
+const isGroom = g => !!g && (g.relationship === 'Groom' ||
+  g.name === 'Joshua Perez Leduc' || g.name === 'Gabriel Taylor');
+const grooms = () => D.guests.filter(isGroom);
+
 const REL_OPTS = ['Groom','Mother','Father','Brother','Sister','Grandmother','Grandfather',
-  'Aunt','Uncle','Cousin','Niece','Nephew','Wedding party','Family friend','Friend','Colleague','Plus one'];
+  'Aunt','Uncle','Cousin','Niece','Nephew',
+  'Mother-in-law','Father-in-law','Sister-in-law','Brother-in-law',
+  'Son-in-law','Daughter-in-law','Step-mother','Step-father','Step-sibling',
+  'Wedding party','Family friend','Friend','Colleague','Plus one'];
 
 const guestName = id => (D.guests.find(g => g.id === id) || {}).name || '?';
 
@@ -2595,7 +2617,17 @@ function makeCombo(wrapSel, getItems){
   function pick(i){
     const o = filtered[i]; if (!o) return;
     chosen = o; input.value = o.label; input.classList.add('ok'); close();
-    if (wrapSel === '#cboRel'){ const w = $('#cboWho'); if (w) w.querySelector('input').focus(); }
+    if (wrapSel === '#cboRel'){
+      const note = $('#lkNote');
+      if (note){
+        const red = REDUNDANT_TO_GROOM.has(o.value);
+        note.hidden = !red;
+        if (red) note.textContent =
+          'Josh and Gabriel are not in this list — their side and relationship columns already cover that.';
+      }
+      const w = $('#cboWho');
+      if (w){ w.querySelector('input').value = ''; w.querySelector('input').classList.remove('ok'); w.querySelector('input').focus(); }
+    }
   }
 
   input.addEventListener('focus', () => open(input.value));
@@ -2638,11 +2670,15 @@ function openLinks(id){
   if (!comboRel) comboRel = makeCombo('#cboRel', () => LINK_RELS.map(([r]) => ({ label:r, value:r })));
   if (!comboWho) comboWho = makeCombo('#cboWho', () => {
     const self = Number($('#linkDlg').dataset.gid);
-    return D.guests.filter(x => x.id !== self)
+    const rel  = comboRel && comboRel.value();
+    const hideGrooms = rel && REDUNDANT_TO_GROOM.has(rel.value);
+    return D.guests
+      .filter(x => x.id !== self && !(hideGrooms && isGroom(x)))
       .sort((a,b)=>a.name.localeCompare(b.name))
       .map(x => ({ label:x.name, value:x.id }));
   });
   comboRel.reset(); comboWho.reset();
+  if ($('#lkNote')) $('#lkNote').hidden = true;
   renderLinks(id);
   dlg.showModal();
   setTimeout(() => comboRel.focus(), 60);
@@ -2684,6 +2720,14 @@ $('#linkDlg').addEventListener('close', async function(){
   const to  = Number(whoPick.value);
   const rel = relPick.value;
   if (!from || !to || from === to || !rel) return;
+
+  const target = D.guests.find(g => g.id === to);
+  const source = D.guests.find(g => g.id === from);
+  if (REDUNDANT_TO_GROOM.has(rel) && (isGroom(target) || isGroom(source))){
+    alert('No need for that one.\n\nSet the guest\u2019s Side to Josh or Gabriel and their ' +
+          'Relationship to Friend — that already says it, without a link.');
+    return;
+  }
   const inv = INVERSE[rel] || rel;
   const pair = `${Math.min(from,to)}-${Math.max(from,to)}-${Date.now()}`;
   linking = true;
