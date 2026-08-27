@@ -162,6 +162,15 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   font-size:12px;font-weight:700;color:var(--ink-3)}
 
 .gtable .mut{color:var(--ink-3)}
+.rel{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+.rel b{color:var(--ink-2);font-weight:600}
+.lkrow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--rule-2);font-size:14px}
+.lkrow:last-child{border-bottom:0}
+.lkrow span{flex:1;color:var(--ink-2)}
+.lkrow b{color:var(--ink);font-weight:600}
+.lkrow button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:2px 6px;border-radius:3px}
+.lkrow button:hover{color:var(--rust);background:var(--rust-lo)}
+.lknone{font-size:13.5px;color:var(--ink-3);font-style:italic;padding-bottom:4px}
 .gtable tr.editing{background:var(--brass-lo)}
 .gtable .ic{background:none;border:1px solid transparent;color:var(--ink-3);font-size:15px;
   padding:4px 8px;border-radius:3px;line-height:1}
@@ -735,6 +744,26 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   </footer>
 </div>
 
+<dialog id="linkDlg">
+  <form method="dialog">
+    <div class="dh"><h3 id="lkTitle">Relationships</h3></div>
+    <div class="db">
+      <div id="lkExisting"></div>
+      <div style="border-top:1px solid var(--rule-2);padding-top:12px;margin-top:2px">
+        <p id="lkLead" style="margin:0 0 8px;font-size:13.5px;color:var(--ink-2)"></p>
+        <select id="lkRel" style="width:100%;padding:8px 10px;font:inherit;font-size:14px;
+          border:1px solid var(--rule);border-radius:var(--r);background:#fff;margin-bottom:7px"></select>
+        <select id="lkWho" style="width:100%;padding:8px 10px;font:inherit;font-size:14px;
+          border:1px solid var(--rule);border-radius:var(--r);background:#fff"></select>
+      </div>
+    </div>
+    <div class="df">
+      <button class="btn ghost" value="cancel">Close</button>
+      <button class="btn" value="save" id="lkAdd">Add</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="swapDlg">
   <form method="dialog">
     <div class="dh"><h3 id="swTitle">Swap tables</h3></div>
@@ -991,7 +1020,7 @@ const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1
 
 let sideFilter = 'all';
 let guestSide = 'all';
-let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{}, pool:[], subs:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
+let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{}, pool:[], subs:[], links:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
 const PW_KEY = 'wedding-ops-money';
@@ -1031,7 +1060,7 @@ $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate()
 
 /* ---------- data ---------- */
 async function load(){
-  const [v,p,t,g,m,tn,pg,gs] = await Promise.all([
+  const [v,p,t,g,m,tn,pg,gs,gl] = await Promise.all([
     sb.from('vendors').select('*').order('sort_order'),
     sb.from('payments').select('*').order('paid_on'),
     sb.from('tasks').select('*').order('due_date'),
@@ -1039,7 +1068,8 @@ async function load(){
     sb.from('milestone_status').select('*'),
     sb.from('table_names').select('*').order('table_no'),
     sb.from('pool_guests').select('*').order('name'),
-    sb.from('guest_submissions').select('*').eq('applied', false).order('created_at', { ascending:false })
+    sb.from('guest_submissions').select('*').eq('applied', false).order('created_at', { ascending:false }),
+    sb.from('guest_links').select('*')
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
   const ms = {};
@@ -1053,7 +1083,8 @@ async function load(){
   layoutTables(tlist);
   D = { vendors:v.data, payments:p.data, tasks:t.data, guests: g.error ? [] : g.data, ms, tnames,
         pool: pg && !pg.error ? pg.data : [],
-        subs: gs && !gs.error ? gs.data : [] };
+        subs: gs && !gs.error ? gs.data : [],
+        links: gl && !gl.error ? gl.data : [] };
   return {};
 }
 async function loadDocs(){
@@ -1293,8 +1324,40 @@ const SIDE_LABEL = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
 const sideChip = v => v
   ? `<span class="pill ${v==='josh'?'tbd':v==='gabriel'?'alt':'paid'}">${SIDE_LABEL[v]}</span>`
   : '<span class="mut">—</span>';
+// "A is the <relation> of B" — each entry carries the reverse so both sides read correctly
+const LINK_RELS = [
+  ['Mother of','Child of'], ['Father of','Child of'], ['Parent of','Child of'],
+  ['Child of','Parent of'],
+  ['Spouse of','Spouse of'], ['Partner of','Partner of'],
+  ['Sibling of','Sibling of'],
+  ['Grandmother of','Grandchild of'], ['Grandfather of','Grandchild of'],
+  ['Grandchild of','Grandparent of'],
+  ['Aunt of','Niece or nephew of'], ['Uncle of','Niece or nephew of'],
+  ['Niece or nephew of','Aunt or uncle of'],
+  ['Cousin of','Cousin of'],
+  ['Plus one of','Brought as a guest by'],
+  ['Friend of','Friend of']
+];
+const INVERSE = Object.fromEntries(LINK_RELS);
+
 const REL_OPTS = ['Groom','Mother','Father','Brother','Sister','Grandmother','Grandfather',
   'Aunt','Uncle','Cousin','Niece','Nephew','Wedding party','Family friend','Friend','Colleague','Plus one'];
+
+const guestName = id => (D.guests.find(g => g.id === id) || {}).name || '?';
+
+function linksFor(id){
+  return (D.links || []).filter(l => l.from_guest === id)
+    .sort((a,b) => a.relation.localeCompare(b.relation));
+}
+
+function linkSummary(id){
+  const ls = linksFor(id);
+  if (!ls.length) return '';
+  const shown = ls.slice(0,2).map(l =>
+    `<b>${esc(l.relation.replace(/ of$/,''))}</b> of ${esc(guestName(l.to_guest))}`).join(' &middot; ');
+  const more = ls.length > 2 ? ` &middot; +${ls.length - 2}` : '';
+  return `<span class="rel">${shown}${more}</span>`;
+}
 
 function drawRoster(){
   const types = dietTypes();
@@ -1316,7 +1379,7 @@ function drawRoster(){
     if (!ed) return `<tr>
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
         title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
-      <td><strong>${esc(g.name)}</strong></td>
+      <td><strong>${esc(g.name)}</strong>${linkSummary(g.id)}</td>
       <td>${sideChip(g.side)}</td>
       <td>${g.relationship ? esc(g.relationship) : '<span class="mut">—</span>'}</td>
       <td>${g.email ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>` : '<span class="mut">—</span>'}</td>
@@ -1325,6 +1388,7 @@ function drawRoster(){
       <td>${tn ? esc(tn) : '<span class="mut">—</span>'}</td>
       <td>${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
       <td style="text-align:right;white-space:nowrap">
+        <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
         <button class="ic" data-edit="${g.id}" title="Edit this row">&#9998;</button></td></tr>`;
 
     return `<tr class="editing">
@@ -1347,6 +1411,7 @@ function drawRoster(){
           style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
       <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
       <td style="text-align:right;white-space:nowrap">
+        <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
         <button class="ic done" data-doneedit="${g.id}" title="Finish editing">&#10003;</button>
         <button class="ic" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`;
   }).join('')
@@ -1956,6 +2021,20 @@ document.addEventListener('blur', async e=>{
 }, true);
 
 document.addEventListener('click', async e=>{
+  const lk = e.target.closest('[data-links]');
+  if (lk){ openLinks(Number(lk.dataset.links)); return; }
+
+  const ul = e.target.closest('[data-unlink]');
+  if (ul){
+    const row = (D.links||[]).find(l => String(l.id) === ul.dataset.unlink);
+    if (row){
+      if (row.pair_key) await sb.from('guest_links').delete().eq('pair_key', row.pair_key);
+      else await sb.from('guest_links').delete().eq('id', row.id);
+      await load(); renderLinks(Number($('#linkDlg').dataset.gid)); guestRoster();
+    }
+    return;
+  }
+
   const ed = e.target.closest('[data-edit]');
   if (ed){ editing.add(ed.dataset.edit); drawRoster(); return; }
   const de = e.target.closest('[data-doneedit]');
@@ -2214,6 +2293,28 @@ $('#ngAdd').onclick = async ()=>{
   await load(); guestRoster();
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
+function openLinks(id){
+  const g = D.guests.find(x => x.id === id); if (!g) return;
+  const dlg = $('#linkDlg');
+  dlg.dataset.gid = id;
+  $('#lkTitle').textContent = g.name;
+  $('#lkLead').innerHTML = `<strong>${esc(g.name)}</strong> is the&hellip;`;
+  $('#lkRel').innerHTML = LINK_RELS.map(([r]) => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  $('#lkWho').innerHTML = D.guests.filter(x => x.id !== id)
+    .sort((a,b)=>a.name.localeCompare(b.name))
+    .map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  renderLinks(id);
+  dlg.showModal();
+}
+
+function renderLinks(id){
+  const ls = linksFor(id);
+  $('#lkExisting').innerHTML = ls.length
+    ? ls.map(l => `<div class="lkrow"><span><b>${esc(l.relation)}</b> ${esc(guestName(l.to_guest))}</span>
+        <button type="button" data-unlink="${l.id}" title="Remove">&times;</button></div>`).join('')
+    : `<div class="lknone">No relationships recorded yet.</div>`;
+}
+
 function updateSwapPreview(){
   const from = Number($('#swapDlg').dataset.from);
   const to   = Number($('#swTarget').value);
@@ -2229,6 +2330,29 @@ function updateSwapPreview(){
 $('#swTarget').addEventListener('change', updateSwapPreview);
 
 let swapping = false;
+let linking = false;
+$('#linkDlg').addEventListener('close', async function(){
+  if (this.returnValue !== 'save' || linking) return;
+  const from = Number(this.dataset.gid);
+  const to   = Number($('#lkWho').value);
+  const rel  = $('#lkRel').value;
+  if (!from || !to || from === to || !rel) return;
+  const inv = INVERSE[rel] || rel;
+  const pair = `${Math.min(from,to)}-${Math.max(from,to)}-${Date.now()}`;
+  linking = true;
+  try {
+    // both directions, so the link reads correctly from either person
+    const res = await sb.from('guest_links').insert([
+      { from_guest:from, to_guest:to, relation:rel, pair_key:pair, created_by:me },
+      { from_guest:to, to_guest:from, relation:inv, pair_key:pair, created_by:me }
+    ]);
+    if (res.error) alert(res.error.code === '23505'
+      ? 'That relationship is already recorded.'
+      : 'Could not save: ' + res.error.message);
+  } finally { linking = false; }
+  await load(); guestRoster(); openLinks(from);
+});
+
 $('#swapDlg').addEventListener('close', async function(){
   if (this.returnValue !== 'save' || swapping) return;
   const from = Number(this.dataset.from);
