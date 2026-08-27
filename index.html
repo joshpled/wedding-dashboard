@@ -170,6 +170,22 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .lkrow b{color:var(--ink);font-weight:600}
 .lkrow button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:2px 6px;border-radius:3px}
 .lkrow button:hover{color:var(--rust);background:var(--rust-lo)}
+.cbo{position:relative}
+.cbo input{width:100%;padding:9px 11px;font:inherit;font-size:14px;
+  border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink)}
+.cbo input:focus{border-color:var(--brass-line);outline:none}
+.cbo input.ok{border-color:var(--moss-line);background:var(--moss-lo)}
+.cbo-list{position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:30;
+  background:#fff;border:1px solid var(--rule);border-radius:var(--r);
+  box-shadow:0 12px 30px -14px rgba(17,20,24,.34);max-height:190px;overflow-y:auto}
+.cbo-list[hidden]{display:none}
+.cbo-opt{padding:8px 11px;font-size:14px;color:var(--ink-2);cursor:pointer;
+  border-bottom:1px solid var(--rule-2);line-height:1.35}
+.cbo-opt:last-child{border-bottom:0}
+.cbo-opt:hover,.cbo-opt.on{background:var(--brass-lo);color:var(--brass)}
+.cbo-opt b{color:var(--ink);font-weight:700}
+.cbo-opt.on b{color:var(--brass)}
+.cbo-empty{padding:9px 11px;font-size:13.5px;color:var(--ink-3);font-style:italic}
 .lknone{font-size:13.5px;color:var(--ink-3);font-style:italic;padding-bottom:4px}
 .gtable tr.editing{background:var(--brass-lo)}
 .gtable .ic{background:none;border:1px solid transparent;color:var(--ink-3);font-size:15px;
@@ -751,10 +767,14 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <div id="lkExisting"></div>
       <div style="border-top:1px solid var(--rule-2);padding-top:12px;margin-top:2px">
         <p id="lkLead" style="margin:0 0 8px;font-size:13.5px;color:var(--ink-2)"></p>
-        <select id="lkRel" style="width:100%;padding:8px 10px;font:inherit;font-size:14px;
-          border:1px solid var(--rule);border-radius:var(--r);background:#fff;margin-bottom:7px"></select>
-        <select id="lkWho" style="width:100%;padding:8px 10px;font:inherit;font-size:14px;
-          border:1px solid var(--rule);border-radius:var(--r);background:#fff"></select>
+        <div class="cbo" id="cboRel">
+          <input type="text" id="lkRel" placeholder="Type a relationship&hellip;" autocomplete="off" role="combobox" aria-expanded="false">
+          <div class="cbo-list" hidden></div>
+        </div>
+        <div class="cbo" id="cboWho" style="margin-top:7px">
+          <input type="text" id="lkWho" placeholder="Type a name&hellip;" autocomplete="off" role="combobox" aria-expanded="false">
+          <div class="cbo-list" hidden></div>
+        </div>
       </div>
     </div>
     <div class="df">
@@ -2293,18 +2313,97 @@ $('#ngAdd').onclick = async ()=>{
   await load(); guestRoster();
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
+/* ---------- searchable combobox ---------- */
+function makeCombo(wrapSel, getItems){
+  const wrap = $(wrapSel);
+  const input = wrap.querySelector('input');
+  const list  = wrap.querySelector('.cbo-list');
+  let items = [], filtered = [], cursor = -1, chosen = null;
+
+  const mark = (label, q) => {
+    if (!q) return esc(label);
+    const i = label.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0) return esc(label);
+    return esc(label.slice(0,i)) + '<b>' + esc(label.slice(i,i+q.length)) + '</b>' + esc(label.slice(i+q.length));
+  };
+
+  function open(q=''){
+    items = getItems();
+    const needle = q.trim().toLowerCase();
+    // startsWith first, then contains — closest match sorts to the top
+    filtered = !needle ? items.slice(0,40)
+      : items.filter(o => o.label.toLowerCase().includes(needle))
+             .sort((a,b) => {
+               const A = a.label.toLowerCase().startsWith(needle) ? 0 : 1;
+               const B = b.label.toLowerCase().startsWith(needle) ? 0 : 1;
+               return A - B || a.label.localeCompare(b.label);
+             }).slice(0,40);
+    cursor = filtered.length ? 0 : -1;
+    list.innerHTML = filtered.length
+      ? filtered.map((o,i) => `<div class="cbo-opt ${i===cursor?'on':''}" data-i="${i}">${mark(o.label,q)}</div>`).join('')
+      : `<div class="cbo-empty">No match</div>`;
+    list.hidden = false;
+    input.setAttribute('aria-expanded','true');
+  }
+  function close(){ list.hidden = true; input.setAttribute('aria-expanded','false'); }
+  function paint(){
+    [...list.querySelectorAll('.cbo-opt')].forEach((el,i) => el.classList.toggle('on', i === cursor));
+    const on = list.querySelector('.cbo-opt.on');
+    if (on) on.scrollIntoView({ block:'nearest' });
+  }
+  function pick(i){
+    const o = filtered[i]; if (!o) return;
+    chosen = o; input.value = o.label; input.classList.add('ok'); close();
+  }
+
+  input.addEventListener('focus', () => open(input.value));
+  input.addEventListener('input', () => { chosen = null; input.classList.remove('ok'); open(input.value); });
+  input.addEventListener('keydown', e => {
+    if (list.hidden && ['ArrowDown','ArrowUp'].includes(e.key)){ open(input.value); return; }
+    if (e.key === 'ArrowDown'){ e.preventDefault(); cursor = Math.min(cursor+1, filtered.length-1); paint(); }
+    else if (e.key === 'ArrowUp'){ e.preventDefault(); cursor = Math.max(cursor-1, 0); paint(); }
+    else if (e.key === 'Enter'){ if (!list.hidden && cursor >= 0){ e.preventDefault(); pick(cursor); } }
+    else if (e.key === 'Escape'){ close(); }
+  });
+  list.addEventListener('mousedown', e => {
+    const opt = e.target.closest('.cbo-opt'); if (!opt) return;
+    e.preventDefault(); pick(Number(opt.dataset.i));
+  });
+  input.addEventListener('blur', () => setTimeout(() => {
+    // an exact typed match still counts even without clicking
+    if (!chosen){
+      const hit = getItems().find(o => o.label.toLowerCase() === input.value.trim().toLowerCase());
+      if (hit){ chosen = hit; input.classList.add('ok'); }
+    }
+    close();
+  }, 120));
+
+  return {
+    value: () => chosen,
+    reset(){ chosen = null; input.value = ''; input.classList.remove('ok'); close(); },
+    focus(){ input.focus(); }
+  };
+}
+
+let comboRel = null, comboWho = null;
+
 function openLinks(id){
   const g = D.guests.find(x => x.id === id); if (!g) return;
   const dlg = $('#linkDlg');
   dlg.dataset.gid = id;
   $('#lkTitle').textContent = g.name;
   $('#lkLead').innerHTML = `<strong>${esc(g.name)}</strong> is the&hellip;`;
-  $('#lkRel').innerHTML = LINK_RELS.map(([r]) => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
-  $('#lkWho').innerHTML = D.guests.filter(x => x.id !== id)
-    .sort((a,b)=>a.name.localeCompare(b.name))
-    .map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  if (!comboRel) comboRel = makeCombo('#cboRel', () => LINK_RELS.map(([r]) => ({ label:r, value:r })));
+  if (!comboWho) comboWho = makeCombo('#cboWho', () => {
+    const self = Number($('#linkDlg').dataset.gid);
+    return D.guests.filter(x => x.id !== self)
+      .sort((a,b)=>a.name.localeCompare(b.name))
+      .map(x => ({ label:x.name, value:x.id }));
+  });
+  comboRel.reset(); comboWho.reset();
   renderLinks(id);
   dlg.showModal();
+  setTimeout(() => comboRel.focus(), 60);
 }
 
 function renderLinks(id){
@@ -2334,8 +2433,14 @@ let linking = false;
 $('#linkDlg').addEventListener('close', async function(){
   if (this.returnValue !== 'save' || linking) return;
   const from = Number(this.dataset.gid);
-  const to   = Number($('#lkWho').value);
-  const rel  = $('#lkRel').value;
+  const relPick = comboRel && comboRel.value();
+  const whoPick = comboWho && comboWho.value();
+  if (!relPick || !whoPick){
+    alert('Pick a relationship and a person from the suggestions.');
+    return;
+  }
+  const to  = Number(whoPick.value);
+  const rel = relPick.value;
   if (!from || !to || from === to || !rel) return;
   const inv = INVERSE[rel] || rel;
   const pair = `${Math.min(from,to)}-${Math.max(from,to)}-${Date.now()}`;
