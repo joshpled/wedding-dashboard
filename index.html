@@ -164,6 +164,7 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .gtable .mut{color:var(--ink-3)}
 .rel{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:2px}
 .rel b{color:var(--ink-2);font-weight:600}
+#lkExisting{max-height:150px;overflow-y:auto}
 .lkrow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--rule-2);font-size:14px}
 .lkrow:last-child{border-bottom:0}
 .lkrow span{flex:1;color:var(--ink-2)}
@@ -171,21 +172,24 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .lkrow button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:2px 6px;border-radius:3px}
 .lkrow button:hover{color:var(--rust);background:var(--rust-lo)}
 .cbo{position:relative}
-.cbo input{width:100%;padding:9px 11px;font:inherit;font-size:14px;
+.cbo input{width:100%;padding:10px 12px;font:inherit;font-size:15px;
   border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink)}
-.cbo input:focus{border-color:var(--brass-line);outline:none}
-.cbo input.ok{border-color:var(--moss-line);background:var(--moss-lo)}
-.cbo-list{position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:30;
-  background:#fff;border:1px solid var(--rule);border-radius:var(--r);
-  box-shadow:0 12px 30px -14px rgba(17,20,24,.34);max-height:190px;overflow-y:auto}
+.cbo input:focus{border-color:var(--brass);outline:none;box-shadow:0 0 0 3px var(--brass-lo)}
+.cbo input.ok{border-color:var(--moss);background:var(--moss-lo);font-weight:600}
+
+/* in the flow, not floating — the dialog grows instead of clipping it */
+.cbo-list{margin-top:6px;background:#fff;border:1px solid var(--rule);border-radius:var(--r);
+  max-height:172px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .cbo-list[hidden]{display:none}
-.cbo-opt{padding:8px 11px;font-size:14px;color:var(--ink-2);cursor:pointer;
-  border-bottom:1px solid var(--rule-2);line-height:1.35}
+.cbo-opt{padding:10px 12px;font-size:15px;color:var(--ink);cursor:pointer;line-height:1.3;
+  border-bottom:1px solid var(--rule-2)}
 .cbo-opt:last-child{border-bottom:0}
-.cbo-opt:hover,.cbo-opt.on{background:var(--brass-lo);color:var(--brass)}
-.cbo-opt b{color:var(--ink);font-weight:700}
-.cbo-opt.on b{color:var(--brass)}
-.cbo-empty{padding:9px 11px;font-size:13.5px;color:var(--ink-3);font-style:italic}
+.cbo-opt.on{background:var(--brass-lo);color:var(--brass);font-weight:600}
+.cbo-opt b{font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.cbo-empty{padding:11px 12px;font-size:14px;color:var(--ink-3);font-style:italic}
+.cbo-count{font-size:11.5px;color:var(--ink-3);padding:6px 12px;background:#FCFBF9;
+  border-bottom:1px solid var(--rule-2);font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.11em;font-weight:700;position:sticky;top:0}
 .lknone{font-size:13.5px;color:var(--ink-3);font-style:italic;padding-bottom:4px}
 .gtable tr.editing{background:var(--brass-lo)}
 .gtable .ic{background:none;border:1px solid transparent;color:var(--ink-3);font-size:15px;
@@ -428,7 +432,7 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-si
 .who{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;font-weight:600}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);margin-right:7px}
 
-dialog{border:1px solid var(--rule);border-radius:var(--r);padding:0;box-shadow:0 24px 60px -22px rgba(17,20,24,.28);max-width:340px;width:92vw}
+dialog{border:1px solid var(--rule);border-radius:var(--r);padding:0;box-shadow:0 24px 60px -22px rgba(17,20,24,.28);max-width:400px;width:92vw;max-height:86vh;overflow-y:auto}
 dialog::backdrop{background:rgba(90,86,78,.22)}
 dialog .dh{padding:16px 18px 0} dialog h3{font-size:14px;letter-spacing:.1em}
 dialog .db{padding:14px 18px;display:grid;gap:9px}
@@ -2331,17 +2335,21 @@ function makeCombo(wrapSel, getItems){
     items = getItems();
     const needle = q.trim().toLowerCase();
     // startsWith first, then contains — closest match sorts to the top
-    filtered = !needle ? items.slice(0,40)
+    const all = !needle ? items
       : items.filter(o => o.label.toLowerCase().includes(needle))
              .sort((a,b) => {
                const A = a.label.toLowerCase().startsWith(needle) ? 0 : 1;
                const B = b.label.toLowerCase().startsWith(needle) ? 0 : 1;
                return A - B || a.label.localeCompare(b.label);
-             }).slice(0,40);
+             });
+    filtered = all.slice(0, 50);
     cursor = filtered.length ? 0 : -1;
+    const head = all.length > filtered.length
+      ? `<div class="cbo-count">${filtered.length} of ${all.length} — keep typing</div>`
+      : (needle && all.length ? `<div class="cbo-count">${all.length} match${all.length===1?'':'es'}</div>` : '');
     list.innerHTML = filtered.length
-      ? filtered.map((o,i) => `<div class="cbo-opt ${i===cursor?'on':''}" data-i="${i}">${mark(o.label,q)}</div>`).join('')
-      : `<div class="cbo-empty">No match</div>`;
+      ? head + filtered.map((o,i) => `<div class="cbo-opt ${i===cursor?'on':''}" data-i="${i}">${mark(o.label,q)}</div>`).join('')
+      : `<div class="cbo-empty">Nothing matches &ldquo;${esc(q)}&rdquo;</div>`;
     list.hidden = false;
     input.setAttribute('aria-expanded','true');
   }
@@ -2349,11 +2357,16 @@ function makeCombo(wrapSel, getItems){
   function paint(){
     [...list.querySelectorAll('.cbo-opt')].forEach((el,i) => el.classList.toggle('on', i === cursor));
     const on = list.querySelector('.cbo-opt.on');
-    if (on) on.scrollIntoView({ block:'nearest' });
+    if (on && on.offsetTop !== undefined){
+      const top = on.offsetTop, bot = top + on.offsetHeight;
+      if (top < list.scrollTop) list.scrollTop = top;
+      else if (bot > list.scrollTop + list.clientHeight) list.scrollTop = bot - list.clientHeight;
+    }
   }
   function pick(i){
     const o = filtered[i]; if (!o) return;
     chosen = o; input.value = o.label; input.classList.add('ok'); close();
+    if (wrapSel === '#cboRel'){ const w = $('#cboWho'); if (w) w.querySelector('input').focus(); }
   }
 
   input.addEventListener('focus', () => open(input.value));
