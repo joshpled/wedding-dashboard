@@ -203,6 +203,14 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .cbo-opt:last-child{border-bottom:0}
 .cbo-opt.on{background:var(--brass-lo);color:var(--brass);font-weight:600}
 .cbo-opt b{font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.picked{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.picked:empty{display:none}
+.picked .pk{display:inline-flex;align-items:center;gap:0;border:1px solid var(--moss-line);
+  background:var(--moss-lo);border-radius:99px;font-size:13px;overflow:hidden}
+.picked .pk span{padding:4px 3px 4px 11px;color:var(--moss);font-weight:600}
+.picked .pk button{background:none;border:0;color:var(--moss);font-size:14px;
+  padding:4px 8px 4px 4px;line-height:1;opacity:.65}
+.picked .pk button:hover{opacity:1;color:var(--rust)}
 .cbo-empty{padding:11px 12px;font-size:14px;color:var(--ink-3);font-style:italic}
 .cbo-count{font-size:11.5px;color:var(--ink-3);padding:6px 12px;background:#FCFBF9;
   border-bottom:1px solid var(--rule-2);font-family:"Barlow Condensed",sans-serif;
@@ -857,9 +865,10 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           background:var(--brass-lo);border:1px solid var(--brass-line);border-radius:var(--r);
           padding:8px 10px;line-height:1.45"></p>
         <div class="cbo" id="cboWho" style="margin-top:7px">
-          <input type="text" id="lkWho" placeholder="Type a name&hellip;" autocomplete="off" role="combobox" aria-expanded="false">
+          <input type="text" id="lkWho" placeholder="Type a name, add as many as you like&hellip;" autocomplete="off" role="combobox" aria-expanded="false">
           <div class="cbo-list" hidden></div>
         </div>
+        <div class="picked" id="lkPicked"></div>
       </div>
     </div>
     <div class="df">
@@ -2327,6 +2336,13 @@ document.addEventListener('click', async e=>{
   const lk = e.target.closest('[data-links]');
   if (lk){ openLinks(Number(lk.dataset.links)); return; }
 
+  const up = e.target.closest('[data-unpick]');
+  if (up){
+    lkPicked = lkPicked.filter(p => String(p.value) !== up.dataset.unpick);
+    renderPicked();
+    return;
+  }
+
   const ul = e.target.closest('[data-unlink]');
   if (ul){
     const row = (D.links||[]).find(l => String(l.id) === ul.dataset.unlink);
@@ -2623,7 +2639,9 @@ $('#ngAdd').onclick = async ()=>{
 };
 $('#ngName').onkeydown = e => { if(e.key==='Enter') $('#ngAdd').click(); };
 /* ---------- searchable combobox ---------- */
-function makeCombo(wrapSel, getItems){
+function makeCombo(wrapSel, getItems, opts){
+  const multi = !!(opts && opts.multi);
+  const onPick = opts && opts.onPick;
   const wrap = $(wrapSel);
   const input = wrap.querySelector('input');
   const list  = wrap.querySelector('.cbo-list');
@@ -2670,6 +2688,15 @@ function makeCombo(wrapSel, getItems){
   }
   function pick(i){
     const o = filtered[i]; if (!o) return;
+    if (multi){
+      // collect several, keep going
+      chosen = o;
+      if (onPick) onPick(o);
+      input.value = ''; input.classList.remove('ok');
+      open('');
+      input.focus();
+      return;
+    }
     chosen = o; input.value = o.label; input.classList.add('ok'); close();
     if (wrapSel === '#cboRel'){
       const w = $('#cboWho');
@@ -2691,6 +2718,7 @@ function makeCombo(wrapSel, getItems){
     e.preventDefault(); pick(Number(opt.dataset.i));
   });
   input.addEventListener('blur', () => setTimeout(() => {
+    if (multi){ close(); return; }
     // an exact typed match still counts even without clicking
     if (!chosen){
       const hit = getItems().find(o => o.label.toLowerCase() === input.value.trim().toLowerCase());
@@ -2707,6 +2735,16 @@ function makeCombo(wrapSel, getItems){
 }
 
 let comboRel = null, comboWho = null;
+let lkPicked = [];               // people chosen for this batch
+
+function renderPicked(){
+  const box = $('#lkPicked'); if (!box) return;
+  box.innerHTML = lkPicked.map(p =>
+    `<span class="pk"><span>${esc(p.label)}</span>
+      <button type="button" data-unpick="${p.value}" title="Remove">&times;</button></span>`).join('');
+  const go = $('#lkAdd');
+  if (go) go.textContent = lkPicked.length > 1 ? `Add ${lkPicked.length}` : 'Add';
+}
 
 function openLinks(id){
   const g = D.guests.find(x => x.id === id); if (!g) return;
@@ -2717,12 +2755,15 @@ function openLinks(id){
   if (!comboRel) comboRel = makeCombo('#cboRel', () => LINK_RELS.map(([r]) => ({ label:r, value:r })));
   if (!comboWho) comboWho = makeCombo('#cboWho', () => {
     const self = Number($('#linkDlg').dataset.gid);
+    const taken = new Set(lkPicked.map(p => p.value));
+    const linked = new Set(linksFor(self).map(l => l.to_guest));
     return D.guests
-      .filter(x => x.id !== self && !isGroom(x))
+      .filter(x => x.id !== self && !isGroom(x) && !taken.has(x.id) && !linked.has(x.id))
       .sort((a,b)=>a.name.localeCompare(b.name))
       .map(x => ({ label:x.name, value:x.id }));
-  });
+  }, { multi:true, onPick: o => { lkPicked.push(o); renderPicked(); } });
   comboRel.reset(); comboWho.reset();
+  lkPicked = []; renderPicked();
   const note = $('#lkNote');
   if (note){
     const side = GROOM_LABEL(g);
@@ -2767,36 +2808,34 @@ $('#linkDlg').addEventListener('close', async function(){
   if (this.returnValue !== 'save' || linking) return;
   const from = Number(this.dataset.gid);
   const relPick = comboRel && comboRel.value();
-  const whoPick = comboWho && comboWho.value();
-  if (!relPick || !whoPick){
-    alert('Pick a relationship and a person from the suggestions.');
+  if (!relPick || !lkPicked.length){
+    alert('Pick a relationship, then one or more people from the suggestions.');
     return;
   }
-  const to  = Number(whoPick.value);
   const rel = relPick.value;
-  if (!from || !to || from === to || !rel) return;
-
-  const target = D.guests.find(g => g.id === to);
   const source = D.guests.find(g => g.id === from);
-  if (isGroom(target) || isGroom(source)){
-    const other = isGroom(target) ? source : target;
-    alert('Links to Josh or Gabriel are not needed.\n\n' +
-          `Set ${other ? other.name + '\u2019s' : 'the guest\u2019s'} Side to Josh or Gabriel and ` +
-          'their Relationship to whatever they are \u2014 mother, cousin, friend. ' +
-          'That already says it, without a second entry.');
+  if (isGroom(source)){
+    alert('Links to Josh or Gabriel are not needed. Use the Side and Relationship columns instead.');
     return;
   }
   const inv = INVERSE[rel] || rel;
-  const pair = `${Math.min(from,to)}-${Math.max(from,to)}-${Date.now()}`;
+  const targets = lkPicked.map(p => Number(p.value))
+    .filter(to => to && to !== from && !isGroom(D.guests.find(g => g.id === to)));
+  if (!targets.length) return;
+
+  const rows = [];
+  const stamp = Date.now();
+  for (const to of targets){
+    const pair = `${Math.min(from,to)}-${Math.max(from,to)}-${stamp}-${to}`;
+    rows.push({ from_guest:from, to_guest:to, relation:rel, pair_key:pair, created_by:me });
+    rows.push({ from_guest:to, to_guest:from, relation:inv, pair_key:pair, created_by:me });
+  }
+
   linking = true;
   try {
-    // both directions, so the link reads correctly from either person
-    const res = await sb.from('guest_links').insert([
-      { from_guest:from, to_guest:to, relation:rel, pair_key:pair, created_by:me },
-      { from_guest:to, to_guest:from, relation:inv, pair_key:pair, created_by:me }
-    ]);
+    const res = await sb.from('guest_links').insert(rows);
     if (res.error) alert(res.error.code === '23505'
-      ? 'That relationship is already recorded.'
+      ? 'One of those relationships is already recorded. Nothing was added.'
       : 'Could not save: ' + res.error.message);
   } finally { linking = false; }
   await load(); guestRoster(); openLinks(from);
