@@ -171,6 +171,23 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .lkrow b{color:var(--ink);font-weight:600}
 .lkrow button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:2px 6px;border-radius:3px}
 .lkrow button:hover{color:var(--rust);background:var(--rust-lo)}
+.lab2{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.13em;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:6px}
+.segs{display:grid;gap:7px}
+.segs button{text-align:left;background:#fff;border:1px solid var(--rule);border-radius:var(--r);
+  padding:10px 13px;color:var(--ink-2);line-height:1.35}
+.segs button b{display:block;font-size:14.5px;color:var(--ink);font-weight:700}
+.segs button em{font-style:normal;font-size:12.5px;color:var(--ink-3)}
+.segs button[aria-pressed="true"]{border-color:var(--brass);background:var(--brass-lo)}
+.segs button[aria-pressed="true"] b{color:var(--brass)}
+.segs.sm{grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:5px}
+.segs.sm button{text-align:center;padding:7px 9px;font-family:"Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:700}
+.chk{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px}
+.chk label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2);cursor:pointer;padding:3px 0}
+.chk input{width:16px;height:16px;accent-color:var(--brass);cursor:pointer}
+.pcount{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule-2);
+  font-size:13px;color:var(--ink-3)}
 .cbo{position:relative}
 .cbo input{width:100%;padding:10px 12px;font:inherit;font-size:15px;
   border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink)}
@@ -771,6 +788,51 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <span><button class="btn ghost" id="switchName">Not you?</button></span>
   </footer>
 </div>
+
+<dialog id="printDlg">
+  <form method="dialog">
+    <div class="dh"><h3>Print the guest list</h3></div>
+    <div class="db">
+      <span class="lab2">Layout</span>
+      <div class="segs" id="pLayout">
+        <button type="button" data-layout="sheet" aria-pressed="true">
+          <b>Guest sheet</b><em>Grouped by table, everything at a glance</em></button>
+        <button type="button" data-layout="table">
+          <b>Simple table</b><em>One row per guest, columns you choose</em></button>
+      </div>
+
+      <div id="pFieldsWrap">
+        <span class="lab2" style="margin-top:14px">Include</span>
+        <div class="chk" id="pFields"></div>
+        <div style="display:flex;gap:7px;margin-top:9px">
+          <button type="button" class="btn ghost sm" data-pall="1">All</button>
+          <button type="button" class="btn ghost sm" data-pall="0">None</button>
+        </div>
+      </div>
+
+      <span class="lab2" style="margin-top:14px">Who</span>
+      <div class="segs sm" id="pWho">
+        <button type="button" data-who="all" aria-pressed="true">Everyone</button>
+        <button type="button" data-who="josh">Josh</button>
+        <button type="button" data-who="gabriel">Gabriel</button>
+        <button type="button" data-who="diet">Restrictions</button>
+      </div>
+
+      <span class="lab2" style="margin-top:14px">Order</span>
+      <div class="segs sm" id="pSort">
+        <button type="button" data-psort="first" aria-pressed="true">First name</button>
+        <button type="button" data-psort="last">Last name</button>
+        <button type="button" data-psort="table">Table</button>
+      </div>
+
+      <div class="pcount" id="pCount"></div>
+    </div>
+    <div class="df">
+      <button class="btn ghost" value="cancel">Cancel</button>
+      <button class="btn" value="save" id="pGo">Print</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="linkDlg">
   <form method="dialog">
@@ -1842,8 +1904,31 @@ const PRINT_CSS = `
   .sum .v{font-size:18pt;font-weight:700;margin-top:2px}
   footer{margin-top:30px;padding-top:12px;border-top:1px solid #EAE7E0;
      font-size:8.5pt;color:#565D68;text-align:center}
+  .alert{border:1px solid #E8B4A6;background:#FDEEEA;border-radius:4px;padding:13px 16px;margin-bottom:20px;break-inside:avoid}
+  .alert h4{margin:0 0 7px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+    letter-spacing:.14em;font-size:9.5pt;color:#8A2F1C;font-weight:700}
+  .dline{font-size:10.5pt;color:#3D434D;line-height:1.6}
+  .dline b{color:#8A2F1C;font-weight:700}
+  .cols{column-count:2;column-gap:20px}
+  .tbl{break-inside:avoid;border:1px solid #D5D0C6;border-radius:4px;padding:12px 14px;margin-bottom:12px}
+  .tbl.un{border-color:#E8B4A6;background:#FDF6F4}
+  .tbl h3{font-size:10.5pt;letter-spacing:.13em;color:#6E5520;border-bottom:1px solid #EAE7E0;
+    padding-bottom:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+  .tbl.un h3{color:#8A2F1C}
+  .tbl h3 em{font-style:normal;font-size:8pt;color:#565D68;letter-spacing:0;font-weight:400}
+  .tbl ul{margin:0;padding:0;list-style:none}
+  .tbl li{padding:4px 0;border-bottom:1px dotted #EFECE4;font-size:10.5pt;line-height:1.4}
+  .tbl li:last-child{border-bottom:0}
+  .tbl .nm{color:#111418;font-weight:600}
+  .tbl .sub{display:block;font-size:8.5pt;color:#565D68;margin-top:1px}
+  .tbl .dt{display:inline-block;font-size:7.5pt;font-weight:700;text-transform:uppercase;
+    letter-spacing:.06em;background:#FDEEEA;color:#8A2F1C;border:1px solid #E8B4A6;
+    border-radius:99px;padding:0 6px;margin-left:5px;vertical-align:1px}
+  .tbl .sd{display:inline-block;font-size:7.5pt;font-weight:700;text-transform:uppercase;
+    letter-spacing:.06em;background:#F6F0E0;color:#6E5520;border:1px solid #D8C08A;
+    border-radius:99px;padding:0 6px;margin-left:4px;vertical-align:1px}
   @page{margin:14mm}
-  @media print{body{padding:0}}
+  @media print{body{padding:0} .cols{column-count:2}}
 `;
 
 function openPrint(title, bodyHtml){
@@ -1921,29 +2006,135 @@ function exportPool(){
     ` + PRINT_FOOT('Rehearsal at 2:00 PM at The American Theater, 446 King Street'));
 }
 
-function exportGuests(){
-  const list = [...D.guests].sort((a,b)=>a.name.localeCompare(b.name));
-  const rows = list.map(g=>`<tr>
-    <td><strong>${esc(g.name)}</strong></td>
-    <td>${esc(g.email||'—')}</td>
-    <td>${esc(g.phone||'—')}</td>
-    <td>${g.dietary?esc(g.dietary):'—'}</td>
-    <td>${g.table_no==null?'—':esc(tableName(g.table_no).full)}</td>
-    <td style="text-align:center">${g.contacted?'&#10003;':'—'}</td>
-    <td>${esc(g.notes||'')}</td></tr>`).join('');
+/* ---------- guest list printing ---------- */
+const P_FIELDS = [
+  ['side','Side'], ['relationship','Relationship'], ['links','Family links'],
+  ['email','Email'], ['phone','Phone'], ['dietary','Dietary'],
+  ['table_no','Table'], ['contacted','Details sent'], ['notes','Notes']
+];
+let pOpts = { layout:'sheet', who:'all', sort:'first',
+              fields:new Set(['side','relationship','links','phone','dietary','table_no']) };
 
-  openPrint('Guest list', PRINT_HEAD('Guest list') + `
-    <div class="sum">
-      <div><div class="k">Attending</div><div class="v">${list.length}</div></div>
-      <div><div class="k">Seated</div><div class="v">${list.filter(g=>g.table_no!=null).length}</div></div>
-      <div><div class="k">Details sent</div><div class="v">${list.filter(g=>g.contacted).length}</div></div>
-      <div><div class="k">Restrictions</div><div class="v">${list.filter(g=>g.dietary).length}</div></div>
-    </div>
-    <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Dietary</th><th>Table</th>
-      <th style="text-align:center">Sent</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>
-    ` + PRINT_FOOT('Guaranteed count 80'));
+function openPrintDlg(){
+  $('#pFields').innerHTML = P_FIELDS.map(([k,label])=>
+    `<label><input type="checkbox" data-pf="${k}" ${pOpts.fields.has(k)?'checked':''}><span>${label}</span></label>`
+  ).join('');
+  syncPrintDlg();
+  $('#printDlg').showModal();
 }
 
+function printSet(){
+  let list = [...D.guests];
+  if (pOpts.who === 'diet') list = list.filter(g => g.dietary);
+  else if (pOpts.who !== 'all')
+    list = list.filter(g => g.side === pOpts.who || g.side === 'both');
+  const key = g => {
+    const bits = g.name.trim().split(/\s+/);
+    return pOpts.sort === 'last' ? (bits[bits.length-1] || g.name) : g.name;
+  };
+  if (pOpts.sort === 'table')
+    list.sort((a,b) => (a.table_no ?? 999) - (b.table_no ?? 999) || a.name.localeCompare(b.name));
+  else
+    list.sort((a,b) => key(a).localeCompare(key(b)) || a.name.localeCompare(b.name));
+  return list;
+}
+
+function syncPrintDlg(){
+  $$('#pLayout button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.layout === pOpts.layout)));
+  $$('#pWho button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.who === pOpts.who)));
+  $$('#pSort button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.psort === pOpts.sort)));
+  $('#pFieldsWrap').style.opacity = pOpts.layout === 'table' ? '1' : '.5';
+  const n = printSet().length;
+  $('#pCount').textContent = pOpts.layout === 'sheet'
+    ? `${n} guests on a grouped sheet.`
+    : `${n} guests, ${pOpts.fields.size + 1} columns.`;
+}
+
+const SIDE_TXT = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
+
+/* the considered version: grouped by table, built to be read on the day */
+function printSheet(list){
+  const groups = {};
+  for (const g of list){
+    const k = g.table_no == null ? 'un' : String(g.table_no);
+    (groups[k] = groups[k] || []).push(g);
+  }
+  const order = Object.keys(groups).sort((a,b)=>{
+    if (a === 'un') return 1; if (b === 'un') return -1;
+    return Number(a) - Number(b);
+  });
+
+  const diet = list.filter(g => g.dietary);
+  const byKind = {};
+  for (const g of diet) (byKind[g.dietary] = byKind[g.dietary] || []).push(g.name);
+
+  const person = g => {
+    const tags = [];
+    if (g.dietary) tags.push(`<span class="dt">${esc(g.dietary)}</span>`);
+    if (g.side) tags.push(`<span class="sd">${SIDE_TXT[g.side]}</span>`);
+    const rel = linksFor(g.id).slice(0,2)
+      .map(l => `${esc(l.relation.replace(/ of$/,''))} of ${esc(guestName(l.to_guest))}`).join(', ');
+    const sub = [g.relationship ? esc(g.relationship) : '', rel].filter(Boolean).join(' &middot; ');
+    return `<li><span class="nm">${esc(g.name)}</span>${tags.join('')}
+      ${sub ? `<span class="sub">${sub}</span>` : ''}</li>`;
+  };
+
+  const block = k => {
+    const at = groups[k];
+    const title = k === 'un' ? 'Not seated' : tableName(Number(k)).full;
+    const flagged = at.filter(g => g.dietary).length;
+    return `<div class="tbl ${k==='un'?'un':''}">
+      <h3>${esc(title)}<em>${at.length}${flagged?` &middot; ${flagged} dietary`:''}</em></h3>
+      <ul>${at.map(person).join('')}</ul></div>`;
+  };
+
+  openPrint('Guest sheet', PRINT_HEAD('Guest sheet') + `
+    <div class="sum">
+      <div><div class="k">Guests</div><div class="v">${list.length}</div></div>
+      <div><div class="k">Tables</div><div class="v">${order.filter(k=>k!=='un').length}</div></div>
+      <div><div class="k">Dietary</div><div class="v">${diet.length}</div></div>
+      <div><div class="k">Not seated</div><div class="v">${(groups.un||[]).length}</div></div>
+    </div>
+    ${diet.length ? `<div class="alert"><h4>Dietary restrictions</h4>
+      ${Object.entries(byKind).map(([k,v]) =>
+        `<div class="dline"><b>${esc(k)}</b> &mdash; ${v.map(esc).join(', ')}</div>`).join('')}
+      </div>` : ''}
+    <div class="cols">${order.map(block).join('')}</div>
+  ` + PRINT_FOOT('Sunday 6 September 2026 &middot; The American Theater'));
+}
+
+/* the plain version: only the columns asked for */
+function printTable(list){
+  const cols = P_FIELDS.filter(([k]) => pOpts.fields.has(k));
+  const cell = (g,k) => {
+    if (k === 'side')     return g.side ? SIDE_TXT[g.side] : '—';
+    if (k === 'table_no') return g.table_no == null ? '—' : esc(tableName(g.table_no).full);
+    if (k === 'contacted')return g.contacted ? '&#10003;' : '—';
+    if (k === 'links')    return linksFor(g.id).map(l =>
+      `${esc(l.relation.replace(/ of$/,''))} of ${esc(guestName(l.to_guest))}`).join('; ') || '—';
+    return g[k] ? esc(g[k]) : '—';
+  };
+  const label = pOpts.who === 'all' ? 'Guest list'
+    : pOpts.who === 'diet' ? 'Guests with dietary restrictions'
+    : `${SIDE_TXT[pOpts.who]}\u2019s guests`;
+
+  openPrint('Guest list', PRINT_HEAD(label) + `
+    <div class="sum">
+      <div><div class="k">Listed</div><div class="v">${list.length}</div></div>
+      <div><div class="k">Seated</div><div class="v">${list.filter(g=>g.table_no!=null).length}</div></div>
+      <div><div class="k">Dietary</div><div class="v">${list.filter(g=>g.dietary).length}</div></div>
+    </div>
+    <table><thead><tr><th>Name</th>${cols.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead>
+    <tbody>${list.map(g=>`<tr><td><strong>${esc(g.name)}</strong></td>
+      ${cols.map(([k])=>`<td>${cell(g,k)}</td>`).join('')}</tr>`).join('')}</tbody></table>
+  ` + PRINT_FOOT('Guaranteed count 80'));
+}
+
+function runPrint(){
+  const list = printSet();
+  if (!list.length){ alert('Nobody matches those options.'); return; }
+  if (pOpts.layout === 'sheet') printSheet(list); else printTable(list);
+}
 
 function people(){
   $('#peopleBody').innerHTML = PEOPLE.map(p=>{
@@ -2560,6 +2751,26 @@ $('#npAdd').onclick = async () => {
 $('#npName').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
 $('#npNote').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
 $('#expPool').onclick = exportPool;
+
+$$('#pLayout button').forEach(b => b.onclick = () => { pOpts.layout = b.dataset.layout; syncPrintDlg(); });
+$$('#pWho button').forEach(b => b.onclick = () => { pOpts.who = b.dataset.who; syncPrintDlg(); });
+$$('#pSort button').forEach(b => b.onclick = () => { pOpts.sort = b.dataset.psort; syncPrintDlg(); });
+document.addEventListener('change', e => {
+  const f = e.target.closest('[data-pf]');
+  if (!f) return;
+  f.checked ? pOpts.fields.add(f.dataset.pf) : pOpts.fields.delete(f.dataset.pf);
+  syncPrintDlg();
+});
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-pall]');
+  if (!a) return;
+  pOpts.fields = a.dataset.pall === '1' ? new Set(P_FIELDS.map(([k])=>k)) : new Set();
+  $$('#pFields input').forEach(i => i.checked = pOpts.fields.has(i.dataset.pf));
+  syncPrintDlg();
+});
+$('#printDlg').addEventListener('close', function(){
+  if (this.returnValue === 'save') runPrint();
+});
 $$('#poolSort button').forEach(b => b.onclick = () => { poolSort = b.dataset.sort; poolParty(); });
 
 $('#addTable').onclick = async () => {
@@ -2572,7 +2783,7 @@ $('#addTable').onclick = async () => {
 };
 
 $('#expSeat').onclick = exportSeating;
-$('#expGuests').onclick = exportGuests;
+$('#expGuests').onclick = openPrintDlg;
 
 document.addEventListener('keydown', async e => {
   const si = e.target.closest('[data-seatinput]');
