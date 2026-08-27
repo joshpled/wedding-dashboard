@@ -192,6 +192,14 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   text-transform:uppercase;letter-spacing:.11em;font-weight:700;position:sticky;top:0}
 .lknone{font-size:13.5px;color:var(--ink-3);font-style:italic;padding-bottom:4px}
 .gtable tr.editing{background:var(--brass-lo)}
+.gtable tr.clickable{cursor:pointer}
+.gtable tr.clickable:hover{background:#FCFBF7}
+.gtable tr.clickable:hover td:first-child{box-shadow:inset 3px 0 0 var(--brass-line)}
+.gtable .ic.danger{color:var(--ink-3)}
+.gtable .ic.danger:hover{color:var(--rust);background:var(--rust-lo);border-color:var(--rust-line)}
+.gtable .ic.danger.armed{color:#fff;background:var(--rust);border-color:var(--rust);
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;
+  font-size:11.5px;font-weight:700;padding:5px 10px}
 .gtable .ic{background:none;border:1px solid transparent;color:var(--ink-3);font-size:15px;
   padding:4px 8px;border-radius:3px;line-height:1}
 .gtable .ic:hover{color:var(--brass);background:#fff;border-color:var(--brass-line)}
@@ -629,7 +637,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     </div>
 
     <div class="sec">
-      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click any field to edit. Pick a restriction from the dropdown, or choose “Add another…” for one that isn’t listed. Changes sync to everyone.</span></div>
+      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click a row to edit it. Changes save as you go and sync to everyone. Removing a guest takes two clicks and a confirmation.</span></div>
       <div class="rfilter">
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
@@ -1344,6 +1352,8 @@ function guestRoster(){
 }
 
 const editing = new Set();
+const armed = new Set();          // guests whose delete has been armed once
+let armTimer = null;
 const SIDE_LABEL = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
 const sideChip = v => v
   ? `<span class="pill ${v==='josh'?'tbd':v==='gabriel'?'alt':'paid'}">${SIDE_LABEL[v]}</span>`
@@ -1400,7 +1410,7 @@ function drawRoster(){
   $('#guestBody').innerHTML = list.length ? list.map(g=>{
     const ed = editing.has(String(g.id));
     const tn = g.table_no == null ? '' : tableName(g.table_no).full;
-    if (!ed) return `<tr>
+    if (!ed) return `<tr class="clickable" data-editrow="${g.id}" title="Click anywhere to edit">
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
         title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
       <td><strong>${esc(g.name)}</strong>${linkSummary(g.id)}</td>
@@ -1436,8 +1446,10 @@ function drawRoster(){
       <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
       <td style="text-align:right;white-space:nowrap">
         <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
-        <button class="ic done" data-doneedit="${g.id}" title="Finish editing">&#10003;</button>
-        <button class="ic" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`;
+        <button class="ic done" data-doneedit="${g.id}" title="Done">&#10003;</button>
+        <button class="ic danger ${armed.has(String(g.id))?'armed':''}" data-delguest="${g.id}"
+          title="${armed.has(String(g.id))?'Click again to remove':'Remove guest'}">${armed.has(String(g.id))?'Sure?':'&#128465;'}</button>
+      </td></tr>`;
   }).join('')
     : `<tr><td colspan="10" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
@@ -2059,10 +2071,19 @@ document.addEventListener('click', async e=>{
     return;
   }
 
+  // click anywhere on a row to edit, except on something already interactive
+  const rowClick = e.target.closest('tr[data-editrow]');
+  if (rowClick && !e.target.closest('button, input, select, a')){
+    editing.add(rowClick.dataset.editrow); drawRoster();
+    const first = document.querySelector(`input[data-gid="${rowClick.dataset.editrow}"][data-gf="name"]`);
+    if (first) first.focus();
+    return;
+  }
+
   const ed = e.target.closest('[data-edit]');
   if (ed){ editing.add(ed.dataset.edit); drawRoster(); return; }
   const de = e.target.closest('[data-doneedit]');
-  if (de){ editing.delete(de.dataset.doneedit); drawRoster(); return; }
+  if (de){ editing.delete(de.dataset.doneedit); armed.clear(); clearTimeout(armTimer); drawRoster(); return; }
 
   const swp = e.target.closest('[data-swaptable]');
   if (swp){
@@ -2204,10 +2225,27 @@ document.addEventListener('click', async e=>{
   }
   const dg = e.target.closest('[data-delguest]');
   if (dg){
-    const g = D.guests.find(x => String(x.id) === dg.dataset.delguest); if (!g) return;
-    if (!confirm(`Remove ${g.name} from the guest list?\n\nThis cannot be undone.`)) return;
+    const id = dg.dataset.delguest;
+    const g = D.guests.find(x => String(x.id) === id); if (!g) return;
+
+    // first click arms it, second click within five seconds asks properly
+    if (!armed.has(id)){
+      armed.clear(); armed.add(id);
+      clearTimeout(armTimer);
+      armTimer = setTimeout(() => { armed.clear(); drawRoster(); }, 5000);
+      drawRoster();
+      return;
+    }
+    armed.delete(id); clearTimeout(armTimer);
+
+    const seated = g.table_no != null ? `\nSeated at ${tableName(g.table_no).full}.` : '';
+    const links  = linksFor(g.id).length;
+    const linked = links ? `\n${links} relationship${links===1?'':'s'} will also be removed.` : '';
+    if (!confirm(`Remove ${g.name} from the guest list?${seated}${linked}\n\nThis cannot be undone.`)){
+      drawRoster(); return;
+    }
     await sb.from('guests').delete().eq('id', g.id);
-    await load(); guestRoster(); return;
+    await load(); guestRoster(); seating(); return;
   }
   const dt = e.target.closest('[data-deltask]');
   if (dt){ await sb.from('tasks').delete().eq('id', dt.dataset.deltask); await load(); tasks(); return; }
