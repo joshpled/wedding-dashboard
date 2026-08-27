@@ -633,6 +633,12 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <div class="card"><table><thead><tr><th style="width:110px">Time</th><th>What happens</th><th style="width:38%">Where / who</th></tr></thead><tbody id="runBody"></tbody></table></div>
     </div>
     <div class="sec">
+      <div class="sec-h"><h2>Wedding party</h2>
+        <span class="hint">Needed at the 2:00 rehearsal Saturday and at the venue by 4:00 Sunday.</span></div>
+      <div class="vgrid" id="wpCards"></div>
+    </div>
+
+    <div class="sec">
       <div class="sec-h"><h2>Service decisions</h2></div>
       <div class="card pad"><ul id="settledList" style="margin:0;padding-left:20px;color:var(--ink-2);line-height:1.9"></ul></div>
     </div>
@@ -664,6 +670,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           <button data-gside="josh">Josh</button>
           <button data-gside="gabriel">Gabriel</button>
           <button data-gside="none">Unassigned</button>
+          <button data-gside="wp">Wedding party</button>
         </span>
         <datalist id="relOpts"></datalist>
         <button class="btn ghost sm" id="expGuests" style="margin-left:auto">Print guest list</button>
@@ -1199,7 +1206,7 @@ const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
 
 /* ---------- render ---------- */
 function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
-  menu(); runsheet(); guestRoster(); seating(); poolParty(); submissions(); people(); renderDocs(); }
+  menu(); runsheet(); weddingParty(); guestRoster(); seating(); poolParty(); submissions(); people(); renderDocs(); }
 
 function applyMoneyLock(){
   $('#moneyLock').hidden = moneyOpen;
@@ -1420,6 +1427,9 @@ const editing = new Set();
 const armed = new Set();          // guests whose delete has been armed once
 let armTimer = null;
 const SIDE_LABEL = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
+const WP_ROLES = new Set(['Matron of Honor','Maid of Honor','Bridesmaid','Best Man','Groomsman',
+  'Flower girl','Ring bearer','Usher','Wedding party']);
+const isWP = g => !!g.relationship && WP_ROLES.has(g.relationship);
 const sideChip = v => v
   ? `<span class="pill ${v==='josh'?'tbd':v==='gabriel'?'alt':'paid'}">${SIDE_LABEL[v]}</span>`
   : '<span class="mut">—</span>';
@@ -1455,7 +1465,8 @@ const isGroom = g => !!g && (g.relationship === 'Groom' ||
   g.name === 'Joshua Perez Leduc' || g.name === 'Gabriel Taylor');
 const grooms = () => D.guests.filter(isGroom);
 
-const REL_OPTS = ['Groom','Mother','Father','Brother','Sister','Grandmother','Grandfather',
+const REL_OPTS = ['Groom','Matron of Honor','Maid of Honor','Bridesmaid','Best Man','Groomsman',
+  'Flower girl','Ring bearer','Usher','Officiant','Mother','Father','Brother','Sister','Grandmother','Grandfather',
   'Aunt','Uncle','Cousin','Niece','Nephew',
   'Mother-in-law','Father-in-law','Sister-in-law','Brother-in-law',
   'Son-in-law','Daughter-in-law','Step-mother','Step-father','Step-sibling',
@@ -1482,7 +1493,9 @@ function drawRoster(){
   const list = D.guests.filter(g => {
     if (gFilter === 'diet' && !g.dietary) return false;
     if (guestSide === 'none' && g.side) return false;
-    if (guestSide !== 'all' && guestSide !== 'none' && g.side !== guestSide && g.side !== 'both') return false;
+    if (guestSide === 'wp' && !isWP(g)) return false;
+    if (guestSide !== 'all' && guestSide !== 'none' && guestSide !== 'wp'
+        && g.side !== guestSide && g.side !== 'both') return false;
     return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
   const dl = $('#relOpts');
@@ -1499,7 +1512,9 @@ function drawRoster(){
         title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
       <td><strong>${esc(g.name)}</strong>${linkSummary(g.id)}</td>
       <td>${sideChip(g.side)}</td>
-      <td>${g.relationship ? esc(g.relationship) : '<span class="mut">—</span>'}</td>
+      <td>${g.relationship
+        ? (isWP(g) ? `<span class="pill alt">${esc(g.relationship)}</span>` : esc(g.relationship))
+        : '<span class="mut">—</span>'}</td>
       <td>${g.email ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>` : '<span class="mut">—</span>'}</td>
       <td>${g.phone ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>` : '<span class="mut">—</span>'}</td>
       <td>${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(g.dietary)}</span>` : '<span class="mut">—</span>'}</td>
@@ -1883,6 +1898,27 @@ function poolParty(){
   $$('#poolSort button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === poolSort)));
 }
 
+const WP_ORDER = ['Matron of Honor','Maid of Honor','Best Man','Bridesmaid','Groomsman',
+  'Flower girl','Ring bearer','Usher','Wedding party'];
+
+function weddingParty(){
+  const box = $('#wpCards'); if (!box) return;
+  const sides = [['josh','Josh'], ['gabriel','Gabriel']];
+  box.innerHTML = sides.map(([k,label]) => {
+    const at = D.guests.filter(g => isWP(g) && (g.side === k || g.side === 'both'))
+      .sort((a,b) => (WP_ORDER.indexOf(a.relationship) - WP_ORDER.indexOf(b.relationship))
+                  || a.name.localeCompare(b.name));
+    return `<article class="v">
+      <div class="top"><div><h3>${label}\u2019s side</h3>
+        <div class="cat">${at.length} in the wedding party</div></div></div>
+      ${at.length ? `<dl style="grid-template-columns:1fr auto">${at.map(g=>`
+        <dt style="color:var(--ink)">${esc(g.name)}${g.dietary?` <span class="pill due" style="font-size:9.5px">${esc(g.dietary)}</span>`:''}</dt>
+        <dd style="font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.09em;font-size:11.5px;color:var(--brass);font-weight:700">${esc(g.relationship)}</dd>`).join('')}</dl>`
+        : '<div class="note">Nobody assigned yet.</div>'}
+    </article>`;
+  }).join('');
+}
+
 function rooms(){
   $('#roomCards').innerHTML = ROOMS.map(r=>`<article class="v">
     <div><h3>${r.n}</h3><div class="cat">${r.c}</div></div>
@@ -2117,6 +2153,22 @@ function printSheet(list){
       <div><div class="k">Dietary</div><div class="v">${diet.length}</div></div>
       <div><div class="k">Not seated</div><div class="v">${(groups.un||[]).length}</div></div>
     </div>
+    ${(() => {
+      const wp = list.filter(isWP);
+      if (!wp.length) return '';
+      const bySide = { josh:[], gabriel:[] };
+      for (const g of wp){
+        if (g.side === 'josh' || g.side === 'both') bySide.josh.push(g);
+        if (g.side === 'gabriel' || g.side === 'both') bySide.gabriel.push(g);
+      }
+      const col = (k,label) => bySide[k].length
+        ? `<div class="dline"><b>${label}</b> &mdash; ${bySide[k]
+            .sort((a,b)=>WP_ORDER.indexOf(a.relationship)-WP_ORDER.indexOf(b.relationship))
+            .map(g=>`${esc(g.name)} (${esc(g.relationship)})`).join(', ')}</div>` : '';
+      return `<div class="alert" style="border-color:#D8C08A;background:#FAF3E2">
+        <h4 style="color:#6E5520">Wedding party</h4>
+        ${col('josh','Josh')}${col('gabriel','Gabriel')}</div>`;
+    })()}
     ${diet.length ? `<div class="alert"><h4>Dietary restrictions</h4>
       ${Object.entries(byKind).map(([k,v]) =>
         `<div class="dline"><b>${esc(k)}</b> &mdash; ${v.map(esc).join(', ')}</div>`).join('')}
