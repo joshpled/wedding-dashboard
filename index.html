@@ -605,13 +605,21 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
         <button class="btn ghost sm" data-gf="diet">Restrictions only</button>
+        <span class="sidesw" id="guestSideSw">
+          <button data-gside="all">All</button>
+          <button data-gside="josh">Josh</button>
+          <button data-gside="gabriel">Gabriel</button>
+          <button data-gside="none">Unassigned</button>
+        </span>
+        <datalist id="relOpts"></datalist>
         <button class="btn ghost sm" id="expGuests" style="margin-left:auto">Print guest list</button>
       </div>
       <div class="card"><table class="gtable">
-        <thead><tr><th style="width:44px" title="Details sent">Sent</th><th style="width:20%">Name</th>
-          <th style="width:22%">Email</th><th style="width:14%">Phone</th>
-          <th style="width:14%">Dietary</th><th style="width:9%">Table</th><th>Notes</th>
-          <th style="width:74px"></th></tr></thead>
+        <thead><tr><th style="width:42px" title="Details sent">Sent</th><th style="width:17%">Name</th>
+          <th style="width:8%">Side</th><th style="width:13%">Relationship</th>
+          <th style="width:18%">Email</th><th style="width:12%">Phone</th>
+          <th style="width:12%">Dietary</th><th style="width:7%">Table</th><th>Notes</th>
+          <th style="width:70px"></th></tr></thead>
         <tbody id="guestBody"></tbody>
       </table>
       <div class="addrow">
@@ -982,6 +990,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const kb = b => b < 1024*1024 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
 
 let sideFilter = 'all';
+let guestSide = 'all';
 let me = null, D = { vendors:[], payments:[], tasks:[], guests:[], ms:{}, tnames:{}, pool:[], subs:[] }, docs = [], labels = {}, gFilter = 'all', gQuery = '';
 
 const MONEY_PW = 'jgwedding';
@@ -1280,13 +1289,27 @@ function guestRoster(){
 }
 
 const editing = new Set();
+const SIDE_LABEL = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
+const sideChip = v => v
+  ? `<span class="pill ${v==='josh'?'tbd':v==='gabriel'?'alt':'paid'}">${SIDE_LABEL[v]}</span>`
+  : '<span class="mut">—</span>';
+const REL_OPTS = ['Groom','Mother','Father','Brother','Sister','Grandmother','Grandfather',
+  'Aunt','Uncle','Cousin','Niece','Nephew','Wedding party','Family friend','Friend','Colleague','Plus one'];
 
 function drawRoster(){
   const types = dietTypes();
   const list = D.guests.filter(g => {
     if (gFilter === 'diet' && !g.dietary) return false;
+    if (guestSide === 'none' && g.side) return false;
+    if (guestSide !== 'all' && guestSide !== 'none' && g.side !== guestSide && g.side !== 'both') return false;
     return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
+  const dl = $('#relOpts');
+  if (dl && !dl.options.length){
+    const used = [...new Set(D.guests.map(g=>g.relationship).filter(Boolean))];
+    dl.innerHTML = [...new Set([...REL_OPTS, ...used])].map(o=>`<option value="${esc(o)}"></option>`).join('');
+  }
+  $$('#guestSideSw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gside === guestSide)));
   $('#guestBody').innerHTML = list.length ? list.map(g=>{
     const ed = editing.has(String(g.id));
     const tn = g.table_no == null ? '' : tableName(g.table_no).full;
@@ -1294,6 +1317,8 @@ function drawRoster(){
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
         title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
       <td><strong>${esc(g.name)}</strong></td>
+      <td>${sideChip(g.side)}</td>
+      <td>${g.relationship ? esc(g.relationship) : '<span class="mut">—</span>'}</td>
       <td>${g.email ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>` : '<span class="mut">—</span>'}</td>
       <td>${g.phone ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>` : '<span class="mut">—</span>'}</td>
       <td>${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(g.dietary)}</span>` : '<span class="mut">—</span>'}</td>
@@ -1305,6 +1330,13 @@ function drawRoster(){
     return `<tr class="editing">
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}></td>
       <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
+      <td><select data-gid="${g.id}" data-gf="side">
+          <option value=""${!g.side?' selected':''}>—</option>
+          <option value="josh"${g.side==='josh'?' selected':''}>Josh</option>
+          <option value="gabriel"${g.side==='gabriel'?' selected':''}>Gabriel</option>
+          <option value="both"${g.side==='both'?' selected':''}>Both</option></select></td>
+      <td><input value="${esc(g.relationship||'')}" data-gid="${g.id}" data-gf="relationship"
+          list="relOpts" placeholder="—"></td>
       <td><input value="${esc(g.email||'')}" data-gid="${g.id}" data-gf="email" placeholder="—" type="email"></td>
       <td><input value="${esc(g.phone||'')}" data-gid="${g.id}" data-gf="phone" placeholder="—"></td>
       <td><select data-gid="${g.id}" data-gf="dietary">
@@ -1318,7 +1350,7 @@ function drawRoster(){
         <button class="ic done" data-doneedit="${g.id}" title="Finish editing">&#10003;</button>
         <button class="ic" data-delguest="${g.id}" title="Remove">&times;</button></td></tr>`;
   }).join('')
-    : `<tr><td colspan="8" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+    : `<tr><td colspan="10" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
 
 /* ---------- seating ---------- */
@@ -1872,6 +1904,10 @@ $$('[data-gf]').forEach(b => b.onclick = () => { gFilter = b.dataset.gf; drawRos
 
 document.addEventListener('change', async e=>{
   const gs = e.target.closest('select[data-gid]');
+  if (gs && gs.dataset.gf === 'side'){
+    await sb.from('guests').update({ side: gs.value || null }).eq('id', gs.dataset.gid);
+    await load(); guestRoster(); return;
+  }
   if (gs){
     let val = gs.value;
     if (val === OTHER){
@@ -2216,6 +2252,7 @@ $('#swapDlg').addEventListener('close', async function(){
 });
 
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
+$$('#guestSideSw button').forEach(b => b.onclick = () => { guestSide = b.dataset.gside; drawRoster(); });
 
 async function addPool(name, note, status){
   const nm = (name||'').trim(); if (!nm) return;
