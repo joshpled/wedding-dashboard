@@ -165,12 +165,17 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .rel{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:2px}
 .rel b{color:var(--ink-2);font-weight:600}
 #lkExisting{max-height:150px;overflow-y:auto}
-.lkrow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--rule-2);font-size:14px}
-.lkrow:last-child{border-bottom:0}
-.lkrow span{flex:1;color:var(--ink-2)}
-.lkrow b{color:var(--ink);font-weight:600}
-.lkrow button{background:none;border:0;color:var(--ink-3);font-size:15px;padding:2px 6px;border-radius:3px}
-.lkrow button:hover{color:var(--rust);background:var(--rust-lo)}
+.lkgrp{padding:9px 0;border-bottom:1px solid var(--rule-2)}
+.lkgrp:last-child{border-bottom:0}
+.lkrel{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;
+  font-size:11.5px;font-weight:700;color:var(--brass);margin-bottom:5px}
+.lkrel em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  color:var(--ink-3);letter-spacing:0;margin-left:6px}
+.lknames{display:flex;flex-wrap:wrap;gap:5px}
+.lkn{display:inline-flex;align-items:center;border:1px solid var(--rule-2);background:#FCFBF9;
+  border-radius:99px;padding:3px 3px 3px 10px;font-size:13.5px;color:var(--ink)}
+.lkn button{background:none;border:0;color:var(--ink-3);font-size:14px;padding:1px 6px;line-height:1;opacity:.6}
+.lkn button:hover{opacity:1;color:var(--rust)}
 .lab2{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
   letter-spacing:.13em;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:6px}
 .segs{display:grid;gap:7px}
@@ -1490,13 +1495,29 @@ function linksFor(id){
     .sort((a,b) => a.relation.localeCompare(b.relation));
 }
 
+// several links sharing a relation collapse into one label and a list of names
+function groupedLinks(id){
+  const by = new Map();
+  for (const l of linksFor(id)){
+    if (!by.has(l.relation)) by.set(l.relation, []);
+    by.get(l.relation).push(l);
+  }
+  return [...by.entries()].map(([relation, ls]) => ({
+    relation,
+    label: relation.replace(/ of$/,''),
+    links: ls.sort((a,b)=>guestName(a.to_guest).localeCompare(guestName(b.to_guest))),
+    names: ls.map(l => guestName(l.to_guest))
+  })).sort((a,b)=>a.relation.localeCompare(b.relation));
+}
+
+const listNames = ns => ns.length <= 1 ? (ns[0] || '')
+  : ns.slice(0,-1).join(', ') + ' and ' + ns[ns.length-1];
+
 function linkSummary(id){
-  const ls = linksFor(id);
-  if (!ls.length) return '';
-  const shown = ls.slice(0,2).map(l =>
-    `<b>${esc(l.relation.replace(/ of$/,''))}</b> of ${esc(guestName(l.to_guest))}`).join(' &middot; ');
-  const more = ls.length > 2 ? ` &middot; +${ls.length - 2}` : '';
-  return `<span class="rel">${shown}${more}</span>`;
+  const gs = groupedLinks(id);
+  if (!gs.length) return '';
+  return `<span class="rel">${gs.map(g =>
+    `<b>${esc(g.label)}</b> of ${esc(listNames(g.names))}`).join(' &middot; ')}</span>`;
 }
 
 function drawRoster(){
@@ -2141,8 +2162,8 @@ function printSheet(list){
     const tags = [];
     if (g.dietary) tags.push(`<span class="dt">${esc(g.dietary)}</span>`);
     if (g.side) tags.push(`<span class="sd">${SIDE_TXT[g.side]}</span>`);
-    const rel = linksFor(g.id).slice(0,2)
-      .map(l => `${esc(l.relation.replace(/ of$/,''))} of ${esc(guestName(l.to_guest))}`).join(', ');
+    const rel = groupedLinks(g.id)
+      .map(gr => `${esc(gr.label)} of ${esc(listNames(gr.names))}`).join(' &middot; ');
     const sub = [g.relationship ? esc(g.relationship) : '', rel].filter(Boolean).join(' &middot; ');
     return `<li><span class="nm">${esc(g.name)}</span>${tags.join('')}
       ${sub ? `<span class="sub">${sub}</span>` : ''}</li>`;
@@ -2195,8 +2216,8 @@ function printTable(list){
     if (k === 'side')     return g.side ? SIDE_TXT[g.side] : '—';
     if (k === 'table_no') return g.table_no == null ? '—' : esc(tableName(g.table_no).full);
     if (k === 'contacted')return g.contacted ? '&#10003;' : '—';
-    if (k === 'links')    return linksFor(g.id).map(l =>
-      `${esc(l.relation.replace(/ of$/,''))} of ${esc(guestName(l.to_guest))}`).join('; ') || '—';
+    if (k === 'links')    return groupedLinks(g.id)
+      .map(gr => `${esc(gr.label)} of ${esc(listNames(gr.names))}`).join('; ') || '—';
     return g[k] ? esc(g[k]) : '—';
   };
   const label = pOpts.who === 'all' ? 'Guest list'
@@ -2781,10 +2802,14 @@ function openLinks(id){
 }
 
 function renderLinks(id){
-  const ls = linksFor(id);
-  $('#lkExisting').innerHTML = ls.length
-    ? ls.map(l => `<div class="lkrow"><span><b>${esc(l.relation)}</b> ${esc(guestName(l.to_guest))}</span>
-        <button type="button" data-unlink="${l.id}" title="Remove">&times;</button></div>`).join('')
+  const gs = groupedLinks(id);
+  $('#lkExisting').innerHTML = gs.length
+    ? gs.map(g => `<div class="lkgrp">
+        <div class="lkrel">${esc(g.relation)}${g.links.length>1?`<em>${g.links.length}</em>`:''}</div>
+        <div class="lknames">${g.links.map(l =>
+          `<span class="lkn">${esc(guestName(l.to_guest))}
+            <button type="button" data-unlink="${l.id}" title="Remove">&times;</button></span>`).join('')}</div>
+      </div>`).join('')
     : `<div class="lknone">No relationships recorded yet.</div>`;
 }
 
