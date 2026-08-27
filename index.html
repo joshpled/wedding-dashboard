@@ -673,7 +673,8 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           <button data-gside="wp">Wedding party</button>
         </span>
         <datalist id="relOpts"></datalist>
-        <button class="btn ghost sm" id="expGuests" style="margin-left:auto">Print guest list</button>
+        <button class="btn ghost sm" id="copyEmails" style="margin-left:auto">Copy emails</button>
+        <button class="btn ghost sm" id="expGuests">Print guest list</button>
       </div>
       <div class="card"><table class="gtable">
         <thead><tr><th style="width:42px" title="Details sent">Sent</th><th style="width:17%">Name</th>
@@ -2880,6 +2881,60 @@ $('#addTable').onclick = async () => {
 
 $('#expSeat').onclick = exportSeating;
 $('#expGuests').onclick = openPrintDlg;
+
+$('#copyEmails').onclick = async () => {
+  // whatever the list is currently showing, so the side and search filters apply
+  const shown = D.guests.filter(g => {
+    if (gFilter === 'diet' && !g.dietary) return false;
+    if (guestSide === 'none' && g.side) return false;
+    if (guestSide === 'wp' && !isWP(g)) return false;
+    if (guestSide !== 'all' && guestSide !== 'none' && guestSide !== 'wp'
+        && g.side !== guestSide && g.side !== 'both') return false;
+    return !gQuery || g.name.toLowerCase().includes(gQuery);
+  });
+
+  const withEmail = shown.filter(g => g.email && g.email.includes('@'));
+  const missing   = shown.length - withEmail.length;
+  if (!withEmail.length){ alert('None of the guests shown have an email address on file.'); return; }
+
+  const seen = new Set();
+  const list = withEmail
+    .map(g => g.email.trim().toLowerCase())
+    .filter(e => !seen.has(e) && seen.add(e));
+  const text = list.join(', ');
+
+  const btn = $('#copyEmails');
+  const done = () => {
+    btn.textContent = `Copied ${list.length}`;
+    btn.style.color = 'var(--moss)';
+    btn.style.borderColor = 'var(--moss-line)';
+    btn.style.background = 'var(--moss-lo)';
+    setTimeout(() => {
+      btn.textContent = 'Copy emails';
+      btn.style.color = btn.style.borderColor = btn.style.background = '';
+    }, 2200);
+    if (missing) setTimeout(() =>
+      alert(`${list.length} email${list.length===1?'':'s'} copied.\n\n` +
+            `${missing} of the ${shown.length} shown have no address on file.`), 60);
+  };
+
+  try {
+    await navigator.clipboard.writeText(text);
+    done();
+  } catch {
+    // clipboard blocked (http, or an older browser) — fall back to a selectable box
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('style','position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);' +
+      'width:min(90vw,560px);height:180px;z-index:9999;padding:12px;font:14px/1.5 monospace;' +
+      'border:1px solid #D5D0C6;border-radius:4px;box-shadow:0 20px 50px -18px rgba(17,20,24,.4)');
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); }
+    catch { alert('Select the text and copy it manually.'); }
+    setTimeout(() => ta.remove(), 400);
+  }
+};
 
 document.addEventListener('keydown', async e => {
   const si = e.target.closest('[data-seatinput]');
