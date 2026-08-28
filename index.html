@@ -162,6 +162,11 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   font-size:12px;font-weight:700;color:var(--ink-3)}
 
 .gtable .mut{color:var(--ink-3)}
+.gtable .waived{color:var(--ink-3);font-style:italic;font-size:12.5px}
+.flags{margin-top:7px;display:grid;gap:4px}
+.flags label{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);
+  cursor:pointer;white-space:nowrap}
+.flags input{width:14px;height:14px;accent-color:var(--brass);flex:0 0 auto}
 .rel{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:2px}
 .rel b{color:var(--ink-2);font-weight:600}
 #lkExisting{max-height:150px;overflow-y:auto}
@@ -772,7 +777,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
         <div class="pgroup" id="grpUnd">
           <div class="phead"><span class="dotm und"></span>Not decided <em id="cUnd">0</em>
-            <span class="phint">Tap a name to invite, or &times; if they are not needed</span></div>
+            <span class="phint">Tap a name to invite &middot; &times; marks them not needed</span></div>
           <div class="pnames pick" id="poolUndecided"></div>
         </div>
 
@@ -924,7 +929,7 @@ const WEDDING_DATE = new Date('2026-09-06T17:00:00-04:00');
 const OWNERS = ['Josh','Gabriel','Josh & Gabriel','Barbara','Josh & Barbara','Loraine'];
 
 const MILESTONES = [
-  { k:'snyder',   date:'2026-08-20', title:'Snyder quote expires', amount:814.50, detail:'50% deposit plus the CCRA, or the linen order lapses.' },
+  { k:'snyder',   date:'2026-09-01', title:'Snyder linen balance', amount:927.81, detail:'Order #349216-14. ePay link from Loraine.' },
   { k:'palmetto', date:'2026-08-22', title:'Palmetto Strings balance', amount:650, detail:'Venmo @palmettostrings. Contract says two weeks out.' },
   { k:'photo',    date:'2026-08-23', title:'Richard Bell Photography balance', amount:2800, detail:'Invoice 17H1742217.' },
   { k:'dj',       date:'2026-08-23', title:'Dream Day Charleston balance', amount:2300, detail:'A mailed check must be postmarked by this date.' },
@@ -952,17 +957,17 @@ const FLAGS = [
     '<strong>Branch Flower Shop</strong> — $640 for the wedding party: 2 boutonnieres, 7 bridesmaid bouquets, the pastor\u2019s boutonniere, 3 small pieces for the grandkids and 2 corsages for the moms. Fifteen pieces, no delivery or pick-up time set.',
     'Branch is the tighter deadline. Those flowers are worn in photographs from <strong>4:00 PM</strong>, so they have to be at the theatre and pinned before then \u2014 not delivered at 4:00.'] },
 
-  { lvl:'warn', h:'The projector has no time, no contact and no venue sign-off', p:[
-    '<strong>Aaron (DJ BlkByte)</strong> is booked at <strong>$200</strong> for day-of projector and video coordination. There is no phone number, no email and no arrival time.',
-    'He has to be set up before <strong>doors open at 4:30</strong>, and after Palmetto Strings load in at 3:30 so they are not working over each other.',
-    'PPHG does not know about him. Their BEO has <strong>no AV line</strong> since Jacob was cancelled, and the Cinema is contracted for the ceremony only. Tell Olivia what is being projected and where before the 26th.'] },
+  { lvl:'warn', h:'PPHG still does not know about the projector', p:[
+    '<strong>Aaron Cauthen (DJ BlkByte)</strong> arrives at <strong>3:00 PM</strong> to test the video equipment. 864.691.2957 &middot; blkbytedj@gmail.com &middot; $200.',
+    'Their BEO has <strong>no AV line</strong> since Jacob was cancelled, and the Cinema is contracted for the ceremony only. Tell Olivia what is being projected and where, so power and a surface are allowed for.',
+    'Three vendors are now loading in between 3:00 and 3:30 &mdash; Aaron, the DJ and Palmetto Strings. Worth telling Loraine so nobody is waiting on a door.'] },
 
   { lvl:'warn', h:'Loose ends with a cost attached', p:[
     '<strong>Palmetto Strings</strong> — $650 due 22 August.',
     '<strong>Richard Bell</strong> — $2,800 due 23 August.',
-    '<strong>Snyder</strong> — $814.50 balance due 1 September.',
+    '<strong>Snyder</strong> — $927.81 balance due 1 September.',
     '<strong>Pool party</strong> — Barbara handling, no figure tracked.',
-    '<strong>Aaron</strong> — $200 for the projector, payment method not agreed.'] },
+    '<strong>Aaron Cauthen</strong> — $200 for the projector, payment method not agreed.'] },
 
   { lvl:'warn', h:'Day-after plans still undecided', p:[
     'No brunch, and no alternative chosen. Worth settling while people still have flights to book.'] }
@@ -972,7 +977,7 @@ const DECISIONS = [
   { q:'Guest count 66 vs 80', s:'BEO bills 66; the contract note still says 80 confirmed at six months', impact:'$2,285 already off the balance', by:'26 Aug' },
   { q:'Cake flavours', s:'BEO reads "Not Noted". No anniversary tier.', impact:'None', by:'26 Aug' },
   { q:'Getaway send-off', s:'Last blank on the BEO vendor list', impact:'Unknown', by:'26 Aug' },
-  { q:'Projector — what and where', s:'Aaron booked at $200. Cinema is ceremony-only; anything in the Ballroom needs PPHG sign-off.', impact:'$200 plus any venue AV charge', by:'29 Aug' },
+  { q:'Projector — what and where', s:'Aaron Cauthen arrives 3:00 PM. Cinema is ceremony-only; anything in the Ballroom needs PPHG sign-off.', impact:'$200 plus any venue AV charge', by:'29 Aug' },
   { q:'Floral shipping', s:'$1,138 quoted for the flowers themselves; shipping excluded and unpriced', impact:'Unknown on top of $1,138', by:'29 Aug' },
   { q:'Branch delivery or pick-up', s:'$640 booked. No time set, and the pieces are worn in photos from 4:00 PM.', impact:'None if handled', by:'29 Aug' },
   { q:'Day-after plans', s:'No brunch. Something else, or nothing.', impact:'Unknown', by:'29 Aug' }
@@ -1008,6 +1013,7 @@ const CLOSED = [
   'Setup access from 9:00 AM the day of the event',
   'All RSVPs in and accounted for',
   'Rehearsal confirmed 2:00 PM on the BEO',
+  'Aaron Cauthen arrives 3:00 PM to test the video equipment',
   'Drinks of choice — Joshua white wine, Gabriel red wine',
   'Bar opens 5:40 after the all-guest photo',
   'Bars: Stars Lounge for cocktail hour, Ballroom for dinner',
@@ -1068,9 +1074,10 @@ const RUNSHEET = [
   { t:'1:00 PM',  e:'Ceremony and reception florals delivered', w:'Amanda Cubello, arranging for Stephen' },
   { t:'Before 4:00 PM', e:'Wedding party flowers on site', w:'Branch Flower Shop · 15 pieces · Barbara arranging · time TBC' },
   { t:'2:00 PM',  e:'Planning team — part 2', w:'Invitation Only' },
+  { t:'3:00 PM',  e:'Aaron Cauthen arrives', w:'DJ BlkByte · sets up and tests the video equipment · 864.691.2957' },
   { t:'3:00 PM',  e:'DJ arrives and sound checks', w:'DJ Eclipze' },
   { t:'3:30 PM',  e:'Palmetto Strings load in', w:'Keyboard, speakers, mics and their own sound tech · booked 4:30 – 6:00' },
-  { t:'TBC',      e:'Aaron (DJ BlkByte) sets up the projector', w:'Arrival time not set · must be in before doors open at 4:30' },
+
   { t:'3:35 PM',  e:'Grooms arrive — final details walkthrough', w:'Final touches in Stars Lounge · venue reveal' },
   { t:'4:00 PM',  e:'Wedding party and photographers arrive', w:'Party partially ready · Richard Bell begins the complimentary half hour' },
   { t:'4:15 PM',  e:'Getting-ready coverage in Stars Lounge', w:'Finishing touches and detail shots · rings, invitation suite, florals' },
@@ -1115,7 +1122,7 @@ const PEOPLE = [
   { r:'Photography · lead', n:'Mell Bell', o:'Richard Bell Photography', t:'864.320.2428', e:'info@richbell.com' },
   { r:'Videography', n:'Anthony Rivera', o:'Blue Box Digital', e:'anthony@blueboxdigital.com', t:'813.956.3648', x:'Attending as a guest — no charge' },
   { r:'DJ', n:'DJ Eclipze (Tim Nobles)', o:'Dream Day Charleston', e:'dreamdaycharleston@gmail.com', t:'803.640.9587' },
-  { r:'Projector and video', n:'Aaron — DJ BlkByte', x:'No contact details yet · $200 · arrival time TBC' },
+  { r:'Projector and video', n:'Aaron Cauthen', o:'DJ BlkByte', t:'864.691.2957', e:'blkbytedj@gmail.com', x:'$200 · arrives 3:00 PM to test the video' },
   { r:'Ceremony music and sound', n:'Lauren Williams', o:'Palmetto Strings', e:'lauren@palmettostrings.com', t:'843.532.8656' },
   { r:'Officiant', n:'Father Will', t:'336.340.8183', x:'Officiating free of charge' },
   { r:'Florist · ceremony and reception', n:'Stephen', t:'301.549.8622', x:'$1,138 quoted, shipping extra' },
@@ -1412,11 +1419,15 @@ const CUSTOM_META = { cls:'other', short:'Diet',
   srv:'Not one of the standard four — flag it to Olivia explicitly so the kitchen sees it.' };
 const metaFor = k => DIET_META[k] || CUSTOM_META;
 
+const needsContact = g => !g.no_contact_needed;
+
 function guestRoster(){
   const G = D.guests;
   const flagged = G.filter(g=>g.dietary);
+  const early = G.filter(g => g.skip_reception).length;
   $('#countCalc').innerHTML = [
-    ['Attending', G.length, 'Every RSVP is in.'],
+    ['Attending', G.length, early ? `${early} for the ceremony only.` : 'Every RSVP is in.'],
+    ['At dinner', G.length - early, 'Staying for the reception.'],
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Plated at', 77, 'Each petite station on the BEO.'],
     ['Restrictions', flagged.length, 'Across four dietary groups.'],
@@ -1542,13 +1553,18 @@ function drawRoster(){
     if (!ed) return `<tr class="clickable" data-editrow="${g.id}" title="Click anywhere to edit">
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
         title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
-      <td><strong>${esc(g.name)}</strong>${linkSummary(g.id)}</td>
+      <td><strong>${esc(g.name)}</strong>${g.skip_reception
+        ? ' <span class="pill due" style="font-size:9.5px">ceremony only</span>' : ''}${linkSummary(g.id)}</td>
       <td>${sideChip(g.side)}</td>
       <td>${g.relationship
         ? (isWP(g) ? `<span class="pill alt">${esc(g.relationship)}</span>` : esc(g.relationship))
         : '<span class="mut">—</span>'}</td>
-      <td>${g.email ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>` : '<span class="mut">—</span>'}</td>
-      <td>${g.phone ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>` : '<span class="mut">—</span>'}</td>
+      <td>${g.email
+        ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>`
+        : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
+      <td>${g.phone
+        ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>`
+        : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
       <td>${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(g.dietary)}</span>` : '<span class="mut">—</span>'}</td>
       <td>${tn ? esc(tn) : '<span class="mut">—</span>'}</td>
       <td>${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
@@ -1574,7 +1590,13 @@ function drawRoster(){
           <option value="${OTHER}">Add another…</option></select></td>
       <td><input value="${g.table_no ?? ''}" data-gid="${g.id}" data-gf="table_no" placeholder="—"
           style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
-      <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—"></td>
+      <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—">
+        <div class="flags">
+          <label><input type="checkbox" data-nocontact="${g.id}" ${g.no_contact_needed?'checked':''}>
+            <span>No email or phone needed</span></label>
+          <label><input type="checkbox" data-skiprec="${g.id}" ${g.skip_reception?'checked':''}>
+            <span>Not staying for the reception</span></label>
+        </div></td>
       <td style="text-align:right;white-space:nowrap">
         <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
         <button class="ic done" data-doneedit="${g.id}" title="Done">&#10003;</button>
@@ -1909,7 +1931,7 @@ function poolParty(){
   $('#poolInvited').innerHTML = inv.map(p=>`<div class="pn">
       <span class="nm">${esc(p.name)}</span>
       ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
-      <button data-poolskip="${p.id}" title="Not needed">&times;</button></div>`).join('');
+      <button data-poolundo="${p.id}" title="Back to not decided">&times;</button></div>`).join('');
 
   $('#poolUndecided').innerHTML = und.map(g=>`<div class="pn" data-addpool="${esc(g.name)}" title="Tap to invite">
       <span class="nm">${esc(g.name)}</span>
@@ -1918,7 +1940,8 @@ function poolParty(){
 
   $('#poolSkipped').innerHTML = skip.map(p=>`<span class="pc skp">
       <span class="nm"><b>${esc(p.name)}</b></span>
-      <button data-poolinv="${p.id}" title="Invite after all">&#8634;</button></span>`).join('');
+      <button data-poolinv="${p.id}" title="Invite after all">&#43;</button>
+      <button data-poolundo="${p.id}" title="Back to not decided">&#8634;</button></span>`).join('');
 
   $('#cInv').textContent  = inv.length;
   $('#cUnd').textContent  = und.length;
@@ -2319,6 +2342,16 @@ document.addEventListener('change', async e=>{
     await sb.from('guests').update({ dietary: val || null }).eq('id', gs.dataset.gid);
     await load(); guestRoster(); return;
   }
+  const nc = e.target.closest('input[data-nocontact]');
+  if (nc){
+    await sb.from('guests').update({ no_contact_needed: nc.checked }).eq('id', nc.dataset.nocontact);
+    await load(); guestRoster(); return;
+  }
+  const sr = e.target.closest('input[data-skiprec]');
+  if (sr){
+    await sb.from('guests').update({ skip_reception: sr.checked }).eq('id', sr.dataset.skiprec);
+    await load(); guestRoster(); seating(); return;
+  }
   const ct = e.target.closest('input[data-contact]');
   if (ct){
     const on = ct.checked;
@@ -2432,9 +2465,10 @@ document.addEventListener('click', async e=>{
   const pn = e.target.closest('[data-poolno]');
   if (pn){ await addPool(pn.dataset.poolno, '', 'skip'); return; }
 
-  const ps = e.target.closest('[data-poolskip]');
-  if (ps){
-    await sb.from('pool_guests').update({ status:'skip', added_by: me }).eq('id', ps.dataset.poolskip);
+  const pu = e.target.closest('[data-poolundo]');
+  if (pu){
+    // back to undecided — deleting the row is what "no decision" means
+    await sb.from('pool_guests').delete().eq('id', pu.dataset.poolundo);
     await load(); poolParty(); return;
   }
 
