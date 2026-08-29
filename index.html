@@ -163,10 +163,6 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 
 .gtable .mut{color:var(--ink-3)}
 .gtable .waived{color:var(--ink-3);font-style:italic;font-size:12.5px}
-.flags{margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
-.flags label{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);
-  cursor:pointer;white-space:nowrap}
-.flags input{width:14px;height:14px;accent-color:var(--brass);flex:0 0 auto}
 .rel{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:2px}
 .rel b{color:var(--ink-2);font-weight:600}
 #lkExisting{max-height:150px;overflow-y:auto}
@@ -181,6 +177,27 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   border-radius:99px;padding:3px 3px 3px 10px;font-size:13.5px;color:var(--ink)}
 .lkn button{background:none;border:0;color:var(--ink-3);font-size:14px;padding:1px 6px;line-height:1;opacity:.6}
 .lkn button:hover{opacity:1;color:var(--rust)}
+.gd{display:grid;gap:0}
+.gd .f{margin-bottom:12px}
+.gd-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gd-sub{font-family:"Public Sans",sans-serif;text-transform:none;letter-spacing:0;
+  font-size:13px;color:var(--ink-3);font-weight:400;margin-top:4px}
+.gd-flags{display:grid;gap:7px;padding:12px 0;margin-top:2px;border-top:1px solid var(--rule-2)}
+.gd-flags label{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink-2);cursor:pointer}
+.gd-flags input{width:16px;height:16px;accent-color:var(--brass);flex:0 0 auto}
+.gd-links{border-top:1px solid var(--rule-2);padding-top:12px}
+.gd-lh{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
+  font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:8px}
+.gd-links .none{font-size:13.5px;color:var(--ink-3);font-style:italic}
+.gd-links .l{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.gd-links .l b{color:var(--brass);font-weight:700}
+.ic.danger{background:none;border:1px solid transparent;color:var(--ink-3);font-size:16px;
+  padding:7px 11px;border-radius:var(--r);cursor:pointer}
+.ic.danger:hover{color:var(--rust);background:var(--rust-lo);border-color:var(--rust-line)}
+.ic.danger.armed{color:#fff;background:var(--rust);border-color:var(--rust);
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;
+  font-size:12px;font-weight:700}
 .lab2{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
   letter-spacing:.13em;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:6px}
 .segs{display:grid;gap:7px}
@@ -226,11 +243,8 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   border-bottom:1px solid var(--rule-2);font-family:"Barlow Condensed",sans-serif;
   text-transform:uppercase;letter-spacing:.11em;font-weight:700;position:sticky;top:0}
 .lknone{font-size:13.5px;color:var(--ink-3);font-style:italic;padding-bottom:4px}
-.gtable tr.editing{background:var(--brass-lo);box-shadow:inset 0 0 0 1px var(--brass-line)}
-.gtable tr.editing td:first-child{box-shadow:inset 4px 0 0 var(--brass)}
 .gtable thead th{position:sticky;top:0;z-index:5;background:var(--card);
   box-shadow:inset 0 -1.5px 0 var(--rule)}
-.gtable tr.editing td{padding-top:9px;padding-bottom:9px}
 .gtable tr.clickable{cursor:pointer}
 .gtable tr.clickable:hover{background:#FCFBF7}
 .gtable tr.clickable:hover td:first-child{box-shadow:inset 3px 0 0 var(--brass-line)}
@@ -682,7 +696,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     </div>
 
     <div class="sec">
-      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click a row to edit it, Escape to close. Changes save as you go and sync to everyone.</span></div>
+      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click a row to open it. Changes save as you go and sync to everyone.</span></div>
       <div class="rfilter">
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
@@ -693,17 +707,18 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           <button data-gside="gabriel">Gabriel</button>
           <button data-gside="none">Unassigned</button>
           <button data-gside="wp">Wedding party</button>
+          <button data-gside="unsent">Not emailed</button>
         </span>
         <datalist id="relOpts"></datalist>
         <button class="btn ghost sm" id="copyEmails" style="margin-left:auto">Copy emails</button>
         <button class="btn ghost sm" id="expGuests">Print guest list</button>
       </div>
       <div class="card"><table class="gtable">
-        <thead><tr><th style="width:42px" title="Details sent">Sent</th><th style="width:17%">Name</th>
-          <th style="width:8%">Side</th><th style="width:13%">Relationship</th>
-          <th style="width:18%">Email</th><th style="width:12%">Phone</th>
+        <thead><tr><th style="width:19%">Name</th>
+          <th style="width:8%">Side</th><th style="width:14%">Relationship</th>
+          <th style="width:19%">Email</th><th style="width:13%">Phone</th>
           <th style="width:12%">Dietary</th><th style="width:7%">Table</th><th>Notes</th>
-          <th style="width:70px"></th></tr></thead>
+          <th style="width:52px"></th></tr></thead>
         <tbody id="guestBody"></tbody>
       </table>
       <div class="addrow">
@@ -818,6 +833,65 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <span><button class="btn ghost" id="switchName">Not you?</button></span>
   </footer>
 </div>
+
+<dialog id="guestDlg">
+  <form method="dialog">
+    <div class="dh">
+      <h3 id="gdTitle">Guest</h3>
+      <div class="gd-sub" id="gdSub"></div>
+    </div>
+    <div class="db gd">
+      <label class="f"><span>Name</span>
+        <input type="text" id="gdName" data-gd="name"></label>
+
+      <div class="gd-2">
+        <label class="f"><span>Side</span>
+          <select id="gdSide" data-gd="side">
+            <option value="">—</option>
+            <option value="josh">Josh</option>
+            <option value="gabriel">Gabriel</option>
+            <option value="both">Both</option>
+          </select></label>
+        <label class="f"><span>Relationship</span>
+          <input type="text" id="gdRel" data-gd="relationship" list="relOpts" placeholder="Mother, Cousin, Friend…"></label>
+      </div>
+
+      <div class="gd-2">
+        <label class="f"><span>Email</span>
+          <input type="email" id="gdEmail" data-gd="email" placeholder="—"></label>
+        <label class="f"><span>Phone</span>
+          <input type="tel" id="gdPhone" data-gd="phone" placeholder="—"></label>
+      </div>
+
+      <div class="gd-2">
+        <label class="f"><span>Dietary</span>
+          <select id="gdDiet" data-gd="dietary"></select></label>
+        <label class="f"><span>Table</span>
+          <input type="text" id="gdTable" data-gd="table_no" placeholder="—"
+            style="text-align:center;font-family:'IBM Plex Mono',monospace"></label>
+      </div>
+
+      <label class="f"><span>Notes</span>
+        <textarea id="gdNotes" data-gd="notes" rows="2" placeholder="—"></textarea></label>
+
+      <div class="gd-flags">
+        <label><input type="checkbox" id="gdContacted"><span>&ldquo;One Week Away&rdquo; email sent</span></label>
+        <label><input type="checkbox" id="gdNoContact"><span>No email or phone needed</span></label>
+        <label><input type="checkbox" id="gdSkipRec"><span>Ceremony only, not staying for the reception</span></label>
+      </div>
+
+      <div class="gd-links">
+        <div class="gd-lh">Relationships <button type="button" class="btn ghost sm" id="gdLinks">Manage</button></div>
+        <div id="gdLinkList"></div>
+      </div>
+    </div>
+    <div class="df">
+      <button type="button" class="ic danger" id="gdDelete" title="Remove guest"
+        style="margin-right:auto">&#128465;</button>
+      <button class="btn" value="close">Done</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="printDlg">
   <form method="dialog">
@@ -1426,8 +1500,8 @@ const metaFor = k => DIET_META[k] || CUSTOM_META;
 const needsContact = g => !g.no_contact_needed;
 
 function guestRoster(){
-  // if someone is mid-edit, leave the table alone and just refresh the numbers
-  if (editing.size){ countsOnly(); return; }
+  // if the modal is open, refresh the numbers but leave the table alone
+  if (gdId != null && $('#guestDlg').open){ countsOnly(); return; }
   const G = D.guests;
   const flagged = G.filter(g=>g.dietary);
   const early = G.filter(g => g.skip_reception).length;
@@ -1436,8 +1510,9 @@ function guestRoster(){
     ['At dinner', G.length - early, 'Staying for the reception.'],
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Plated at', 77, 'Each petite station on the BEO.'],
-    ['Restrictions', flagged.length, 'Across four dietary groups.'],
-    ['Vendor meals', 6, '2 photo, 1 DJ, 3 planner. Separate from the count.']
+    ['Restrictions', flagged.length, 'Across the dietary groups.'],
+    ['Emailed', G.filter(g=>g.contacted).length,
+      `${G.filter(g=>g.email && !g.contacted).length} with an address still to send.`]
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
   $('#dietGrid').innerHTML = dietTypes().map(key=>{
@@ -1455,22 +1530,91 @@ function guestRoster(){
   $('#bGuests').classList.toggle('hot', pending > 0);
 }
 
-const editing = new Set();
 
-// only the clicked row is replaced, so nothing above it shifts and the page stays put
+let gdId = null;
+
 function openRow(id){
-  id = String(id);
-  editing.add(id);
-  redrawRow(id);
-  const first = document.querySelector(`input[data-gid="${id}"][data-gf="name"]`);
-  if (first) first.focus({ preventScroll: true });
+  const g = D.guests.find(x => String(x.id) === String(id));
+  if (!g) return;
+  gdId = g.id;
+  armed.clear(); clearTimeout(armTimer);
+
+  $('#gdTitle').textContent = g.name;
+  const bits = [];
+  if (g.side) bits.push(SIDE_LABEL[g.side] + '\u2019s side');
+  if (g.table_no != null) bits.push(tableName(g.table_no).full);
+  $('#gdSub').textContent = bits.join(' \u00b7 ') || 'Not seated';
+
+  $('#gdName').value  = g.name || '';
+  $('#gdSide').value  = g.side || '';
+  $('#gdRel').value   = g.relationship || '';
+  $('#gdEmail').value = g.email || '';
+  $('#gdPhone').value = g.phone || '';
+  $('#gdTable').value = g.table_no ?? '';
+  $('#gdNotes').value = g.notes || '';
+  $('#gdContacted').checked = !!g.contacted;
+  $('#gdNoContact').checked = !!g.no_contact_needed;
+  $('#gdSkipRec').checked   = !!g.skip_reception;
+
+  $('#gdDiet').innerHTML = `<option value=""${!g.dietary?' selected':''}>—</option>` +
+    dietTypes().map(o => `<option value="${esc(o)}"${g.dietary===o?' selected':''}>${esc(o)}</option>`).join('') +
+    `<option value="${OTHER}">Add another…</option>`;
+
+  const del = $('#gdDelete');
+  del.classList.remove('armed'); del.innerHTML = '&#128465;'; del.title = 'Remove guest';
+
+  renderGdLinks();
+  $('#guestDlg').showModal();
 }
 
-function closeRow(id){
-  id = String(id);
-  editing.delete(id);
-  armed.clear(); clearTimeout(armTimer);
-  redrawRow(id);
+function renderGdLinks(){
+  const gs = groupedLinks(gdId);
+  $('#gdLinkList').innerHTML = gs.length
+    ? gs.map(g => `<div class="l"><b>${esc(g.label)}</b> of ${esc(listNames(g.names))}</div>`).join('')
+    : '<div class="none">None recorded.</div>';
+}
+
+/* every field saves as you leave it */
+async function saveGd(field, raw){
+  const g = D.guests.find(x => x.id === gdId); if (!g) return;
+  let val = String(raw ?? '').trim() || null;
+
+  if (field === 'name' && !val){ $('#gdName').value = g.name; return; }
+  if (field === 'table_no' && val !== null){
+    const n = parseInt(val, 10);
+    if (isNaN(n) || n < 0 || n > TABLES.length){
+      alert(`Table must be 0 for the sweetheart table, or 1 to ${TABLES.length}.`);
+      $('#gdTable').value = g.table_no ?? ''; return;
+    }
+    val = n;
+  }
+  if (field === 'dietary' && val === OTHER){
+    const typed = prompt('What is the restriction?');
+    val = (typed || '').trim() || null;
+    if (val){
+      const hit = dietTypes().find(t => t.toLowerCase() === val.toLowerCase());
+      if (hit) val = hit;
+    }
+  }
+  if (String(g[field] ?? '') === String(val ?? '')) return;
+
+  await sb.from('guests').update({ [field]: val }).eq('id', g.id);
+  await load();
+  redrawRow(g.id); countsOnly(); seating();
+  const now = D.guests.find(x => x.id === gdId);
+  if (now){
+    $('#gdTitle').textContent = now.name;
+    const bits = [];
+    if (now.side) bits.push(SIDE_LABEL[now.side] + '\u2019s side');
+    if (now.table_no != null) bits.push(tableName(now.table_no).full);
+    $('#gdSub').textContent = bits.join(' \u00b7 ') || 'Not seated';
+    if (field === 'dietary'){
+      $('#gdDiet').innerHTML = `<option value=""${!now.dietary?' selected':''}>—</option>` +
+        dietTypes().map(o => `<option value="${esc(o)}"${now.dietary===o?' selected':''}>${esc(o)}</option>`).join('') +
+        `<option value="${OTHER}">Add another…</option>`;
+    }
+    if (field === 'phone') $('#gdPhone').value = now.phone || '';
+  }
 }
 const armed = new Set();          // guests whose delete has been armed once
 let armTimer = null;
@@ -1563,7 +1707,8 @@ function countsOnly(){
     ['At dinner', G.length - early, 'Staying for the reception.'],
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Restrictions', flagged.length, 'Across the dietary groups.'],
-    ['Vendor meals', 6, '2 photo, 1 DJ, 3 planner. Separate from the count.']
+    ['Emailed', G.filter(g=>g.contacted).length,
+      `${G.filter(g=>g.email && !g.contacted).length} with an address still to send.`]
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
   $('#dietGrid').innerHTML = dietTypes().map(key=>{
     const m = metaFor(key);
@@ -1577,16 +1722,22 @@ function countsOnly(){
   $('#bGuests').textContent = pending ? `${flagged.length}+${pending}` : flagged.length;
 }
 
-function drawRoster(){
-  const types = dietTypes();
-  const list = D.guests.filter(g => {
+// whatever the guest list is currently showing
+function shownGuests(){
+  return D.guests.filter(g => {
     if (gFilter === 'diet' && !g.dietary) return false;
     if (guestSide === 'none' && g.side) return false;
     if (guestSide === 'wp' && !isWP(g)) return false;
-    if (guestSide !== 'all' && guestSide !== 'none' && guestSide !== 'wp'
+    if (guestSide === 'unsent' && (g.contacted || !g.email)) return false;
+    if (!['all','none','wp','unsent'].includes(guestSide)
         && g.side !== guestSide && g.side !== 'both') return false;
     return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
+}
+
+function drawRoster(){
+  const types = dietTypes();
+  const list = shownGuests();
   const dl = $('#relOpts');
   if (dl && !dl.options.length){
     const used = [...new Set(D.guests.map(g=>g.relationship).filter(Boolean))];
@@ -1594,21 +1745,16 @@ function drawRoster(){
   }
   $$('#guestSideSw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gside === guestSide)));
   $('#guestBody').innerHTML = list.length
-    ? list.map(g => rowHtml(g, types)).join('')
-    : `<tr><td colspan="10" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+    ? list.map(g => rowHtml(g)).join('')
+    : `<tr><td colspan="9" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
 
-/* one row's markup, so a single row can be swapped without touching the others */
-function rowHtml(g, types){
-  types = types || dietTypes();
-  const ed = editing.has(String(g.id));
+/* one row's markup — read only; editing happens in the modal */
+function rowHtml(g){
   const tn = g.table_no == null ? '' : tableName(g.table_no).full;
-
-  if (!ed) return `<tr class="clickable" data-editrow="${g.id}" title="Click anywhere to edit">
-      <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
-        title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
+  return `<tr class="clickable" data-editrow="${g.id}" title="Click to edit">
       <td><strong>${esc(g.name)}</strong>${g.skip_reception
-        ? ' <span class="pill due" style="font-size:9.5px">ceremony only</span>' : ''}${linkSummary(g.id)}</td>
+        ? ' <span class="pill due" style="font-size:9.5px">ceremony only</span>' : ''}</td>
       <td>${sideChip(g.side)}</td>
       <td>${g.relationship
         ? (isWP(g) ? `<span class="pill alt">${esc(g.relationship)}</span>` : esc(g.relationship))
@@ -1623,51 +1769,16 @@ function rowHtml(g, types){
       <td>${tn ? esc(tn) : '<span class="mut">—</span>'}</td>
       <td>${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
       <td style="text-align:right;white-space:nowrap">
-        <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
-        <button class="ic" data-edit="${g.id}" title="Edit this row">&#9998;</button></td></tr>`;
-
-  return `<tr class="editing" data-editing="${g.id}">
-      <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}></td>
-      <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
-      <td><select data-gid="${g.id}" data-gf="side">
-          <option value=""${!g.side?' selected':''}>—</option>
-          <option value="josh"${g.side==='josh'?' selected':''}>Josh</option>
-          <option value="gabriel"${g.side==='gabriel'?' selected':''}>Gabriel</option>
-          <option value="both"${g.side==='both'?' selected':''}>Both</option></select></td>
-      <td><input value="${esc(g.relationship||'')}" data-gid="${g.id}" data-gf="relationship"
-          list="relOpts" placeholder="—"></td>
-      <td><input value="${esc(g.email||'')}" data-gid="${g.id}" data-gf="email" placeholder="—" type="email"></td>
-      <td><input value="${esc(g.phone||'')}" data-gid="${g.id}" data-gf="phone" placeholder="—"></td>
-      <td><select data-gid="${g.id}" data-gf="dietary">
-          <option value=""${!g.dietary?' selected':''}>—</option>
-          ${types.map(o=>`<option value="${esc(o)}"${g.dietary===o?' selected':''}>${esc(o)}</option>`).join('')}
-          <option value="${OTHER}">Add another…</option></select></td>
-      <td><input value="${g.table_no ?? ''}" data-gid="${g.id}" data-gf="table_no" placeholder="—"
-          style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
-      <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—">
-        <div class="flags">
-          <label title="Children, or anyone covered by someone else">
-            <input type="checkbox" data-nocontact="${g.id}" ${g.no_contact_needed?'checked':''}>
-            <span>No contact needed</span></label>
-          <label title="Coming to the ceremony but not the reception">
-            <input type="checkbox" data-skiprec="${g.id}" ${g.skip_reception?'checked':''}>
-            <span>Ceremony only</span></label>
-        </div></td>
-      <td style="text-align:right;white-space:nowrap">
-        <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
-        <button class="ic done" data-doneedit="${g.id}" title="Done">&#10003;</button>
-        <button class="ic danger ${armed.has(String(g.id))?'armed':''}" data-delguest="${g.id}"
-          title="${armed.has(String(g.id))?'Click again to remove':'Remove guest'}">${armed.has(String(g.id))?'Sure?':'&#128465;'}</button>
-      </td></tr>`;
+        <button class="ic" data-edit="${g.id}" title="Edit">&#9998;</button></td></tr>`;
 }
 
 /* swap one row in place — nothing else on the page moves */
 function redrawRow(id){
   const g  = D.guests.find(x => String(x.id) === String(id));
-  const el = document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
+  const el = document.querySelector(`tr[data-editrow="${id}"]`);
   if (!g || !el){ drawRoster(); return null; }
   el.outerHTML = rowHtml(g);
-  return document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
+  return document.querySelector(`tr[data-editrow="${id}"]`);
 }
 
 /* ---------- seating ---------- */
@@ -2186,7 +2297,7 @@ function exportPool(){
 const P_FIELDS = [
   ['side','Side'], ['relationship','Relationship'], ['links','Family links'],
   ['email','Email'], ['phone','Phone'], ['dietary','Dietary'],
-  ['table_no','Table'], ['contacted','Details sent'], ['notes','Notes']
+  ['table_no','Table'], ['contacted','Email sent'], ['notes','Notes']
 ];
 let pOpts = { layout:'sheet', who:'all', sort:'first',
               fields:new Set(['side','relationship','links','phone','dietary','table_no']) };
@@ -2405,23 +2516,6 @@ document.addEventListener('change', async e=>{
     await sb.from('guests').update({ dietary: val || null }).eq('id', gs.dataset.gid);
     await load(); guestRoster(); return;
   }
-  const nc = e.target.closest('input[data-nocontact]');
-  if (nc){
-    await sb.from('guests').update({ no_contact_needed: nc.checked }).eq('id', nc.dataset.nocontact);
-    await load(); redrawRow(nc.dataset.nocontact); countsOnly(); return;
-  }
-  const sr = e.target.closest('input[data-skiprec]');
-  if (sr){
-    await sb.from('guests').update({ skip_reception: sr.checked }).eq('id', sr.dataset.skiprec);
-    await load(); redrawRow(sr.dataset.skiprec); countsOnly(); return;
-  }
-  const ct = e.target.closest('input[data-contact]');
-  if (ct){
-    const on = ct.checked;
-    await sb.from('guests').update({ contacted:on, contacted_by: on ? me : null,
-      contacted_at: on ? new Date().toISOString() : null }).eq('id', ct.dataset.contact);
-    await load(); guestRoster(); return;
-  }
   const cb = e.target.closest('.task input[type=checkbox]'); if (!cb) return;
   const done = cb.checked;
   await sb.from('tasks').update({ done, done_by_name: done ? me : null, done_at: done ? new Date().toISOString() : null }).eq('id', cb.dataset.id);
@@ -2484,8 +2578,7 @@ document.addEventListener('click', async e=>{
   const ed = e.target.closest('[data-edit]');
   if (ed){ openRow(ed.dataset.edit); return; }
 
-  const de = e.target.closest('[data-doneedit]');
-  if (de){ closeRow(de.dataset.doneedit); return; }
+
 
   const swp = e.target.closest('[data-swaptable]');
   if (swp){
@@ -3050,13 +3143,184 @@ $('#addTable').onclick = async () => {
 $('#expSeat').onclick = exportSeating;
 $('#expGuests').onclick = openPrintDlg;
 
+['gdName','gdRel','gdEmail','gdPhone','gdTable','gdNotes'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('blur', () => saveGd(el.dataset.gd, el.value));
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' && el.tagName !== 'TEXTAREA'){ e.preventDefault(); el.blur(); } });
+});
+['gdSide','gdDiet'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('change', () => saveGd(el.dataset.gd, el.value));
+});
+[['gdContacted','contacted'],['gdNoContact','no_contact_needed'],['gdSkipRec','skip_reception']]
+  .forEach(([id, field]) => {
+    $('#' + id).addEventListener('change', async e => {
+      const patch = { [field]: e.target.checked };
+      if (field === 'contacted'){
+        patch.contacted_by = e.target.checked ? me : null;
+        patch.contacted_at = e.target.checked ? new Date().toISOString() : null;
+      }
+      await sb.from('guests').update(patch).eq('id', gdId);
+      await load(); redrawRow(gdId); countsOnly(); seating();
+    });
+  });
+
+$('#gdLinks').onclick = () => { $('#guestDlg').close(); openLinks(gdId); };
+
+$('#guestDlg').addEventListener('close', () => {
+  armed.clear(); clearTimeout(armTimer);
+  guestRoster();
+  gdId = null;
+});
+
+$('#gdDelete').onclick = async () => {
+  const g = D.guests.find(x => x.id === gdId); if (!g) return;
+  const del = $('#gdDelete');
+  if (!del.classList.contains('armed')){
+    del.classList.add('armed'); del.textContent = 'Sure?';
+    clearTimeout(armTimer);
+    armTimer = setTimeout(() => { del.classList.remove('armed'); del.innerHTML = '&#128465;'; }, 5000);
+    return;
+  }
+  clearTimeout(armTimer);
+  const seated = g.table_no != null ? `\nSeated at ${tableName(g.table_no).full}.` : '';
+  const n = linksFor(g.id).length;
+  const linked = n ? `\n${n} relationship${n===1?'':'s'} will also be removed.` : '';
+  if (!confirm(`Remove ${g.name} from the guest list?${seated}${linked}\n\nThis cannot be undone.`)){
+    del.classList.remove('armed'); del.innerHTML = '&#128465;'; return;
+  }
+  await sb.from('guests').delete().eq('id', g.id);
+  $('#guestDlg').close();
+  await load(); guestRoster(); seating();
+};
+
+$('#copyEmails').onclick = async () => {
+  const shown = shownGuests();
+  const withEmail = shown.filter(g => g.email && g.email.includes('@'));
+  const missing   = shown.length - withEmail.length;
+  if (!withEmail.length){ alert('None of the guests shown have an email address on file.'); return; }
+
+  const seen = new Set();
+  const picked = withEmail.filter(g => {
+    const e = g.email.trim().toLowerCase();
+    if (seen.has(e)) return false;
+    seen.add(e); return true;
+  });
+  const text = picked.map(g => g.email.trim().toLowerCase()).join(', ');
+
+  const btn = $('#copyEmails');
+  const flash = () => {
+    btn.textContent = `Copied ${picked.length}`;
+    btn.style.color = 'var(--moss)';
+    btn.style.borderColor = 'var(--moss-line)';
+    btn.style.background = 'var(--moss-lo)';
+    setTimeout(() => {
+      btn.textContent = 'Copy emails';
+      btn.style.color = btn.style.borderColor = btn.style.background = '';
+    }, 2200);
+  };
+
+  const afterCopy = async () => {
+    flash();
+    const unsent = picked.filter(g => !g.contacted);
+    const note = missing ? `\n\n${missing} of the ${shown.length} shown have no address on file.` : '';
+    setTimeout(async () => {
+      if (!unsent.length){
+        alert(`${picked.length} email${picked.length===1?'':'s'} copied. All of them are already marked as sent.${note}`);
+        return;
+      }
+      const ok = confirm(
+        `${picked.length} email${picked.length===1?'':'s'} copied.${note}\n\n` +
+        `Mark ${unsent.length} of them as having received the “One Week Away” email?\n\n` +
+        `Do this after the email actually goes out.`);
+      if (!ok) return;
+      const ids = unsent.map(g => g.id);
+      const { error } = await sb.from('guests').update({
+        contacted: true, contacted_by: me, contacted_at: new Date().toISOString()
+      }).in('id', ids);
+      if (error){ alert('Could not mark them: ' + error.message); return; }
+      await load(); guestRoster();
+    }, 120);
+  };
+
+  try {
+    await navigator.clipboard.writeText(text);
+    await afterCopy();
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('style','position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);' +
+      'width:min(90vw,560px);height:180px;z-index:9999;padding:12px;font:14px/1.5 monospace;' +
+      'border:1px solid #D5D0C6;border-radius:4px;box-shadow:0 20px 50px -18px rgba(17,20,24,.4)');
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); await afterCopy(); }
+    catch { alert('Select the text and copy it manually.'); }
+    setTimeout(() => ta.remove(), 400);
+  }
+};
+
+$('#expGuests').onclick = openPrintDlg;
+
+['gdName','gdRel','gdEmail','gdPhone','gdTable','gdNotes'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('blur', () => saveGd(el.dataset.gd, el.value));
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' && el.tagName !== 'TEXTAREA'){ e.preventDefault(); el.blur(); } });
+});
+['gdSide','gdDiet'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('change', () => saveGd(el.dataset.gd, el.value));
+});
+[['gdContacted','contacted'],['gdNoContact','no_contact_needed'],['gdSkipRec','skip_reception']]
+  .forEach(([id, field]) => {
+    $('#' + id).addEventListener('change', async e => {
+      const patch = { [field]: e.target.checked };
+      if (field === 'contacted'){
+        patch.contacted_by = e.target.checked ? me : null;
+        patch.contacted_at = e.target.checked ? new Date().toISOString() : null;
+      }
+      await sb.from('guests').update(patch).eq('id', gdId);
+      await load(); redrawRow(gdId); countsOnly(); seating();
+    });
+  });
+
+$('#gdLinks').onclick = () => { $('#guestDlg').close(); openLinks(gdId); };
+
+$('#guestDlg').addEventListener('close', () => {
+  armed.clear(); clearTimeout(armTimer);
+  guestRoster();
+  gdId = null;
+});
+
+$('#gdDelete').onclick = async () => {
+  const g = D.guests.find(x => x.id === gdId); if (!g) return;
+  const del = $('#gdDelete');
+  if (!del.classList.contains('armed')){
+    del.classList.add('armed'); del.textContent = 'Sure?';
+    clearTimeout(armTimer);
+    armTimer = setTimeout(() => { del.classList.remove('armed'); del.innerHTML = '&#128465;'; }, 5000);
+    return;
+  }
+  clearTimeout(armTimer);
+  const seated = g.table_no != null ? `\nSeated at ${tableName(g.table_no).full}.` : '';
+  const n = linksFor(g.id).length;
+  const linked = n ? `\n${n} relationship${n===1?'':'s'} will also be removed.` : '';
+  if (!confirm(`Remove ${g.name} from the guest list?${seated}${linked}\n\nThis cannot be undone.`)){
+    del.classList.remove('armed'); del.innerHTML = '&#128465;'; return;
+  }
+  await sb.from('guests').delete().eq('id', g.id);
+  $('#guestDlg').close();
+  await load(); guestRoster(); seating();
+};
+
 $('#copyEmails').onclick = async () => {
   // whatever the list is currently showing, so the side and search filters apply
   const shown = D.guests.filter(g => {
     if (gFilter === 'diet' && !g.dietary) return false;
     if (guestSide === 'none' && g.side) return false;
     if (guestSide === 'wp' && !isWP(g)) return false;
-    if (guestSide !== 'all' && guestSide !== 'none' && guestSide !== 'wp'
+    if (guestSide === 'unsent' && (g.contacted || !g.email)) return false;
+    if (!['all','none','wp','unsent'].includes(guestSide)
         && g.side !== guestSide && g.side !== 'both') return false;
     return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
@@ -3103,14 +3367,6 @@ $('#copyEmails').onclick = async () => {
     setTimeout(() => ta.remove(), 400);
   }
 };
-
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Escape') return;
-  const row = e.target.closest('tr[data-editing]');
-  if (!row) return;
-  e.target.blur();
-  closeRow(row.dataset.editing);
-});
 
 document.addEventListener('keydown', async e => {
   const si = e.target.closest('[data-seatinput]');
