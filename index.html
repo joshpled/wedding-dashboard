@@ -408,7 +408,6 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   font-weight:600;letter-spacing:0;color:var(--ink-2);background:var(--rule-2);
   border-radius:99px;padding:2px 9px;min-width:26px;text-align:center}
 #grpYes .phead em{background:var(--moss-lo);color:var(--moss)}
-#grpMaybe .phead em{background:var(--brass-lo);color:var(--brass)}
 #grpNo .phead em{background:var(--rust-lo);color:var(--rust)}
 .phead .phint{font-family:"Public Sans",sans-serif;text-transform:none;letter-spacing:0;
   font-size:12.5px;color:var(--ink-3);font-weight:400;margin-left:auto}
@@ -420,7 +419,7 @@ details.pgroup summary:before{content:"\25B8";color:var(--ink-3);font-size:10px;
 details.pgroup[open] summary:before{content:"\25BE"}
 .dotm{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
 .dotm.inv{background:var(--moss)} .dotm.und{background:var(--brass)} .dotm.skp{background:var(--ink-3)}
-.dotm.r-yes{background:var(--moss)} .dotm.r-maybe{background:var(--brass)}
+.dotm.r-yes{background:var(--moss)}
 .dotm.r-no{background:var(--rust)} .dotm.r-none{background:var(--rule)}
 
 .psort{display:inline-flex;margin-left:auto;border:1px solid var(--rule);border-radius:var(--r);
@@ -457,10 +456,8 @@ details.pgroup[open] summary:before{content:"\25BE"}
 .setr:hover{border-color:currentColor}
 .setr.on{border-color:currentColor;font-weight:700}
 .setr.r-yes.on{background:var(--moss-lo);color:var(--moss);border-color:var(--moss-line)}
-.setr.r-maybe.on{background:var(--brass-lo);color:var(--brass);border-color:var(--brass-line)}
 .setr.r-no.on{background:var(--rust-lo);color:var(--rust);border-color:var(--rust-line)}
 .setr.r-yes:hover{background:var(--moss-lo);color:var(--moss)}
-.setr.r-maybe:hover{background:var(--brass-lo);color:var(--brass)}
 .setr.r-no:hover{background:var(--rust-lo);color:var(--rust)}
 
 .pn .x,.pn .go{background:none;border:0;font-size:15px;line-height:1;padding:4px 6px;
@@ -905,11 +902,6 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           <div class="phead"><span class="dotm r-yes"></span>Coming <em id="cYes">0</em>
             <span class="phint">Click a pill to set or clear a reply</span></div>
           <div class="pnames" id="poolYes"></div>
-        </div>
-
-        <div class="pgroup" id="grpMaybe">
-          <div class="phead"><span class="dotm r-maybe"></span>Not sure <em id="cMaybe">0</em></div>
-          <div class="pnames" id="poolMaybe"></div>
         </div>
 
         <div class="pgroup" id="grpNo">
@@ -2340,20 +2332,20 @@ function poolParty(){
   const und    = sortNames(D.guests.filter(g => !known.has(g.name.toLowerCase())));
 
   const by  = r => sortNames(invAll.filter(p => (p.rsvp || 'none') === r));
-  const yes = by('yes'), maybe = by('maybe'), no = by('no'), quiet = by('none');
+  const yes = by('yes'), no = by('no'), quiet = by('none');
 
   $('#poolCount').innerHTML = [
     ['Coming', yes.length, yes.length ? 'Confirmed for Saturday.' : 'Nobody yet.'],
     ['No reply', quiet.length, `of ${invAll.length} invited.`],
-    ['Cannot make it', no.length, maybe.length ? `${maybe.length} still unsure.` : 'Declined.'],
+    ['Cannot make it', no.length, 'Declined.'],
     ['Invited', invAll.length, 'On the Saturday list.'],
     ['Runs', '5–9 PM', 'Restore at Carolina Park.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  const WORD = { yes:'Coming', maybe:'Unsure', no:'Cannot' };
+  const WORD = { yes:'Coming', no:'Cannot' };
   const row = p => {
     const cur = p.rsvp || 'none';
-    const opts = ['yes','maybe','no'].map(r => {
+    const opts = ['yes','no'].map(r => {
       const on = cur === r;
       return `<button class="setr r-${r}${on?' on':''}" data-setrsvp="${p.id}" data-to="${on?'':r}"
         title="${on ? 'Click to clear' : 'Mark ' + WORD[r]}">${WORD[r]}</button>`;
@@ -2366,7 +2358,6 @@ function poolParty(){
   };
 
   $('#poolYes').innerHTML   = yes.map(row).join('');
-  $('#poolMaybe').innerHTML = maybe.map(row).join('');
   $('#poolNo').innerHTML    = no.map(row).join('');
   $('#poolQuiet').innerHTML = quiet.map(row).join('');
 
@@ -2382,14 +2373,12 @@ function poolParty(){
       <button data-poolundo="${p.id}" title="Back to not invited">&#8634;</button></span>`).join('');
 
   $('#cYes').textContent   = yes.length;
-  $('#cMaybe').textContent = maybe.length;
   $('#cNo').textContent    = no.length;
   $('#cQuiet').textContent = quiet.length;
   $('#cUnd').textContent   = und.length;
   $('#cSkip').textContent  = skip.length;
 
   $('#grpYes').hidden   = yes.length === 0;
-  $('#grpMaybe').hidden = maybe.length === 0;
   $('#grpNo').hidden    = no.length === 0;
   $('#grpQuiet').hidden = quiet.length === 0;
   $('#grpUnd').hidden   = und.length === 0;
@@ -2511,7 +2500,7 @@ const PRINT_CSS = `
   .plist li{break-inside:avoid;padding-right:4px}
   .pnm{color:#111418}
   .pm{display:inline-block;width:14px;text-align:center;font-weight:700;margin-left:6px}
-  .pm.y{color:#26492F} .pm.n{color:#8A2F1C} .pm.m{color:#6E5520}
+  .pm.y{color:#26492F} .pm.n{color:#8A2F1C}
   .pnote{font-size:8.5pt;color:#565D68;margin-left:6px}
   .pkey{margin-top:16px;padding-top:10px;border-top:1px solid #EAE7E0;
     font-size:9pt;color:#565D68}
@@ -2588,10 +2577,9 @@ function exportPool(){
   const n    = list.length;
   const yes  = rows.filter(p => p.rsvp === 'yes').length;
   const no   = rows.filter(p => p.rsvp === 'no').length;
-  const may  = rows.filter(p => p.rsvp === 'maybe').length;
-  const quiet= n - yes - no - may;
+  const quiet= n - yes - no;
 
-  const MARK = { yes:['&#10003;','y'], no:['&times;','n'], maybe:['?','m'] };
+  const MARK = { yes:['&#10003;','y'], no:['&times;','n'] };
   // one continuous list; CSS columns keep the numbering running 1..n down
   // the first column and on into the second
   const items = list.map(p => {
@@ -2608,11 +2596,11 @@ function exportPool(){
       <div><div class="k">Invited</div><div class="v">${n}</div></div>
       <div><div class="k">Coming</div><div class="v">${yes}</div></div>
       <div><div class="k">No reply</div><div class="v">${quiet}</div></div>
-      <div><div class="k">Cannot</div><div class="v">${no + may}</div></div>
+      <div><div class="k">Cannot</div><div class="v">${no}</div></div>
     </div>
     ${n ? `<ol class="plist">${items}</ol>
-      <div class="pkey">&#10003; coming &nbsp;&middot;&nbsp; ? unsure &nbsp;&middot;&nbsp;
-        &times; cannot make it &nbsp;&middot;&nbsp; blank means no reply yet</div>`
+      <div class="pkey">&#10003; coming &nbsp;&middot;&nbsp; &times; cannot make it
+        &nbsp;&middot;&nbsp; blank means no reply yet</div>`
         : '<div class="t"><div class="none">Nobody on the list yet.</div></div>'}
     ` + PRINT_FOOT('Pizza provided &middot; BYOB, cans only &mdash; no glass'));
 }
