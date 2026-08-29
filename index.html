@@ -177,27 +177,36 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   border-radius:99px;padding:3px 3px 3px 10px;font-size:13.5px;color:var(--ink)}
 .lkn button{background:none;border:0;color:var(--ink-3);font-size:14px;padding:1px 6px;line-height:1;opacity:.6}
 .lkn button:hover{opacity:1;color:var(--rust)}
-.gd{display:grid;gap:0}
-.gd .f{margin-bottom:12px}
-.gd-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gd{display:grid;gap:0;padding:18px 20px}
+.gd .f{margin-bottom:0}
+.gd .f span{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.13em;font-size:10.5px;font-weight:700;color:var(--ink-3);margin-bottom:5px}
+.gd .f input,.gd .f select,.gd .f textarea{width:100%;height:40px;padding:0 11px;font:inherit;
+  font-size:14.5px;border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink)}
+.gd .f textarea{height:64px;padding:9px 11px;resize:vertical;line-height:1.5}
+.gd .f input:focus,.gd .f select:focus,.gd .f textarea:focus{
+  border-color:var(--brass);outline:none;box-shadow:0 0 0 3px var(--brass-lo)}
+.gd-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.gd-grid .wide{grid-column:1 / -1}
 .gd-sub{font-family:"Public Sans",sans-serif;text-transform:none;letter-spacing:0;
-  font-size:13px;color:var(--ink-3);font-weight:400;margin-top:4px}
-.gd-flags{display:grid;gap:7px;padding:12px 0;margin-top:2px;border-top:1px solid var(--rule-2)}
-.gd-flags label{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink-2);cursor:pointer}
-.gd-flags input{width:16px;height:16px;accent-color:var(--brass);flex:0 0 auto}
-.gd-links{border-top:1px solid var(--rule-2);padding-top:12px}
+  font-size:13px;color:var(--ink-3);font-weight:400;margin-top:5px}
+.gd-flags{display:grid;gap:9px;padding:15px 0 4px;margin-top:16px;border-top:1px solid var(--rule-2)}
+.gd-flags label{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-2);cursor:pointer;line-height:1.35}
+.gd-flags input{width:17px;height:17px;accent-color:var(--brass);flex:0 0 auto}
+.gd-links{border-top:1px solid var(--rule-2);padding-top:14px;margin-top:14px}
 .gd-lh{display:flex;align-items:center;justify-content:space-between;gap:10px;
   font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.13em;
-  font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:8px}
+  font-size:10.5px;font-weight:700;color:var(--ink-3);margin-bottom:9px}
 .gd-links .none{font-size:13.5px;color:var(--ink-3);font-style:italic}
-.gd-links .l{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.gd-links .l{font-size:13.5px;color:var(--ink-2);line-height:1.7}
 .gd-links .l b{color:var(--brass);font-weight:700}
 .ic.danger{background:none;border:1px solid transparent;color:var(--ink-3);font-size:16px;
-  padding:7px 11px;border-radius:var(--r);cursor:pointer}
+  padding:8px 12px;border-radius:var(--r);cursor:pointer}
 .ic.danger:hover{color:var(--rust);background:var(--rust-lo);border-color:var(--rust-line)}
 .ic.danger.armed{color:#fff;background:var(--rust);border-color:var(--rust);
   font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;
   font-size:12px;font-weight:700}
+@media(max-width:520px){.gd-grid{grid-template-columns:1fr}}
 .lab2{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
   letter-spacing:.13em;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:6px}
 .segs{display:grid;gap:7px}
@@ -263,7 +272,13 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .gtable input:hover{border-color:var(--rule-2);background:#fff}
 .gtable input:focus{border-color:var(--brass-line);background:#fff}
 .gtable select{padding:5px 7px;font-size:13.5px;border-color:var(--rule-2)}
-.gtable td{padding:4px 8px;vertical-align:middle}
+.gtable{table-layout:fixed}
+.gtable td{padding:0 10px;height:44px;vertical-align:middle;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
+.gtable th{padding:9px 10px;white-space:nowrap}
+.gtable td strong{font-weight:700}
+.gtable td .pill{vertical-align:middle}
+.gtable tr.clickable td:last-child{overflow:visible}
 .gtable .x{background:none;border:0;color:var(--ink-3);font-size:17px;padding:3px 7px;border-radius:3px}
 .gtable .x:hover{color:var(--rust);background:var(--rust-lo)}
 
@@ -494,6 +509,7 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-si
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);margin-right:7px}
 
 dialog{border:1px solid var(--rule);border-radius:var(--r);padding:0;box-shadow:0 24px 60px -22px rgba(17,20,24,.28);max-width:400px;width:92vw;max-height:86vh;overflow-y:auto}
+dialog#guestDlg{max-width:580px}
 dialog::backdrop{background:rgba(90,86,78,.22)}
 dialog .dh{padding:16px 18px 0} dialog h3{font-size:14px;letter-spacing:.1em}
 dialog .db{padding:14px 18px;display:grid;gap:9px}
@@ -841,10 +857,10 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <div class="gd-sub" id="gdSub"></div>
     </div>
     <div class="db gd">
-      <label class="f"><span>Name</span>
-        <input type="text" id="gdName" data-gd="name"></label>
+      <div class="gd-grid">
+        <label class="f wide"><span>Name</span>
+          <input type="text" id="gdName" data-gd="name"></label>
 
-      <div class="gd-2">
         <label class="f"><span>Side</span>
           <select id="gdSide" data-gd="side">
             <option value="">—</option>
@@ -852,27 +868,26 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
             <option value="gabriel">Gabriel</option>
             <option value="both">Both</option>
           </select></label>
-        <label class="f"><span>Relationship</span>
-          <input type="text" id="gdRel" data-gd="relationship" list="relOpts" placeholder="Mother, Cousin, Friend…"></label>
-      </div>
 
-      <div class="gd-2">
+        <label class="f"><span>Relationship</span>
+          <input type="text" id="gdRel" data-gd="relationship" list="relOpts" placeholder="Mother, Cousin&hellip;"></label>
+
         <label class="f"><span>Email</span>
           <input type="email" id="gdEmail" data-gd="email" placeholder="—"></label>
+
         <label class="f"><span>Phone</span>
           <input type="tel" id="gdPhone" data-gd="phone" placeholder="—"></label>
-      </div>
 
-      <div class="gd-2">
         <label class="f"><span>Dietary</span>
           <select id="gdDiet" data-gd="dietary"></select></label>
+
         <label class="f"><span>Table</span>
           <input type="text" id="gdTable" data-gd="table_no" placeholder="—"
             style="text-align:center;font-family:'IBM Plex Mono',monospace"></label>
-      </div>
 
-      <label class="f"><span>Notes</span>
-        <textarea id="gdNotes" data-gd="notes" rows="2" placeholder="—"></textarea></label>
+        <label class="f wide"><span>Notes</span>
+          <textarea id="gdNotes" data-gd="notes" placeholder="—"></textarea></label>
+      </div>
 
       <div class="gd-flags">
         <label><input type="checkbox" id="gdContacted"><span>&ldquo;One Week Away&rdquo; email sent</span></label>
@@ -1753,13 +1768,13 @@ function drawRoster(){
 function rowHtml(g){
   const tn = g.table_no == null ? '' : tableName(g.table_no).full;
   return `<tr class="clickable" data-editrow="${g.id}" title="Click to edit">
-      <td><strong>${esc(g.name)}</strong>${g.skip_reception
-        ? ' <span class="pill due" style="font-size:9.5px">ceremony only</span>' : ''}</td>
+      <td title="${esc(g.name)}"><strong>${esc(g.name)}</strong>${g.skip_reception
+        ? ' <span class="pill due" style="font-size:9.5px;vertical-align:1px">ceremony only</span>' : ''}</td>
       <td>${sideChip(g.side)}</td>
       <td>${g.relationship
         ? (isWP(g) ? `<span class="pill alt">${esc(g.relationship)}</span>` : esc(g.relationship))
         : '<span class="mut">—</span>'}</td>
-      <td>${g.email
+      <td title="${esc(g.email||'')}">${g.email
         ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>`
         : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
       <td>${g.phone
@@ -1767,7 +1782,7 @@ function rowHtml(g){
         : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
       <td>${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(g.dietary)}</span>` : '<span class="mut">—</span>'}</td>
       <td>${tn ? esc(tn) : '<span class="mut">—</span>'}</td>
-      <td>${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
+      <td title="${esc(g.notes||'')}">${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
       <td style="text-align:right;white-space:nowrap">
         <button class="ic" data-edit="${g.id}" title="Edit">&#9998;</button></td></tr>`;
 }
