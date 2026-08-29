@@ -6,7 +6,9 @@
 <title>Wedding</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"></noscript>
 <style>
 :root{
   --ink:#111418; --ink-2:#3D434D; --ink-3:#565D68;
@@ -20,7 +22,9 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font:400 16px/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{background:var(--paper);color:var(--ink);
+  font:400 16px/1.6 "Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
 .wrap{max-width:min(1600px, 96vw);margin:0 auto;padding:0 20px 96px}
 h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
@@ -225,6 +229,15 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .chk input{width:16px;height:16px;accent-color:var(--brass);cursor:pointer}
 .pcount{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule-2);
   font-size:13px;color:var(--ink-3)}
+#toast{position:fixed;left:50%;bottom:-90px;transform:translateX(-50%);
+  max-width:min(560px,92vw);padding:13px 18px;border-radius:var(--r);
+  font-size:14.5px;line-height:1.5;z-index:9999;opacity:0;
+  transition:bottom .22s ease,opacity .22s ease;
+  box-shadow:0 16px 40px -18px rgba(17,20,24,.45)}
+#toast.show{bottom:22px;opacity:1}
+#toast.err{background:var(--rust);color:#fff}
+#toast.warn{background:var(--brass);color:#fff}
+#toast.ok{background:var(--moss);color:#fff}
 .cbo{position:relative}
 .cbo input{width:100%;padding:10px 12px;font:inherit;font-size:15px;
   border:1px solid var(--rule);border-radius:var(--r);background:#fff;color:var(--ink)}
@@ -432,15 +445,20 @@ details.pgroup[open] summary:before{content:"\25BE"}
 .pn .nt{flex:0 0 auto;font-size:10.5px;color:var(--brass);font-family:"Barlow Condensed",sans-serif;
   text-transform:uppercase;letter-spacing:.07em;font-weight:700;white-space:nowrap}
 
-.pn .acts{display:flex;align-items:center;gap:3px;flex:0 0 auto;
-  opacity:0;transition:opacity .12s ease}
-.pn:hover .acts,.pn:focus-within .acts{opacity:1}
-@media (hover:none){ .pn .acts{opacity:1} }
+.pn .acts{display:flex;align-items:center;gap:3px;flex:0 0 auto}
+.pn .setr:not(.on),.pn .x{opacity:0;transition:opacity .12s ease}
+.pn:hover .setr,.pn:hover .x,
+.pn:focus-within .setr,.pn:focus-within .x{opacity:1}
+@media (hover:none){ .pn .setr,.pn .x{opacity:1} }
 
 .setr{border:1px solid transparent;background:none;border-radius:99px;padding:4px 10px;
   font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.08em;
   font-size:11px;font-weight:700;color:var(--ink-3);cursor:pointer;white-space:nowrap;line-height:1}
 .setr:hover{border-color:currentColor}
+.setr.on{border-color:currentColor;font-weight:700}
+.setr.r-yes.on{background:var(--moss-lo);color:var(--moss);border-color:var(--moss-line)}
+.setr.r-maybe.on{background:var(--brass-lo);color:var(--brass);border-color:var(--brass-line)}
+.setr.r-no.on{background:var(--rust-lo);color:var(--rust);border-color:var(--rust-line)}
 .setr.r-yes:hover{background:var(--moss-lo);color:var(--moss)}
 .setr.r-maybe:hover{background:var(--brass-lo);color:var(--brass)}
 .setr.r-no:hover{background:var(--rust-lo);color:var(--rust)}
@@ -885,7 +903,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
         <div class="pgroup" id="grpYes">
           <div class="phead"><span class="dotm r-yes"></span>Coming <em id="cYes">0</em>
-            <span class="phint">Confirmed for Saturday</span></div>
+            <span class="phint">Click a pill to set or clear a reply</span></div>
           <div class="pnames" id="poolYes"></div>
         </div>
 
@@ -1114,6 +1132,43 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://ixtynzfktgfwjwlvdaho.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Y1DyL0oNks-QYefEMXvVkg_-EU-RRWC';
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ---------- write safety net ----------
+   About half the writes on this board did not check .error, so a failed save
+   looked exactly like a successful one. This wraps the client so any failing
+   write says so, once, in plain language, wherever it was called from. */
+function toast(msg, kind){
+  let t = document.getElementById('toast');
+  if (!t){ t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = 'show ' + (kind || 'err');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.className = ''; }, 5200);
+}
+
+const _from = sb.from.bind(sb);
+sb.from = (table) => {
+  const q = _from(table);
+  for (const op of ['insert','update','delete','upsert']){
+    const orig = q[op];
+    if (typeof orig !== 'function') continue;
+    q[op] = (...args) => {
+      const b = orig.apply(q, args);
+      if (b && typeof b.then === 'function'){
+        const then = b.then.bind(b);
+        b.then = (res, rej) => then(r => {
+          if (r && r.error){
+            console.error(table, op, r.error);
+            toast(`Could not save to ${table.replace(/_/g,' ')} \u2014 ${r.error.message}`);
+          }
+          return res ? res(r) : r;
+        }, rej);
+      }
+      return b;
+    };
+  }
+  return q;
+};
 const BUCKET = 'documents';
 
 const WEDDING_DATE = new Date('2026-09-06T17:00:00-04:00');
@@ -1368,10 +1423,70 @@ async function enter(name){
   $('#whoMsg').textContent = `Live · you are ${me}`;
   await loadDocs();
   renderAll();
-  sb.channel('board').on('postgres_changes', { event:'*', schema:'public' },
-    async () => { await load(); renderAll(); }).subscribe();
+  startLive();
   setInterval(() => { header(); timeline(); tasks(); }, 60000);   // keeps the countdown honest
 }
+/* ---------- staying live ----------
+   A dropped socket used to fail silently: the board looked fine and quietly
+   stopped updating. Now it says so, retries, and refreshes whenever the tab
+   comes back or the network returns. */
+let liveCh = null, liveTries = 0, liveTimer = null, lastSync = 0;
+
+function liveState(ok){
+  const el = $('#whoMsg');
+  if (!el) return;
+  if (ok){
+    el.textContent = `Live · you are ${me}`;
+    el.classList.remove('stale');
+  } else {
+    el.textContent = `Reconnecting · you are ${me}`;
+    el.classList.add('stale');
+  }
+}
+
+async function refresh(reason){
+  const { error } = await load();
+  if (error){ liveState(false); return false; }
+  lastSync = Date.now();
+  renderAll();
+  liveState(true);
+  return true;
+}
+
+function startLive(){
+  if (liveCh){ try { sb.removeChannel(liveCh); } catch {} liveCh = null; }
+  liveCh = sb.channel('board-' + Date.now())
+    .on('postgres_changes', { event:'*', schema:'public' }, () => refresh('change'))
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED'){
+        liveTries = 0;
+        liveState(true);
+        refresh('subscribed');
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED'){
+        liveState(false);
+        clearTimeout(liveTimer);
+        const wait = Math.min(30000, 1000 * Math.pow(2, liveTries++));
+        liveTimer = setTimeout(startLive, wait);
+      }
+    });
+}
+
+// a sleeping laptop kills the socket without firing an error
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  if (Date.now() - lastSync > 20000) refresh('visible');
+  if (!liveCh || liveCh.state !== 'joined') startLive();
+});
+
+window.addEventListener('online',  () => { liveTries = 0; startLive(); });
+window.addEventListener('offline', () => {
+  liveState(false);
+  toast('You are offline. Changes will not save until the connection is back.', 'warn');
+});
+
+// belt and braces: if nothing has arrived in five minutes, pull anyway
+setInterval(() => { if (Date.now() - lastSync > 300000) refresh('idle'); }, 60000);
+
 $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate(); };
 
 /* ---------- data ---------- */
@@ -2235,13 +2350,15 @@ function poolParty(){
     ['Runs', '5–9 PM', 'Restore at Carolina Park.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  const NEXT = { yes:['maybe','no'], maybe:['yes','no'], no:['yes','maybe'], none:['yes','no'] };
   const WORD = { yes:'Coming', maybe:'Unsure', no:'Cannot' };
   const row = p => {
     const cur = p.rsvp || 'none';
-    const opts = NEXT[cur].map(r =>
-      `<button class="setr r-${r}" data-setrsvp="${p.id}" data-to="${r}">${WORD[r]}</button>`).join('');
-    return `<div class="pn">
+    const opts = ['yes','maybe','no'].map(r => {
+      const on = cur === r;
+      return `<button class="setr r-${r}${on?' on':''}" data-setrsvp="${p.id}" data-to="${on?'':r}"
+        title="${on ? 'Click to clear' : 'Mark ' + WORD[r]}">${WORD[r]}</button>`;
+    }).join('');
+    return `<div class="pn${cur !== 'none' ? ' answered' : ''}">
       <span class="nm">${esc(p.name)}</span>
       ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
       <span class="acts">${opts}
@@ -2389,8 +2506,17 @@ const PRINT_CSS = `
   .tbl .sd{display:inline-block;font-size:7.5pt;font-weight:700;text-transform:uppercase;
     letter-spacing:.06em;background:#F6F0E0;color:#6E5520;border:1px solid #D8C08A;
     border-radius:99px;padding:0 6px;margin-left:4px;vertical-align:1px}
+  .plist{column-count:2;column-gap:26px;margin:0;padding:0 0 0 34px;
+    font-size:11pt;line-height:1.9}
+  .plist li{break-inside:avoid;padding-right:4px}
+  .pnm{color:#111418}
+  .pm{display:inline-block;width:14px;text-align:center;font-weight:700;margin-left:6px}
+  .pm.y{color:#26492F} .pm.n{color:#8A2F1C} .pm.m{color:#6E5520}
+  .pnote{font-size:8.5pt;color:#565D68;margin-left:6px}
+  .pkey{margin-top:16px;padding-top:10px;border-top:1px solid #EAE7E0;
+    font-size:9pt;color:#565D68}
   @page{margin:14mm}
-  @media print{body{padding:0} .cols{column-count:2}}
+  @media print{body{padding:0} .cols{column-count:2} .plist{column-count:2}}
 `;
 
 function openPrint(title, bodyHtml){
@@ -2417,9 +2543,9 @@ const PRINT_FOOT = extra => `<footer>Printed ${new Date().toLocaleDateString('en
 function exportSeating(){
   const byTable = {};
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
-  const unseated = list.filter(g => g.table_no == null && !g.skip_reception)
+  const unseated = D.guests.filter(g => g.table_no == null && !g.skip_reception)
     .sort((a,b)=>a.name.localeCompare(b.name));
-  const ceremonyOnly = list.filter(g => g.skip_reception).sort((a,b)=>a.name.localeCompare(b.name));
+  const ceremonyOnly = D.guests.filter(g => g.skip_reception).sort((a,b)=>a.name.localeCompare(b.name));
   const sweetheart = (byTable[0]||[]).sort((a,b)=>a.name.localeCompare(b.name));
   const restricted = D.guests.filter(g=>g.dietary).length;
 
@@ -2457,22 +2583,38 @@ function exportSeating(){
 }
 
 function exportPool(){
-  const list = sortNames((D.pool||[]).filter(p => p.status !== 'skip'));
-  const half = Math.ceil(list.length / 2);
-  const col = arr => `<ol>${arr.map(p=>`<li><strong>${esc(p.name)}</strong>${p.notes?`<span class="d">${esc(p.notes)}</span>`:''}</li>`).join('')}</ol>`;
+  const rows = (D.pool||[]).filter(p => p.status !== 'skip');
+  const list = sortNames(rows);
+  const n    = list.length;
+  const yes  = rows.filter(p => p.rsvp === 'yes').length;
+  const no   = rows.filter(p => p.rsvp === 'no').length;
+  const may  = rows.filter(p => p.rsvp === 'maybe').length;
+  const quiet= n - yes - no - may;
+
+  const MARK = { yes:['&#10003;','y'], no:['&times;','n'], maybe:['?','m'] };
+  // one continuous list; CSS columns keep the numbering running 1..n down
+  // the first column and on into the second
+  const items = list.map(p => {
+    const m = MARK[p.rsvp];
+    return `<li><span class="pnm">${esc(p.name)}</span>` +
+      (m ? `<span class="pm ${m[1]}">${m[0]}</span>` : '<span class="pm q">&nbsp;</span>') +
+      (p.notes ? `<span class="pnote">${esc(p.notes)}</span>` : '') + `</li>`;
+  }).join('');
+
   openPrint('Pool party', `<header><h1>Pool Party</h1>
     <div class="s">Saturday 5 September 2026 &middot; 5:00 &ndash; 9:00 PM<br>
       Restore at Carolina Park &middot; 1588 Bloom St, Mount Pleasant, SC 29466</div></header>
     <div class="sum">
-      <div><div class="k">Invited</div><div class="v">${list.length}</div></div>
-      <div><div class="k">Starts</div><div class="v">5:00 PM</div></div>
-      <div><div class="k">Ends</div><div class="v">9:00 PM</div></div>
+      <div><div class="k">Invited</div><div class="v">${n}</div></div>
+      <div><div class="k">Coming</div><div class="v">${yes}</div></div>
+      <div><div class="k">No reply</div><div class="v">${quiet}</div></div>
+      <div><div class="k">Cannot</div><div class="v">${no + may}</div></div>
     </div>
-    ${list.length
-      ? `<div class="grid"><div class="t"><h3>Guests<em>${half}</em></h3>${col(list.slice(0,half))}</div>
-         <div class="t"><h3>&nbsp;<em>${list.length-half}</em></h3>${col(list.slice(half))}</div></div>`
-      : '<div class="t"><div class="none">Nobody on the list yet.</div></div>'}
-    ` + PRINT_FOOT('Rehearsal at 2:00 PM at The American Theater, 446 King Street'));
+    ${n ? `<ol class="plist">${items}</ol>
+      <div class="pkey">&#10003; coming &nbsp;&middot;&nbsp; ? unsure &nbsp;&middot;&nbsp;
+        &times; cannot make it &nbsp;&middot;&nbsp; blank means no reply yet</div>`
+        : '<div class="t"><div class="none">Nobody on the list yet.</div></div>'}
+    ` + PRINT_FOOT('Pizza provided &middot; BYOB, cans only &mdash; no glass'));
 }
 
 /* ---------- guest list printing ---------- */
@@ -2737,15 +2879,6 @@ document.addEventListener('blur', async e=>{
 }, true);
 
 document.addEventListener('click', async e=>{
-  const lk = e.target.closest('[data-links]');
-  if (lk){ openLinks(Number(lk.dataset.links)); return; }
-
-  const up = e.target.closest('[data-unpick]');
-  if (up){
-    lkPicked = lkPicked.filter(p => String(p.value) !== up.dataset.unpick);
-    renderPicked();
-    return;
-  }
 
   const ul = e.target.closest('[data-unlink]');
   if (ul){
@@ -2818,15 +2951,15 @@ document.addEventListener('click', async e=>{
   const pn = e.target.closest('[data-poolno]');
   if (pn){ await addPool(pn.dataset.poolno, '', 'skip'); return; }
 
-  const cy = e.target.closest('[data-cycle]');
-  if (cy){
-    const row = (D.pool||[]).find(p => String(p.id) === cy.dataset.cycle); if (!row) return;
-    const next = { null:'yes', yes:'maybe', maybe:'no', no:null }[String(row.rsvp)];
+  const srv = e.target.closest('[data-setrsvp]');
+  if (srv){
+    const to = srv.dataset.to || null;          // empty means clear the reply
     await sb.from('pool_guests')
-      .update({ rsvp: next, rsvp_at: next ? new Date().toISOString() : null })
-      .eq('id', row.id);
+      .update({ rsvp: to, rsvp_at: to ? new Date().toISOString() : null })
+      .eq('id', srv.dataset.setrsvp);
     await load(); poolParty(); return;
   }
+
   const pu = e.target.closest('[data-poolundo]');
   if (pu){
     // back to undecided — deleting the row is what "no decision" means
@@ -2922,30 +3055,6 @@ document.addEventListener('click', async e=>{
     await sb.from('milestone_status').upsert({ key:ucf.dataset.unconfirm, confirmed:false,
       confirmed_by:null, confirmed_at:null });
     await load(); timeline(); return;
-  }
-  const dg = e.target.closest('[data-delguest]');
-  if (dg){
-    const id = dg.dataset.delguest;
-    const g = D.guests.find(x => String(x.id) === id); if (!g) return;
-
-    // first click arms it, second click within five seconds asks properly
-    if (!armed.has(id)){
-      armed.clear(); armed.add(id);
-      clearTimeout(armTimer);
-      armTimer = setTimeout(() => { armed.clear(); drawRoster(); }, 5000);
-      drawRoster();
-      return;
-    }
-    armed.delete(id); clearTimeout(armTimer);
-
-    const seated = g.table_no != null ? `\nSeated at ${tableName(g.table_no).full}.` : '';
-    const links  = linksFor(g.id).length;
-    const linked = links ? `\n${links} relationship${links===1?'':'s'} will also be removed.` : '';
-    if (!confirm(`Remove ${g.name} from the guest list?${seated}${linked}\n\nThis cannot be undone.`)){
-      drawRoster(); return;
-    }
-    await sb.from('guests').delete().eq('id', g.id);
-    await load(); guestRoster(); seating(); return;
   }
   const dt = e.target.closest('[data-deltask]');
   if (dt){ await sb.from('tasks').delete().eq('id', dt.dataset.deltask); await load(); tasks(); return; }
@@ -3287,6 +3396,14 @@ $('#swapDlg').addEventListener('close', async function(){
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
 $$('#guestSideSw button').forEach(b => b.onclick = () => { guestSide = b.dataset.gside; drawRoster(); });
 
+$('#npAdd').onclick = async () => {
+  await addPool($('#npName').value, $('#npNote').value);
+  $('#npName').value = ''; $('#npNote').value = '';
+};
+$('#npName').addEventListener('keydown', e => {
+  if (e.key === 'Enter'){ e.preventDefault(); $('#npAdd').click(); }
+});
+
 $('#expPool').onclick = exportPool;
 
 $$('#poolSort button').forEach(b => b.onclick = () => {
@@ -3310,6 +3427,29 @@ $('#addTable').onclick = async () => {
 
 $('#expSeat').onclick = exportSeating;
 $('#expGuests').onclick = openPrintDlg;
+
+$$('#pLayout button').forEach(b => b.onclick = () => { pOpts.layout = b.dataset.layout; syncPrintDlg(); });
+$$('#pWho button').forEach(b => b.onclick = () => { pOpts.who = b.dataset.who; syncPrintDlg(); });
+$$('#pSort button').forEach(b => b.onclick = () => { pOpts.sort = b.dataset.psort; syncPrintDlg(); });
+
+document.addEventListener('change', e => {
+  const f = e.target.closest('[data-pf]');
+  if (!f) return;
+  f.checked ? pOpts.fields.add(f.dataset.pf) : pOpts.fields.delete(f.dataset.pf);
+  syncPrintDlg();
+});
+
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-pall]');
+  if (!a) return;
+  pOpts.fields = a.dataset.pall === '1' ? new Set(P_FIELDS.map(([k]) => k)) : new Set();
+  $$('#pFields input').forEach(i => i.checked = pOpts.fields.has(i.dataset.pf));
+  syncPrintDlg();
+});
+
+$('#printDlg').addEventListener('close', function(){
+  if (this.returnValue === 'save') runPrint();
+});
 
 ['gdName','gdRel','gdEmail','gdPhone','gdTable','gdNotes'].forEach(id => {
   const el = $('#' + id);
@@ -3438,7 +3578,6 @@ $('#copyEmails').onclick = async () => {
   }
 };
 
-$('#expGuests').onclick = openPrintDlg;
 
 ['gdName','gdRel','gdEmail','gdPhone','gdTable','gdNotes'].forEach(id => {
   const el = $('#' + id);
@@ -3471,90 +3610,6 @@ $('#expGuests').onclick = openPrintDlg;
       await load(); redrawRow(gdId); countsOnly(); seating();
     });
   });
-
-$('#gdLinks').onclick = () => { $('#guestDlg').close(); openLinks(gdId); };
-
-$('#guestDlg').addEventListener('close', () => {
-  armed.clear(); clearTimeout(armTimer);
-  guestRoster();
-  gdId = null;
-});
-
-$('#gdDelete').onclick = async () => {
-  const g = D.guests.find(x => x.id === gdId); if (!g) return;
-  const del = $('#gdDelete');
-  if (!del.classList.contains('armed')){
-    del.classList.add('armed'); del.textContent = 'Sure?';
-    clearTimeout(armTimer);
-    armTimer = setTimeout(() => { del.classList.remove('armed'); del.innerHTML = '&#128465;'; }, 5000);
-    return;
-  }
-  clearTimeout(armTimer);
-  const seated = g.table_no != null ? `\nSeated at ${tableName(g.table_no).full}.` : '';
-  const n = linksFor(g.id).length;
-  const linked = n ? `\n${n} relationship${n===1?'':'s'} will also be removed.` : '';
-  if (!confirm(`Remove ${g.name} from the guest list?${seated}${linked}\n\nThis cannot be undone.`)){
-    del.classList.remove('armed'); del.innerHTML = '&#128465;'; return;
-  }
-  await sb.from('guests').delete().eq('id', g.id);
-  $('#guestDlg').close();
-  await load(); guestRoster(); seating();
-};
-
-$('#copyEmails').onclick = async () => {
-  // whatever the list is currently showing, so the side and search filters apply
-  const shown = D.guests.filter(g => {
-    if (gFilter === 'diet' && !g.dietary) return false;
-    if (guestSide === 'none' && g.side) return false;
-    if (guestSide === 'wp' && !isWP(g)) return false;
-    if (guestSide === 'unsent' && (g.contacted || !g.email)) return false;
-    if (!['all','none','wp','unsent'].includes(guestSide)
-        && g.side !== guestSide && g.side !== 'both') return false;
-    return !gQuery || g.name.toLowerCase().includes(gQuery);
-  });
-
-  const withEmail = shown.filter(g => g.email && g.email.includes('@'));
-  const missing   = shown.length - withEmail.length;
-  if (!withEmail.length){ alert('None of the guests shown have an email address on file.'); return; }
-
-  const seen = new Set();
-  const list = withEmail
-    .map(g => g.email.trim().toLowerCase())
-    .filter(e => !seen.has(e) && seen.add(e));
-  const text = list.join(', ');
-
-  const btn = $('#copyEmails');
-  const done = () => {
-    btn.textContent = `Copied ${list.length}`;
-    btn.style.color = 'var(--moss)';
-    btn.style.borderColor = 'var(--moss-line)';
-    btn.style.background = 'var(--moss-lo)';
-    setTimeout(() => {
-      btn.textContent = 'Copy emails';
-      btn.style.color = btn.style.borderColor = btn.style.background = '';
-    }, 2200);
-    if (missing) setTimeout(() =>
-      alert(`${list.length} email${list.length===1?'':'s'} copied.\n\n` +
-            `${missing} of the ${shown.length} shown have no address on file.`), 60);
-  };
-
-  try {
-    await navigator.clipboard.writeText(text);
-    done();
-  } catch {
-    // clipboard blocked (http, or an older browser) — fall back to a selectable box
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('style','position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);' +
-      'width:min(90vw,560px);height:180px;z-index:9999;padding:12px;font:14px/1.5 monospace;' +
-      'border:1px solid #D5D0C6;border-radius:4px;box-shadow:0 20px 50px -18px rgba(17,20,24,.4)');
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); done(); }
-    catch { alert('Select the text and copy it manually.'); }
-    setTimeout(() => ta.remove(), 400);
-  }
-};
 
 document.addEventListener('keydown', async e => {
   const si = e.target.closest('[data-seatinput]');
