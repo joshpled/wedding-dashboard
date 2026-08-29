@@ -424,6 +424,12 @@ details.pgroup[open] summary:before{content:"\25BE"}
 .pnames.pick .pn:hover{background:var(--brass-lo)}
 .pnames.pick .pn:hover .nm{color:var(--brass)}
 
+.rsv{border:0;cursor:pointer;font-size:10.5px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.09em;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.rsv.r-yes{background:var(--moss-lo);color:var(--moss);border:1px solid var(--moss-line)}
+.rsv.r-no{background:var(--rust-lo);color:var(--rust);border:1px solid var(--rust-line)}
+.rsv.r-maybe{background:var(--brass-lo);color:var(--brass);border:1px solid var(--brass-line)}
+.rsv.r-none{background:#F6F5F2;color:var(--ink-3);border:1px solid var(--rule-2)}
 .pchips{display:flex;flex-wrap:wrap;gap:5px;padding:11px 15px 14px}
 .pchips:empty:after{content:"None";color:var(--ink-3);font-size:13px;font-style:italic}
 .pc{display:inline-flex;align-items:center;gap:0;border-radius:99px;overflow:hidden;
@@ -853,6 +859,11 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
         <div class="pgroup">
           <div class="phead"><span class="dotm inv"></span>Invited <em id="cInv">0</em>
+            <span class="psort" id="poolRsvpF" style="margin-right:8px">
+              <button data-rf="all" aria-pressed="true">All</button>
+              <button data-rf="yes">Coming</button>
+              <button data-rf="none">No reply</button>
+            </span>
             <span class="psort" id="poolSort">
               <button data-sort="first-asc">First A&ndash;Z</button>
               <button data-sort="first-desc">First Z&ndash;A</button>
@@ -864,7 +875,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
         <div class="pgroup" id="grpUnd">
           <div class="phead"><span class="dotm und"></span>Not decided <em id="cUnd">0</em>
-            <span class="phint">Tap a name to invite &middot; &times; marks them not needed</span></div>
+            <span class="phint">Tap a name to invite &middot; &times; marks them not needed &middot; click a reply chip to change it</span></div>
           <div class="pnames pick" id="poolUndecided"></div>
         </div>
 
@@ -2167,25 +2178,45 @@ function submissions(){
   }).join('');
 }
 
+let poolRsvpFilter = 'all';
+
 function poolParty(){
   const rows = D.pool || [];
-  const inv  = sortNames(rows.filter(p => p.status !== 'skip'));
+  const invAll = sortNames(rows.filter(p => p.status !== 'skip'));
+  const inv = invAll.filter(p =>
+    poolRsvpFilter === 'all' ? true :
+    poolRsvpFilter === 'yes' ? p.rsvp === 'yes' : !p.rsvp);
   const skip = sortNames(rows.filter(p => p.status === 'skip'));
   const known = new Set(rows.map(p => p.name.toLowerCase()));
   const und  = sortNames(D.guests.filter(g => !known.has(g.name.toLowerCase())));
 
+  const yes   = invAll.filter(p => p.rsvp === 'yes').length;
+  const no    = invAll.filter(p => p.rsvp === 'no').length;
+  const maybe = invAll.filter(p => p.rsvp === 'maybe').length;
+  const quiet = invAll.length - yes - no - maybe;
   $('#poolCount').innerHTML = [
-    ['Invited', inv.length, 'Coming Saturday.'],
-    ['Not decided', und.length, 'On the wedding list, no answer yet.'],
-    ['No need', skip.length, 'Deliberately not invited.'],
-    ['Wedding guests', D.guests.length, 'The full Sunday list.'],
-    ['Runs', '5–9 PM', 'Saturday, after the 2:00 rehearsal.']
+    ['Coming', yes, no || maybe ? `${no} cannot, ${maybe} unsure.` : 'Replied yes.'],
+    ['No reply', quiet, `of ${invAll.length} invited.`],
+    ['Invited', invAll.length, 'On the Saturday list.'],
+    ['Not decided', und.length, 'No decision yet.'],
+    ['No need', skip.length, 'Deliberately not invited.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  $('#poolInvited').innerHTML = inv.map(p=>`<div class="pn">
-      <span class="nm">${esc(p.name)}</span>
-      ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
-      <button data-poolundo="${p.id}" title="Back to not decided">&times;</button></div>`).join('');
+  const RS = { yes:['yes','r-yes'], no:['cannot','r-no'], maybe:['unsure','r-maybe'] };
+  $('#poolInvited').innerHTML = inv
+    .sort((a,b)=>{
+      const rank = r => r === 'yes' ? 0 : r === 'maybe' ? 1 : r === 'no' ? 2 : 3;
+      return rank(a.rsvp) - rank(b.rsvp) || a.name.localeCompare(b.name);
+    })
+    .map(p=>{
+      const r = RS[p.rsvp];
+      return `<div class="pn">
+        <span class="nm">${esc(p.name)}</span>
+        <button class="rsv ${r ? r[1] : 'r-none'}" data-cycle="${p.id}"
+          title="Click to change">${r ? r[0] : 'no reply'}</button>
+        ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
+        <button data-poolundo="${p.id}" title="Back to not decided">&times;</button></div>`;
+    }).join('');
 
   $('#poolUndecided').innerHTML = und.map(g=>`<div class="pn" data-addpool="${esc(g.name)}" title="Tap to invite">
       <span class="nm">${esc(g.name)}</span>
@@ -2197,12 +2228,12 @@ function poolParty(){
       <button data-poolinv="${p.id}" title="Invite after all">&#43;</button>
       <button data-poolundo="${p.id}" title="Back to not decided">&#8634;</button></span>`).join('');
 
-  $('#cInv').textContent  = inv.length;
+  $('#cInv').textContent  = invAll.length;
   $('#cUnd').textContent  = und.length;
   $('#cSkip').textContent = skip.length;
   $('#grpUnd').hidden  = und.length === 0;
   $('#grpSkip').hidden = skip.length === 0;
-  $('#bPool').textContent = inv.length;
+  $('#bPool').textContent = yes || invAll.length;
   $('#weddingGuests').innerHTML = und.map(g=>`<option value="${esc(g.name)}"></option>`).join('');
   $$('#poolSort button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === poolSort)));
 }
@@ -2699,10 +2730,15 @@ document.addEventListener('click', async e=>{
     if (r.phone)   patch.phone   = r.phone;
     if (r.dietary) patch.dietary = r.dietary;
     if (Object.keys(patch).length) await sb.from('guests').update(patch).eq('id', r.guest_id);
-    if (r.pool_rsvp === 'yes'){
+    if (r.pool_rsvp){
       const g = D.guests.find(x => x.id === r.guest_id);
-      if (g && !(D.pool||[]).some(p => p.name.toLowerCase() === g.name.toLowerCase()))
-        await sb.from('pool_guests').insert({ name:g.name, guest_id:g.id, added_by:me, status:'invited' });
+      if (g){
+        const row = (D.pool||[]).find(p => p.name.toLowerCase() === g.name.toLowerCase());
+        const stamp = { rsvp: r.pool_rsvp, rsvp_at: r.created_at };
+        if (row) await sb.from('pool_guests').update(stamp).eq('id', row.id);
+        else await sb.from('pool_guests').insert({
+          name:g.name, guest_id:g.id, added_by:me, status:'invited', ...stamp });
+      }
     }
     await sb.from('guest_submissions').update({ applied:true }).eq('id', r.id);
     await load(); guestRoster(); poolParty(); submissions(); return;
@@ -2718,6 +2754,15 @@ document.addEventListener('click', async e=>{
   const pn = e.target.closest('[data-poolno]');
   if (pn){ await addPool(pn.dataset.poolno, '', 'skip'); return; }
 
+  const cy = e.target.closest('[data-cycle]');
+  if (cy){
+    const row = (D.pool||[]).find(p => String(p.id) === cy.dataset.cycle); if (!row) return;
+    const next = { null:'yes', yes:'maybe', maybe:'no', no:null }[String(row.rsvp)];
+    await sb.from('pool_guests')
+      .update({ rsvp: next, rsvp_at: next ? new Date().toISOString() : null })
+      .eq('id', row.id);
+    await load(); poolParty(); return;
+  }
   const pu = e.target.closest('[data-poolundo]');
   if (pu){
     // back to undecided — deleting the row is what "no decision" means
@@ -3177,6 +3222,18 @@ $('#swapDlg').addEventListener('close', async function(){
 
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
 $$('#guestSideSw button').forEach(b => b.onclick = () => { guestSide = b.dataset.gside; drawRoster(); });
+
+$('#expPool').onclick = exportPool;
+
+$$('#poolSort button').forEach(b => b.onclick = () => {
+  poolSort = b.dataset.sort; poolParty();
+});
+
+$$('#poolRsvpF button').forEach(b => b.onclick = () => {
+  poolRsvpFilter = b.dataset.rf;
+  $$('#poolRsvpF button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  poolParty();
+});
 
 $('#addTable').onclick = async () => {
   if (TABLES.length >= MAX_TABLES) return;
