@@ -1101,6 +1101,7 @@ const MILESTONES = [
 const FLAGS = [
   { lvl:'warn', h:'Two blanks left on the BEO', p:[
     '<strong>Cake flavours</strong> read \u201cNot Noted\u201d, and the anniversary tier is marked NO. Publix needs the flavours.',
+    '<strong>The gluten free cake is not on the BEO.</strong> Tell Olivia it is coming, so PPHG cut and serve it separately &mdash; a shared knife or board defeats the point.',
     '<strong>Getaway send-off</strong> is the last empty line on the vendor list. If the answer is none, tell Olivia that rather than leaving it blank.'] },
 
   { lvl:'warn', h:'Both florists are booked. Neither has a delivery time.', p:[
@@ -1147,6 +1148,7 @@ const CLOSED = [
   'Vendor meals at 6 — 2 photo, 1 DJ, 3 planner',
   'Security at 18 hours, two guards',
   'Cake paid — Publix, two tiers, cut and served by PPHG',
+  'A separate gluten free cake so the gluten free guests are covered',
   'Childcare — not being offered, all six families notified',
   'Rehearsal confirmed for 2:00 PM Saturday at the venue',
   'Pool party 5:00 – 9:00 PM at Restore at Carolina Park — pizza provided, BYOB cans only',
@@ -1196,7 +1198,8 @@ const MENU = [
   { c:'Toast', t:'7:50 PM · passed', items:[
     { n:'Champagne Toast', d:'Arte Latino Cava, passed to every guest, served in a champagne coupe', tags:['Complimentary'], q:66, p:0 } ] },
   { c:'Cake', t:'8:15 PM', items:[
-    { n:'Publix — two tiers', d:'Left side of the stage, cut and served by PPHG onto salad plates. No anniversary tier. Flavours still to be given to Publix.', tags:['Confirmed'], q:1, p:0 } ] },
+    { n:'Publix — two tiers', d:'Left side of the stage, cut and served by PPHG onto salad plates. No anniversary tier. Flavours still to be given to Publix.', tags:['Confirmed'], q:1, p:0 },
+    { n:'Gluten free cake', d:'A separate gluten free cake so nobody misses out. Must be kept and cut away from the main cake.', tags:['Gluten free'], q:1, p:0 } ] },
   { c:'Vendor meals', t:'7:30 PM · one hour after stations open', items:[
     { n:'Stations, two plates max', d:'2 photo · 1 DJ · 3 planner. Served at the vendor table in the Ballroom.', q:6, p:25 } ] }
 ];
@@ -1210,6 +1213,7 @@ const MENU_NOTES = [
   'PPHG supplies all china, silver and glassware: 130 salad plates, 130 pasta bowls, 66 dinner forks, 155 salad forks, 66 dinner knives, 80 salad knives, 275 champagne coupes, 324 wine glasses and 288 highballs.',
   'Ballroom set with 66 gold chivari chairs, 9 guest tables, a sweetheart and a cake table, 3 station tables, 2 bars and 6 cocktail tables.',
   'Bars: Stars Lounge for cocktail hour, Ballroom for dinner and the reception.',
+  'A separate gluten free cake is being provided alongside the Publix cake. It must be stored, cut and served away from the main cake to avoid cross contact.',
   'Linens and napkins come from Snyder. Everything else on the table is PPHG’s.',
   'PPHG provides the bar and station signs. Posters are client provided.',
   'Setup can begin at 9:00 AM. Earlier access needs approval a month out and may require a parking buyout.'
@@ -1244,7 +1248,7 @@ const RUNSHEET = [
   { t:'7:30 PM',  e:'Vendor meals', w:'Vendor table in the Ballroom · 6 covered — 2 photo, 1 DJ, 3 planner' },
   { t:'7:50 PM',  e:'PPHG passes champagne', w:'Served in champagne coupes' },
   { t:'7:55 PM',  e:'Roasts and toasts' },
-  { t:'8:15 PM',  e:'Cutting of the cake', w:'Left side of the stage · PPHG cuts and serves onto salad plates' },
+  { t:'8:15 PM',  e:'Cutting of the cake', w:'Left side of the stage · PPHG cuts and serves onto salad plates · separate gluten free cake alongside' },
   { t:'8:30 PM',  e:'Dance floor opens', w:'Alternate slot for formalities if they run late' },
   { t:'9:30 PM',  e:'Photographers depart', w:'End of coverage. No send-off.' },
   { t:'10:15 PM', e:'Informal last call for alcohol' },
@@ -1552,7 +1556,7 @@ function runsheet(){
 
 const DIET_META = {
   'Vegan':      { cls:'vegan',  short:'Vegan', srv:'Glazed Butternut Squash is on the order at 3.' },
-  'Gluten free':{ cls:'gluten', short:'GF',    srv:'Petite Filet and the butternut squash are both gluten free.' },
+  'Gluten free':{ cls:'gluten', short:'GF',    srv:'Petite Filet and the butternut squash are both gluten free, and there is a separate gluten free cake.' },
   'Dairy free': { cls:'dairy',  short:'Dairy', srv:'Two children — their mother is handling it. No action needed from the venue.' },
   'Nut allergy':{ cls:'nut',    short:'Nuts',  srv:'Nothing on the current menu lists almonds. Worth confirming with the kitchen.' }
 };
