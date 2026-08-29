@@ -21,7 +21,8 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:400 16px/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px 96px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px 96px;transition:max-width .18s ease}
+.wrap.wide{max-width:min(1600px, 96vw)}
 h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
 button{font:inherit;cursor:pointer}
@@ -275,8 +276,17 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .gtable{table-layout:auto;width:100%}
 .gtable td{padding:0 12px;height:44px;vertical-align:middle;white-space:nowrap}
 .gtable th{padding:9px 12px;white-space:nowrap}
-.gtable td:last-child,.gtable th:last-child{width:1%}
-.gtable td:nth-child(9){white-space:normal}
+/* everything but Notes hugs its content; Notes soaks up the rest */
+.gtable th:nth-child(1),.gtable td:nth-child(1),
+.gtable th:nth-child(2),.gtable td:nth-child(2),
+.gtable th:nth-child(3),.gtable td:nth-child(3),
+.gtable th:nth-child(4),.gtable td:nth-child(4),
+.gtable th:nth-child(5),.gtable td:nth-child(5),
+.gtable th:nth-child(6),.gtable td:nth-child(6),
+.gtable th:nth-child(7),.gtable td:nth-child(7),
+.gtable th:nth-child(9),.gtable td:nth-child(9){width:1%}
+.gtable th:nth-child(8),.gtable td:nth-child(8){width:auto;min-width:200px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
 .gtable td strong{font-weight:700}
 .gtable td .pill{vertical-align:middle}
 .gtable tr.clickable td:last-child{overflow:visible}
@@ -1786,7 +1796,7 @@ function rowHtml(g){
         : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
       <td title="${esc(g.dietary||'')}">${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(trunc(g.dietary,16))}</span>` : '<span class="mut">—</span>'}</td>
       <td title="${esc(tn)}">${tn ? esc(trunc(tn,14)) : '<span class="mut">—</span>'}</td>
-      <td title="${esc(g.notes||'')}">${g.notes ? esc(trunc(g.notes,34)) : '<span class="mut">—</span>'}</td>
+      <td title="${esc(g.notes||'')}">${g.notes ? esc(trunc(g.notes,90)) : '<span class="mut">—</span>'}</td>
       <td style="text-align:right;white-space:nowrap">
         <button class="ic" data-edit="${g.id}" title="Edit">&#9998;</button></td></tr>`;
 }
@@ -3101,6 +3111,14 @@ $('#swapDlg').addEventListener('close', async function(){
 
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
 $$('#guestSideSw button').forEach(b => b.onclick = () => { guestSide = b.dataset.gside; drawRoster(); });
+
+// the guest table earns more width than the rest of the board
+function syncWidth(){
+  const onGuests = !$('#p-guests').hidden;
+  document.querySelector('.wrap').classList.toggle('wide', onGuests);
+}
+$$('nav [role=tab]').forEach(b => b.addEventListener('click', () => setTimeout(syncWidth, 0)));
+syncWidth();
 
 async function addPool(name, note, status){
   const nm = (name||'').trim(); if (!nm) return;
