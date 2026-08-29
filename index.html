@@ -272,10 +272,11 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .gtable input:hover{border-color:var(--rule-2);background:#fff}
 .gtable input:focus{border-color:var(--brass-line);background:#fff}
 .gtable select{padding:5px 7px;font-size:13.5px;border-color:var(--rule-2)}
-.gtable{table-layout:fixed}
-.gtable td{padding:0 10px;height:44px;vertical-align:middle;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
-.gtable th{padding:9px 10px;white-space:nowrap}
+.gtable{table-layout:auto;width:100%}
+.gtable td{padding:0 12px;height:44px;vertical-align:middle;white-space:nowrap}
+.gtable th{padding:9px 12px;white-space:nowrap}
+.gtable td:last-child,.gtable th:last-child{width:1%}
+.gtable td:nth-child(9){white-space:normal}
 .gtable td strong{font-weight:700}
 .gtable td .pill{vertical-align:middle}
 .gtable tr.clickable td:last-child{overflow:visible}
@@ -730,11 +731,9 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         <button class="btn ghost sm" id="expGuests">Print guest list</button>
       </div>
       <div class="card"><table class="gtable">
-        <thead><tr><th style="width:19%">Name</th>
-          <th style="width:8%">Side</th><th style="width:14%">Relationship</th>
-          <th style="width:19%">Email</th><th style="width:13%">Phone</th>
-          <th style="width:12%">Dietary</th><th style="width:7%">Table</th><th>Notes</th>
-          <th style="width:52px"></th></tr></thead>
+        <thead><tr><th>Name</th><th>Side</th><th>Relationship</th>
+          <th>Email</th><th>Phone</th><th>Dietary</th><th>Table</th><th>Notes</th>
+          <th></th></tr></thead>
         <tbody id="guestBody"></tbody>
       </table>
       <div class="addrow">
@@ -1765,24 +1764,29 @@ function drawRoster(){
 }
 
 /* one row's markup — read only; editing happens in the modal */
+const trunc = (v, n) => {
+  const t = String(v ?? '');
+  return t.length > n ? t.slice(0, n - 1).trimEnd() + '\u2026' : t;
+};
+
 function rowHtml(g){
   const tn = g.table_no == null ? '' : tableName(g.table_no).full;
   return `<tr class="clickable" data-editrow="${g.id}" title="Click to edit">
-      <td title="${esc(g.name)}"><strong>${esc(g.name)}</strong>${g.skip_reception
+      <td title="${esc(g.name)}"><strong>${esc(trunc(g.name, 22))}</strong>${g.skip_reception
         ? ' <span class="pill due" style="font-size:9.5px;vertical-align:1px">ceremony only</span>' : ''}</td>
       <td>${sideChip(g.side)}</td>
-      <td>${g.relationship
-        ? (isWP(g) ? `<span class="pill alt">${esc(g.relationship)}</span>` : esc(g.relationship))
+      <td title="${esc(g.relationship||'')}">${g.relationship
+        ? (isWP(g) ? `<span class="pill alt">${esc(trunc(g.relationship,16))}</span>` : esc(trunc(g.relationship,18)))
         : '<span class="mut">—</span>'}</td>
       <td title="${esc(g.email||'')}">${g.email
-        ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>`
+        ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(trunc(g.email,26))}</a>`
         : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
       <td>${g.phone
         ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>`
         : (g.no_contact_needed ? '<span class="waived">not needed</span>' : '<span class="mut">—</span>')}</td>
-      <td>${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(g.dietary)}</span>` : '<span class="mut">—</span>'}</td>
-      <td>${tn ? esc(tn) : '<span class="mut">—</span>'}</td>
-      <td title="${esc(g.notes||'')}">${g.notes ? esc(g.notes) : '<span class="mut">—</span>'}</td>
+      <td title="${esc(g.dietary||'')}">${g.dietary ? `<span class="pill ${g.dietary==='Vegan'?'paid':g.dietary==='Nut allergy'?'due':'tbd'}">${esc(trunc(g.dietary,16))}</span>` : '<span class="mut">—</span>'}</td>
+      <td title="${esc(tn)}">${tn ? esc(trunc(tn,14)) : '<span class="mut">—</span>'}</td>
+      <td title="${esc(g.notes||'')}">${g.notes ? esc(trunc(g.notes,34)) : '<span class="mut">—</span>'}</td>
       <td style="text-align:right;white-space:nowrap">
         <button class="ic" data-edit="${g.id}" title="Edit">&#9998;</button></td></tr>`;
 }
