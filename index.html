@@ -825,9 +825,11 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           <button data-gside="none">Unassigned</button>
           <button data-gside="wp">Wedding party</button>
           <button data-gside="unsent">Not emailed</button>
+          <button data-gside="silent">No response</button>
         </span>
         <datalist id="relOpts"></datalist>
         <button class="btn ghost sm" id="copyEmails" style="margin-left:auto">Copy emails</button>
+        <button class="btn ghost sm" id="copyPhones">Copy phones</button>
         <button class="btn ghost sm" id="expGuests">Print guest list</button>
       </div>
       <div class="card"><table class="gtable">
@@ -1718,6 +1720,15 @@ const metaFor = k => DIET_META[k] || CUSTOM_META;
 
 const needsContact = g => !g.no_contact_needed;
 
+/* Nothing has come back from this person: no dietary answer on file, and no
+   submission of theirs sitting in the queue. Anyone who does not need to be
+   chased — children with no contact of their own — drops out. */
+const isSilent = g => {
+  if (g.no_contact_needed) return false;
+  if (g.dietary) return false;
+  return !(D.subs || []).some(r => r.guest_id === g.id);
+};
+
 function guestRoster(){
   // if the modal is open, refresh the numbers but leave the table alone
   if (gdId != null && $('#guestDlg').open){ countsOnly(); return; }
@@ -1731,7 +1742,8 @@ function guestRoster(){
     ['Plated at', 77, 'Each petite station on the BEO.'],
     ['Restrictions', flagged.length, 'Across the dietary groups.'],
     ['Emailed', G.filter(g=>g.contacted).length,
-      `${G.filter(g=>g.email && !g.contacted).length} with an address still to send.`]
+      `${G.filter(g=>g.email && !g.contacted).length} with an address still to send.`],
+    ['No response', G.filter(isSilent).length, 'Asked, nothing back yet.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
   $('#dietGrid').innerHTML = dietTypes().map(key=>{
@@ -1927,7 +1939,8 @@ function countsOnly(){
     ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
     ['Restrictions', flagged.length, 'Across the dietary groups.'],
     ['Emailed', G.filter(g=>g.contacted).length,
-      `${G.filter(g=>g.email && !g.contacted).length} with an address still to send.`]
+      `${G.filter(g=>g.email && !g.contacted).length} with an address still to send.`],
+    ['No response', G.filter(isSilent).length, 'Asked, nothing back yet.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
   $('#dietGrid').innerHTML = dietTypes().map(key=>{
     const m = metaFor(key);
@@ -1948,7 +1961,8 @@ function shownGuests(){
     if (guestSide === 'none' && g.side) return false;
     if (guestSide === 'wp' && !isWP(g)) return false;
     if (guestSide === 'unsent' && (g.contacted || !g.email)) return false;
-    if (!['all','none','wp','unsent'].includes(guestSide)
+    if (guestSide === 'silent' && !isSilent(g)) return false;
+    if (!['all','none','wp','unsent','silent'].includes(guestSide)
         && g.side !== guestSide && g.side !== 'both') return false;
     return !gQuery || g.name.toLowerCase().includes(gQuery);
   });
@@ -3414,6 +3428,186 @@ $('#addTable').onclick = async () => {
 };
 
 $('#expSeat').onclick = exportSeating;
+$('#expGuests').onclick = openPrintDlg;
+
+$$('#pLayout button').forEach(b => b.onclick = () => { pOpts.layout = b.dataset.layout; syncPrintDlg(); });
+$$('#pWho button').forEach(b => b.onclick = () => { pOpts.who = b.dataset.who; syncPrintDlg(); });
+$$('#pSort button').forEach(b => b.onclick = () => { pOpts.sort = b.dataset.psort; syncPrintDlg(); });
+
+document.addEventListener('change', e => {
+  const f = e.target.closest('[data-pf]');
+  if (!f) return;
+  f.checked ? pOpts.fields.add(f.dataset.pf) : pOpts.fields.delete(f.dataset.pf);
+  syncPrintDlg();
+});
+
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-pall]');
+  if (!a) return;
+  pOpts.fields = a.dataset.pall === '1' ? new Set(P_FIELDS.map(([k]) => k)) : new Set();
+  $$('#pFields input').forEach(i => i.checked = pOpts.fields.has(i.dataset.pf));
+  syncPrintDlg();
+});
+
+$('#printDlg').addEventListener('close', function(){
+  if (this.returnValue === 'save') runPrint();
+});
+
+['gdName','gdRel','gdEmail','gdPhone','gdTable','gdNotes'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('blur', () => saveGd(el.dataset.gd, el.value));
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' && el.tagName !== 'TEXTAREA'){ e.preventDefault(); el.blur(); } });
+});
+['gdSide','gdDiet'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('change', () => saveGd(el.dataset.gd, el.value));
+});
+[['gdContacted','contacted'],['gdNoContact','no_contact_needed'],['gdSkipRec','skip_reception']]
+  .forEach(([id, field]) => {
+    $('#' + id).addEventListener('change', async e => {
+      const patch = { [field]: e.target.checked };
+      if (field === 'contacted'){
+        patch.contacted_by = e.target.checked ? me : null;
+        patch.contacted_at = e.target.checked ? new Date().toISOString() : null;
+      }
+      if (field === 'skip_reception' && e.target.checked){
+        const g = D.guests.find(x => x.id === gdId);
+        if (g && g.table_no != null){
+          if (!confirm(`${g.name} is seated at ${tableName(g.table_no).full}.\n\n` +
+                       `Marking them ceremony only will take them off the seating chart. Continue?`)){
+            e.target.checked = false; return;
+          }
+          patch.table_no = null; patch.seat_no = null;
+        }
+      }
+      await sb.from('guests').update(patch).eq('id', gdId);
+      await load(); redrawRow(gdId); countsOnly(); seating();
+    });
+  });
+
+$('#gdLinks').onclick = () => { $('#guestDlg').close(); openLinks(gdId); };
+
+$('#guestDlg').addEventListener('close', () => {
+  armed.clear(); clearTimeout(armTimer);
+  guestRoster();
+  gdId = null;
+});
+
+$('#gdDelete').onclick = async () => {
+  const g = D.guests.find(x => x.id === gdId); if (!g) return;
+  const del = $('#gdDelete');
+  if (!del.classList.contains('armed')){
+    del.classList.add('armed'); del.textContent = 'Sure?';
+    clearTimeout(armTimer);
+    armTimer = setTimeout(() => { del.classList.remove('armed'); del.innerHTML = '&#128465;'; }, 5000);
+    return;
+  }
+  clearTimeout(armTimer);
+  const seated = g.table_no != null ? `\nSeated at ${tableName(g.table_no).full}.` : '';
+  const n = linksFor(g.id).length;
+  const linked = n ? `\n${n} relationship${n===1?'':'s'} will also be removed.` : '';
+  if (!confirm(`Remove ${g.name} from the guest list?${seated}${linked}\n\nThis cannot be undone.`)){
+    del.classList.remove('armed'); del.innerHTML = '&#128465;'; return;
+  }
+  await sb.from('guests').delete().eq('id', g.id);
+  $('#guestDlg').close();
+  await load(); guestRoster(); seating();
+};
+
+/* copying contact details — emails and phones share one routine so the
+   filters, de-duplication and flash behave identically */
+async function copyToClipboard(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('style','position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);' +
+      'width:min(90vw,560px);height:180px;z-index:9999;padding:12px;font:14px/1.5 monospace;' +
+      'border:1px solid #D5D0C6;border-radius:4px;box-shadow:0 20px 50px -18px rgba(17,20,24,.4)');
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch {}
+    setTimeout(() => ta.remove(), 400);
+    return ok;
+  }
+}
+
+function flash(btn, label){
+  const was = btn.textContent;
+  btn.textContent = label;
+  btn.style.color = 'var(--moss)';
+  btn.style.borderColor = 'var(--moss-line)';
+  btn.style.background = 'var(--moss-lo)';
+  setTimeout(() => {
+    btn.textContent = was;
+    btn.style.color = btn.style.borderColor = btn.style.background = '';
+  }, 2200);
+}
+
+// picks the field off whoever the list is currently showing, de-duplicated
+function contactSet(field, clean){
+  const shown = shownGuests();
+  const seen = new Set();
+  const picked = shown.filter(g => {
+    const v = (g[field] || '').trim();
+    if (!v) return false;
+    const key = clean(v);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return { shown, picked, values: [...seen] };
+}
+
+$('#copyEmails').onclick = async () => {
+  const { shown, picked, values } =
+    contactSet('email', v => v.includes('@') ? v.toLowerCase() : '');
+  if (!values.length){ alert('None of the guests shown have an email address on file.'); return; }
+  if (!await copyToClipboard(values.join(', '))){
+    alert('Select the text and copy it manually.'); return;
+  }
+  const btn = $('#copyEmails');
+  flash(btn, `Copied ${values.length}`);
+
+  const missing = shown.length - picked.length;
+  const unsent  = picked.filter(g => !g.contacted);
+  setTimeout(async () => {
+    const note = missing ? `\n\n${missing} of the ${shown.length} shown have no address on file.` : '';
+    if (!unsent.length){
+      alert(`${values.length} email${values.length===1?'':'s'} copied. All are already marked as sent.${note}`);
+      return;
+    }
+    const ok = confirm(
+      `${values.length} email${values.length===1?'':'s'} copied.${note}\n\n` +
+      `Mark ${unsent.length} of them as having received the \u201cOne Week Away\u201d email?\n\n` +
+      `Do this after the email actually goes out.`);
+    if (!ok) return;
+    const { error } = await sb.from('guests').update({
+      contacted: true, contacted_by: me, contacted_at: new Date().toISOString()
+    }).in('id', unsent.map(g => g.id));
+    if (!error){ await load(); guestRoster(); }
+  }, 120);
+};
+
+$('#copyPhones').onclick = async () => {
+  const digits = v => v.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+  const { shown, picked, values } =
+    contactSet('phone', v => digits(v).length === 10 ? digits(v) : '');
+  if (!values.length){ alert('None of the guests shown have a mobile number on file.'); return; }
+
+  // +1XXXXXXXXXX pastes cleanly into Messages, WhatsApp and most group-text fields
+  const text = values.map(d => '+1' + d).join(', ');
+  if (!await copyToClipboard(text)){ alert('Select the text and copy it manually.'); return; }
+
+  const btn = $('#copyPhones');
+  flash(btn, `Copied ${values.length}`);
+  const missing = shown.length - picked.length;
+  if (missing) setTimeout(() => alert(
+    `${values.length} number${values.length===1?'':'s'} copied.\n\n` +
+    `${missing} of the ${shown.length} shown have no mobile on file.`), 120);
+};
+
 $('#expGuests').onclick = openPrintDlg;
 
 $$('#pLayout button').forEach(b => b.onclick = () => { pOpts.layout = b.dataset.layout; syncPrintDlg(); });
