@@ -397,6 +397,8 @@ details.pgroup summary:before{content:"\25B8";color:var(--ink-3);font-size:10px;
 details.pgroup[open] summary:before{content:"\25BE"}
 .dotm{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
 .dotm.inv{background:var(--moss)} .dotm.und{background:var(--brass)} .dotm.skp{background:var(--ink-3)}
+.dotm.r-yes{background:var(--moss)} .dotm.r-maybe{background:var(--brass)}
+.dotm.r-no{background:var(--rust)} .dotm.r-none{background:var(--rule)}
 
 .psort{display:inline-flex;margin-left:auto;border:1px solid var(--rule);border-radius:var(--r);
   overflow:hidden;background:#fff}
@@ -857,27 +859,36 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
         </div>
         <datalist id="weddingGuests"></datalist>
 
-        <div class="pgroup">
-          <div class="phead"><span class="dotm inv"></span>Invited <em id="cInv">0</em>
-            <span class="psort" id="poolRsvpF" style="margin-right:8px">
-              <button data-rf="all" aria-pressed="true">All</button>
-              <button data-rf="yes">Coming</button>
-              <button data-rf="none">No reply</button>
-            </span>
-            <span class="psort" id="poolSort">
-              <button data-sort="first-asc">First A&ndash;Z</button>
-              <button data-sort="first-desc">First Z&ndash;A</button>
-              <button data-sort="last-asc">Last A&ndash;Z</button>
-              <button data-sort="last-desc">Last Z&ndash;A</button>
-            </span></div>
-          <div class="pnames" id="poolInvited"></div>
+        <div class="pgroup" id="grpYes">
+          <div class="phead"><span class="dotm r-yes"></span>Coming <em id="cYes">0</em>
+            <span class="phint">Confirmed for Saturday</span></div>
+          <div class="pnames" id="poolYes"></div>
         </div>
 
-        <div class="pgroup" id="grpUnd">
-          <div class="phead"><span class="dotm und"></span>Not decided <em id="cUnd">0</em>
-            <span class="phint">Tap a name to invite &middot; &times; marks them not needed &middot; click a reply chip to change it</span></div>
-          <div class="pnames pick" id="poolUndecided"></div>
+        <div class="pgroup" id="grpMaybe">
+          <div class="phead"><span class="dotm r-maybe"></span>Not sure <em id="cMaybe">0</em></div>
+          <div class="pnames" id="poolMaybe"></div>
         </div>
+
+        <div class="pgroup" id="grpNo">
+          <div class="phead"><span class="dotm r-no"></span>Cannot make it <em id="cNo">0</em></div>
+          <div class="pnames" id="poolNo"></div>
+        </div>
+
+        <div class="pgroup" id="grpQuiet">
+          <div class="phead"><span class="dotm r-none"></span>No reply yet <em id="cQuiet">0</em>
+            <span class="psort" id="poolSort" style="margin-left:auto">
+              <button data-sort="first-asc">First A&ndash;Z</button>
+              <button data-sort="last-asc">Last A&ndash;Z</button>
+            </span></div>
+          <div class="pnames" id="poolQuiet"></div>
+        </div>
+
+        <details class="pgroup" id="grpUnd">
+          <summary class="phead"><span class="dotm und"></span>Not invited yet <em id="cUnd">0</em>
+            <span class="phint">On the wedding list &mdash; tap to invite</span></summary>
+          <div class="pnames pick" id="poolUndecided"></div>
+        </details>
 
         <details class="pgroup" id="grpSkip">
           <summary class="phead"><span class="dotm skp"></span>No need <em id="cSkip">0</em></summary>
@@ -2182,64 +2193,89 @@ function submissions(){
   }).join('');
 }
 
-let poolRsvpFilter = 'all';
-
 function poolParty(){
-  const rows = D.pool || [];
-  const invAll = sortNames(rows.filter(p => p.status !== 'skip'));
-  const inv = invAll.filter(p =>
-    poolRsvpFilter === 'all' ? true :
-    poolRsvpFilter === 'yes' ? p.rsvp === 'yes' : !p.rsvp);
-  const skip = sortNames(rows.filter(p => p.status === 'skip'));
-  const known = new Set(rows.map(p => p.name.toLowerCase()));
-  const und  = sortNames(D.guests.filter(g => !known.has(g.name.toLowerCase())));
+  const rows   = D.pool || [];
+  const invAll = rows.filter(p => p.status !== 'skip');
+  const skip   = sortNames(rows.filter(p => p.status === 'skip'));
+  const known  = new Set(rows.map(p => p.name.toLowerCase()));
+  const und    = sortNames(D.guests.filter(g => !known.has(g.name.toLowerCase())));
 
-  const yes   = invAll.filter(p => p.rsvp === 'yes').length;
-  const no    = invAll.filter(p => p.rsvp === 'no').length;
-  const maybe = invAll.filter(p => p.rsvp === 'maybe').length;
-  const quiet = invAll.length - yes - no - maybe;
+  const by  = r => sortNames(invAll.filter(p => (p.rsvp || 'none') === r));
+  const yes = by('yes'), maybe = by('maybe'), no = by('no'), quiet = by('none');
+
   $('#poolCount').innerHTML = [
-    ['Coming', yes, no || maybe ? `${no} cannot, ${maybe} unsure.` : 'Replied yes.'],
-    ['No reply', quiet, `of ${invAll.length} invited.`],
+    ['Coming', yes.length, yes.length ? 'Confirmed for Saturday.' : 'Nobody yet.'],
+    ['No reply', quiet.length, `of ${invAll.length} invited.`],
+    ['Cannot make it', no.length, maybe.length ? `${maybe.length} still unsure.` : 'Declined.'],
     ['Invited', invAll.length, 'On the Saturday list.'],
-    ['Not decided', und.length, 'No decision yet.'],
-    ['No need', skip.length, 'Deliberately not invited.']
+    ['Runs', '5–9 PM', 'Restore at Carolina Park.']
   ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
 
-  const RS = { yes:['yes','r-yes'], no:['cannot','r-no'], maybe:['unsure','r-maybe'] };
-  $('#poolInvited').innerHTML = inv
-    .sort((a,b)=>{
-      const rank = r => r === 'yes' ? 0 : r === 'maybe' ? 1 : r === 'no' ? 2 : 3;
-      return rank(a.rsvp) - rank(b.rsvp) || a.name.localeCompare(b.name);
-    })
-    .map(p=>{
-      const r = RS[p.rsvp];
-      return `<div class="pn">
-        <span class="nm">${esc(p.name)}</span>
-        <button class="rsv ${r ? r[1] : 'r-none'}" data-cycle="${p.id}"
-          title="Click to change">${r ? r[0] : 'no reply'}</button>
-        ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
-        <button data-poolundo="${p.id}" title="Back to not decided">&times;</button></div>`;
-    }).join('');
+  const NEXT = { yes:['maybe','no'], maybe:['yes','no'], no:['yes','maybe'], none:['yes','no'] };
+  const WORD = { yes:'Coming', maybe:'Unsure', no:'Cannot' };
+  const row = p => {
+    const cur = p.rsvp || 'none';
+    const opts = NEXT[cur].map(r =>
+      `<button class="setr r-${r}" data-setrsvp="${p.id}" data-to="${r}">${WORD[r]}</button>`).join('');
+    return `<div class="pn">
+      <span class="nm">${esc(p.name)}</span>
+      ${p.notes ? `<span class="nt">${esc(p.notes)}</span>` : ''}
+      <span class="acts">${opts}
+        <button class="x" data-poolundo="${p.id}" title="Remove from the list">&times;</button></span></div>`;
+  };
+
+  $('#poolYes').innerHTML   = yes.map(row).join('');
+  $('#poolMaybe').innerHTML = maybe.map(row).join('');
+  $('#poolNo').innerHTML    = no.map(row).join('');
+  $('#poolQuiet').innerHTML = quiet.map(row).join('');
 
   $('#poolUndecided').innerHTML = und.map(g=>`<div class="pn" data-addpool="${esc(g.name)}" title="Tap to invite">
       <span class="nm">${esc(g.name)}</span>
-      <button class="go" data-addpool="${esc(g.name)}" title="Invite">+</button>
-      <button data-poolno="${esc(g.name)}" title="Not needed">&times;</button></div>`).join('');
+      <span class="acts">
+        <button class="go" data-addpool="${esc(g.name)}" title="Invite">+</button>
+        <button class="x" data-poolno="${esc(g.name)}" title="Not needed">&times;</button></span></div>`).join('');
 
   $('#poolSkipped').innerHTML = skip.map(p=>`<span class="pc skp">
       <span class="nm"><b>${esc(p.name)}</b></span>
       <button data-poolinv="${p.id}" title="Invite after all">&#43;</button>
-      <button data-poolundo="${p.id}" title="Back to not decided">&#8634;</button></span>`).join('');
+      <button data-poolundo="${p.id}" title="Back to not invited">&#8634;</button></span>`).join('');
 
-  $('#cInv').textContent  = invAll.length;
-  $('#cUnd').textContent  = und.length;
-  $('#cSkip').textContent = skip.length;
-  $('#grpUnd').hidden  = und.length === 0;
-  $('#grpSkip').hidden = skip.length === 0;
-  $('#bPool').textContent = yes || invAll.length;
+  $('#cYes').textContent   = yes.length;
+  $('#cMaybe').textContent = maybe.length;
+  $('#cNo').textContent    = no.length;
+  $('#cQuiet').textContent = quiet.length;
+  $('#cUnd').textContent   = und.length;
+  $('#cSkip').textContent  = skip.length;
+
+  $('#grpYes').hidden   = yes.length === 0;
+  $('#grpMaybe').hidden = maybe.length === 0;
+  $('#grpNo').hidden    = no.length === 0;
+  $('#grpQuiet').hidden = quiet.length === 0;
+  $('#grpUnd').hidden   = und.length === 0;
+  $('#grpSkip').hidden  = skip.length === 0;
+
+  $('#bPool').textContent = yes.length || invAll.length;
   $('#weddingGuests').innerHTML = und.map(g=>`<option value="${esc(g.name)}"></option>`).join('');
   $$('#poolSort button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === poolSort)));
+}
+
+async function addPool(name, note, status){
+  const nm = (name||'').trim(); if (!nm) return;
+  const existing = (D.pool||[]).find(p => p.name.toLowerCase() === nm.toLowerCase());
+  if (existing){
+    if (existing.status === (status || 'invited')){
+      alert(`${nm} is already ${existing.status === 'skip' ? 'marked as not needed' : 'on the list'}.`);
+      return;
+    }
+    await sb.from('pool_guests').update({ status: status || 'invited', added_by: me }).eq('id', existing.id);
+    await load(); poolParty(); return;
+  }
+  const match = D.guests.find(g => g.name.toLowerCase() === nm.toLowerCase());
+  const { error } = await sb.from('pool_guests').insert({
+    name: match ? match.name : nm, guest_id: match ? match.id : null,
+    notes: (note||'').trim() || null, added_by: me, status: status || 'invited' });
+  if (error){ alert('Could not add: ' + error.message); return; }
+  await load(); poolParty();
 }
 
 const WP_ORDER = ['Matron of Honor','Maid of Honor','Best Man','Bridesmaid','Groomsman',
