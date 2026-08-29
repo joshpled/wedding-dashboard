@@ -21,8 +21,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:400 16px/1.6 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px 96px;transition:max-width .18s ease}
-.wrap.wide{max-width:min(1600px, 96vw)}
+.wrap{max-width:min(1600px, 96vw);margin:0 auto;padding:0 20px 96px}
 h1,h2,h3{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
 button{font:inherit;cursor:pointer}
@@ -164,6 +163,7 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 
 .gtable .mut{color:var(--ink-3)}
 .gtable .waived{color:var(--ink-3);font-style:italic;font-size:12.5px}
+.mobonly{display:none}
 .rel{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:2px}
 .rel b{color:var(--ink-2);font-weight:600}
 #lkExisting{max-height:150px;overflow-y:auto}
@@ -520,11 +520,64 @@ dialog .dh{padding:16px 18px 0} dialog h3{font-size:14px;letter-spacing:.1em}
 dialog .db{padding:14px 18px;display:grid;gap:9px}
 dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--rule-2)}
 
+/* ---------- narrow screens ---------- */
+@media (max-width:900px){
+  /* the guest table drops to names only — everything else lives in the modal */
+  .gtable th:nth-child(n+2),.gtable td:nth-child(n+2){display:none}
+  .gtable th:last-child,.gtable td:last-child{display:table-cell;width:1px}
+  .gtable th:nth-child(1),.gtable td:nth-child(1){width:auto;white-space:normal}
+  .gtable td:nth-child(1){padding:0 8px 0 12px}
+  .gtable td{height:52px}
+  .gtable tr.clickable td:first-child:after{content:"\203A";float:right;color:var(--rule);
+    font-size:19px;line-height:1;padding-left:10px}
+  .mobonly{display:block;font-size:12px;color:var(--ink-3);line-height:1.45;margin-top:1px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gtable td{height:auto;padding-top:9px;padding-bottom:9px}
+  .gtable tr.clickable:hover td:first-child{box-shadow:none;background:#FCFBF7}
+}
+
 @media (max-width:640px){
   header.top{padding-top:26px}
   .title{border-bottom-width:1px}
   .title .meta{text-align:left}
   .wrap{padding:0 14px 70px}
+
+  /* the board itself */
+  nav[role=tablist]{gap:2px}
+  nav [role=tab]{padding:9px 11px;font-size:13.5px}
+  .tally{grid-template-columns:repeat(2,1fr)}
+  .calc{grid-template-columns:repeat(2,1fr)}
+  .sec-h{flex-wrap:wrap;gap:8px}
+  .sec-h .hint{width:100%;order:3}
+  .sec-h .btn,.sec-h .sidesw,.sec-h .psort{margin-left:0!important}
+  .vgrid{grid-template-columns:1fr}
+  .info{grid-template-columns:1fr}
+  .dietgrid{grid-template-columns:1fr}
+  .seatgrid{grid-template-columns:1fr}
+  .rfilter{flex-wrap:wrap;gap:7px}
+  .rfilter input[type=search]{width:100%;order:-1}
+  .addrow{flex-wrap:wrap}
+  .addrow input{min-width:0;flex:1 1 100%}
+  .row{grid-template-columns:66px 1fr;gap:11px}
+  .share{flex-direction:column;align-items:flex-start}
+  .prow{flex-wrap:wrap}
+  .prow input{flex:1 1 100%}
+  .psort{width:100%;overflow-x:auto}
+  .sidesw{width:100%}
+  .sidesw button{flex:1}
+  .chk{grid-template-columns:1fr}
+  .segs.sm{grid-template-columns:repeat(2,1fr)}
+  table{font-size:14px}
+  dialog{max-height:92vh}
+  dialog#guestDlg{max-width:100%}
+  .gd{padding:16px}
+  .fp{max-width:100%}
+}
+
+@media (max-width:420px){
+  .tally{grid-template-columns:1fr}
+  .calc{grid-template-columns:1fr}
+  nav [role=tab]{padding:8px 9px;font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -1768,7 +1821,13 @@ function rowHtml(g){
   const tn = g.table_no == null ? '' : tableName(g.table_no).full;
   return `<tr class="clickable" data-editrow="${g.id}" title="Click to edit">
       <td title="${esc(g.name)}"><strong>${esc(trunc(g.name, 22))}</strong>${g.skip_reception
-        ? ' <span class="pill due" style="font-size:9.5px;vertical-align:1px">ceremony only</span>' : ''}</td>
+        ? ' <span class="pill due" style="font-size:9.5px;vertical-align:1px">ceremony only</span>' : ''}
+        <span class="mobonly">${[
+          g.side ? SIDE_LABEL[g.side] : '',
+          g.relationship || '',
+          g.table_no != null ? tableName(g.table_no).full : '',
+          g.dietary || ''
+        ].filter(Boolean).map(esc).join(' \u00b7 ')}</span></td>
       <td>${sideChip(g.side)}</td>
       <td title="${esc(g.relationship||'')}">${g.relationship
         ? (isWP(g) ? `<span class="pill alt">${esc(trunc(g.relationship,16))}</span>` : esc(trunc(g.relationship,18)))
@@ -3118,62 +3177,6 @@ $('#swapDlg').addEventListener('close', async function(){
 
 $$('#sideSw button').forEach(b => b.onclick = () => { sideFilter = b.dataset.side; seating(); });
 $$('#guestSideSw button').forEach(b => b.onclick = () => { guestSide = b.dataset.gside; drawRoster(); });
-
-// the guest table earns more width than the rest of the board
-function syncWidth(){
-  const onGuests = !$('#p-guests').hidden;
-  document.querySelector('.wrap').classList.toggle('wide', onGuests);
-}
-$$('nav [role=tab]').forEach(b => b.addEventListener('click', () => setTimeout(syncWidth, 0)));
-syncWidth();
-
-async function addPool(name, note, status){
-  const nm = (name||'').trim(); if (!nm) return;
-  const existing = (D.pool||[]).find(p => p.name.toLowerCase() === nm.toLowerCase());
-  if (existing){
-    if (existing.status === (status || 'invited')){
-      alert(`${nm} is already ${existing.status === 'skip' ? 'marked as not needed' : 'invited'}.`);
-      return;
-    }
-    await sb.from('pool_guests').update({ status: status || 'invited', added_by: me }).eq('id', existing.id);
-    await load(); poolParty(); return;
-  }
-  const match = D.guests.find(g => g.name.toLowerCase() === nm.toLowerCase());
-  const { error } = await sb.from('pool_guests').insert({
-    name: match ? match.name : nm, guest_id: match ? match.id : null,
-    notes: (note||'').trim() || null, added_by: me, status: status || 'invited' });
-  if (error){ alert('Could not add: ' + error.message); return; }
-  await load(); poolParty();
-}
-
-$('#npAdd').onclick = async () => {
-  await addPool($('#npName').value, $('#npNote').value, 'invited');
-  $('#npName').value = ''; $('#npNote').value = ''; $('#npName').focus();
-};
-$('#npName').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
-$('#npNote').onkeydown = e => { if (e.key === 'Enter') $('#npAdd').click(); };
-$('#expPool').onclick = exportPool;
-
-$$('#pLayout button').forEach(b => b.onclick = () => { pOpts.layout = b.dataset.layout; syncPrintDlg(); });
-$$('#pWho button').forEach(b => b.onclick = () => { pOpts.who = b.dataset.who; syncPrintDlg(); });
-$$('#pSort button').forEach(b => b.onclick = () => { pOpts.sort = b.dataset.psort; syncPrintDlg(); });
-document.addEventListener('change', e => {
-  const f = e.target.closest('[data-pf]');
-  if (!f) return;
-  f.checked ? pOpts.fields.add(f.dataset.pf) : pOpts.fields.delete(f.dataset.pf);
-  syncPrintDlg();
-});
-document.addEventListener('click', e => {
-  const a = e.target.closest('[data-pall]');
-  if (!a) return;
-  pOpts.fields = a.dataset.pall === '1' ? new Set(P_FIELDS.map(([k])=>k)) : new Set();
-  $$('#pFields input').forEach(i => i.checked = pOpts.fields.has(i.dataset.pf));
-  syncPrintDlg();
-});
-$('#printDlg').addEventListener('close', function(){
-  if (this.returnValue === 'save') runPrint();
-});
-$$('#poolSort button').forEach(b => b.onclick = () => { poolSort = b.dataset.sort; poolParty(); });
 
 $('#addTable').onclick = async () => {
   if (TABLES.length >= MAX_TABLES) return;

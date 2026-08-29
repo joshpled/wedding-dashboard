@@ -129,7 +129,29 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   h2.sec{break-after:avoid}
   @page{margin:14mm}
 }
-@media (max-width:560px){ .wrap{padding:26px 15px 70px} header .back{position:static;display:block;margin-bottom:12px} }
+@media (max-width:640px){
+  .wrap{padding:26px 15px 70px}
+  header .back{position:static;display:block;margin-bottom:12px}
+  .tally{grid-template-columns:repeat(2,1fr)}
+  .pay .top{flex-direction:column;gap:6px}
+  .pay .amt{font-size:26px}
+  .pay .act{flex-direction:column;align-items:stretch}
+  .pay .act .btn{width:100%;text-align:center}
+  h2.sec{flex-wrap:wrap}
+  /* the wide table becomes stacked cards */
+  table thead{display:none}
+  table,table tbody,table tr,table td{display:block;width:100%}
+  table tr{border-bottom:1px solid var(--rule);padding:11px 13px}
+  table tr:last-child{border-bottom:0}
+  table td{border:0;padding:2px 0;display:flex;justify-content:space-between;gap:14px;text-align:right}
+  table td:before{content:attr(data-l);font-family:"Barlow Condensed",sans-serif;
+    text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;color:var(--ink-3);
+    font-weight:700;text-align:left;flex:0 0 auto}
+  table td:first-child{justify-content:flex-start;font-size:15.5px;margin-bottom:4px}
+  table td:first-child:before{display:none}
+  tfoot tr{background:#FCFBF9}
+}
+@media (max-width:400px){ .tally{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -329,17 +351,20 @@ function render(){
   $('#allRows').innerHTML = V.map(v=>{
     const o = owed(v);
     const t = v.total == null ? (v.status === 'done' ? 'Paid' : 'No charge') : money(v.total);
-    return '<tr><td><strong>' + esc(v.name) + '</strong></td><td>' + esc(v.category||'') + '</td>' +
-      '<td class="n">' + t + '</td>' +
-      '<td class="n">' + (v.total==null ? '\u2014' : money(paidFor(v.id))) + '</td>' +
-      '<td class="n"' + (o>0.005 ? ' style="color:var(--rust)"' : '') + '>' +
+    return '<tr><td><strong>' + esc(v.name) + '</strong></td>' +
+      '<td data-l="For">' + esc(v.category||'') + '</td>' +
+      '<td class="n" data-l="Total">' + t + '</td>' +
+      '<td class="n" data-l="Paid">' + (v.total==null ? '\u2014' : money(paidFor(v.id))) + '</td>' +
+      '<td class="n" data-l="Owed"' + (o>0.005 ? ' style="color:var(--rust)"' : '') + '>' +
         (v.total==null ? '$0.00' : money(o)) + '</td>' +
-      '<td>' + (v.due_date && o>0.005 ? shortD(v.due_date) : '\u2014') + '</td></tr>';
+      '<td data-l="Due">' + (v.due_date && o>0.005 ? shortD(v.due_date) : '\u2014') + '</td></tr>';
   }).join('');
 
-  $('#allFoot').innerHTML = '<tr><td colspan="2">Totals</td>' +
-    '<td class="n">' + money(total) + '</td><td class="n">' + money(paid) + '</td>' +
-    '<td class="n" style="color:var(--rust)">' + money(total-paid) + '</td><td></td></tr>';
+  $('#allFoot').innerHTML = '<tr><td><strong>Totals</strong></td><td data-l="For"></td>' +
+    '<td class="n" data-l="Total">' + money(total) + '</td>' +
+    '<td class="n" data-l="Paid">' + money(paid) + '</td>' +
+    '<td class="n" data-l="Owed" style="color:var(--rust)">' + money(total-paid) + '</td>' +
+    '<td data-l="Due"></td></tr>';
 }
 
 document.addEventListener('click', e => {

@@ -94,7 +94,11 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-si
   header{padding-top:0}
   .note{break-inside:avoid}
 }
-@media (max-width:560px){
+@media (max-width:600px){
+  .row{grid-template-columns:62px 1fr;gap:10px}
+  .strip{grid-template-columns:repeat(2,1fr)}
+  .info{grid-template-columns:1fr}
+
   .row{grid-template-columns:78px 1fr;gap:13px}
   .row .t{font-size:14px}
   .wrap{padding:0 15px 60px}
