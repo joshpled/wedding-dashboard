@@ -1426,6 +1426,8 @@ const metaFor = k => DIET_META[k] || CUSTOM_META;
 const needsContact = g => !g.no_contact_needed;
 
 function guestRoster(){
+  // if someone is mid-edit, leave the table alone and just refresh the numbers
+  if (editing.size){ countsOnly(); return; }
   const G = D.guests;
   const flagged = G.filter(g=>g.dietary);
   const early = G.filter(g => g.skip_reception).length;
@@ -1455,18 +1457,20 @@ function guestRoster(){
 
 const editing = new Set();
 
-// redraw without the page moving: measure where the row sits in the viewport,
-// then put it back there afterwards
-function keepRowSteady(id, redraw){
-  const before = document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
-  const top = before ? before.getBoundingClientRect().top : null;
-  redraw();
-  if (top == null) return null;
-  const after = document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
-  if (!after) return null;
-  const delta = after.getBoundingClientRect().top - top;
-  if (delta) window.scrollBy({ top: delta, behavior: 'instant' });
-  return after;
+// only the clicked row is replaced, so nothing above it shifts and the page stays put
+function openRow(id){
+  id = String(id);
+  editing.add(id);
+  redrawRow(id);
+  const first = document.querySelector(`input[data-gid="${id}"][data-gf="name"]`);
+  if (first) first.focus({ preventScroll: true });
+}
+
+function closeRow(id){
+  id = String(id);
+  editing.delete(id);
+  armed.clear(); clearTimeout(armTimer);
+  redrawRow(id);
 }
 const armed = new Set();          // guests whose delete has been armed once
 let armTimer = null;
@@ -1549,6 +1553,30 @@ function linkSummary(id){
     `<b>${esc(g.label)}</b> of ${esc(listNames(g.names))}`).join(' &middot; ')}</span>`;
 }
 
+// update the tallies and dietary cards without touching the table rows
+function countsOnly(){
+  const G = D.guests;
+  const flagged = G.filter(g => g.dietary);
+  const early = G.filter(g => g.skip_reception).length;
+  $('#countCalc').innerHTML = [
+    ['Attending', G.length, early ? `${early} for the ceremony only.` : 'Every RSVP is in.'],
+    ['At dinner', G.length - early, 'Staying for the reception.'],
+    ['Guaranteed', 80, 'Contractual. You pay for 80 either way.'],
+    ['Restrictions', flagged.length, 'Across the dietary groups.'],
+    ['Vendor meals', 6, '2 photo, 1 DJ, 3 planner. Separate from the count.']
+  ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
+  $('#dietGrid').innerHTML = dietTypes().map(key=>{
+    const m = metaFor(key);
+    const who = flagged.filter(g=>g.dietary===key);
+    return `<div class="dcard ${m.cls}">
+      <div class="cnt">${who.length}</div><div class="lbl">${esc(key)}</div>
+      <ul>${who.map(g=>`<li>${esc(g.name)}</li>`).join('')}</ul>
+      <div class="srv">${m.srv}</div></div>`;
+  }).join('');
+  const pending = (D.subs||[]).length;
+  $('#bGuests').textContent = pending ? `${flagged.length}+${pending}` : flagged.length;
+}
+
 function drawRoster(){
   const types = dietTypes();
   const list = D.guests.filter(g => {
@@ -1565,10 +1593,18 @@ function drawRoster(){
     dl.innerHTML = [...new Set([...REL_OPTS, ...used])].map(o=>`<option value="${esc(o)}"></option>`).join('');
   }
   $$('#guestSideSw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gside === guestSide)));
-  $('#guestBody').innerHTML = list.length ? list.map(g=>{
-    const ed = editing.has(String(g.id));
-    const tn = g.table_no == null ? '' : tableName(g.table_no).full;
-    if (!ed) return `<tr class="clickable" data-editrow="${g.id}" title="Click anywhere to edit">
+  $('#guestBody').innerHTML = list.length
+    ? list.map(g => rowHtml(g, types)).join('')
+    : `<tr><td colspan="10" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+}
+
+/* one row's markup, so a single row can be swapped without touching the others */
+function rowHtml(g, types){
+  types = types || dietTypes();
+  const ed = editing.has(String(g.id));
+  const tn = g.table_no == null ? '' : tableName(g.table_no).full;
+
+  if (!ed) return `<tr class="clickable" data-editrow="${g.id}" title="Click anywhere to edit">
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}
         title="${g.contacted ? 'Details sent'+(g.contacted_by?' by '+esc(g.contacted_by):'') : 'Mark details sent'}"></td>
       <td><strong>${esc(g.name)}</strong>${g.skip_reception
@@ -1590,7 +1626,7 @@ function drawRoster(){
         <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
         <button class="ic" data-edit="${g.id}" title="Edit this row">&#9998;</button></td></tr>`;
 
-    return `<tr class="editing" data-editing="${g.id}">
+  return `<tr class="editing" data-editing="${g.id}">
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}></td>
       <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
       <td><select data-gid="${g.id}" data-gf="side">
@@ -1623,8 +1659,15 @@ function drawRoster(){
         <button class="ic danger ${armed.has(String(g.id))?'armed':''}" data-delguest="${g.id}"
           title="${armed.has(String(g.id))?'Click again to remove':'Remove guest'}">${armed.has(String(g.id))?'Sure?':'&#128465;'}</button>
       </td></tr>`;
-  }).join('')
-    : `<tr><td colspan="10" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+}
+
+/* swap one row in place — nothing else on the page moves */
+function redrawRow(id){
+  const g  = D.guests.find(x => String(x.id) === String(id));
+  const el = document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
+  if (!g || !el){ drawRoster(); return null; }
+  el.outerHTML = rowHtml(g);
+  return document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
 }
 
 /* ---------- seating ---------- */
@@ -2365,12 +2408,12 @@ document.addEventListener('change', async e=>{
   const nc = e.target.closest('input[data-nocontact]');
   if (nc){
     await sb.from('guests').update({ no_contact_needed: nc.checked }).eq('id', nc.dataset.nocontact);
-    await load(); guestRoster(); return;
+    await load(); redrawRow(nc.dataset.nocontact); countsOnly(); return;
   }
   const sr = e.target.closest('input[data-skiprec]');
   if (sr){
     await sb.from('guests').update({ skip_reception: sr.checked }).eq('id', sr.dataset.skiprec);
-    await load(); guestRoster(); seating(); return;
+    await load(); redrawRow(sr.dataset.skiprec); countsOnly(); return;
   }
   const ct = e.target.closest('input[data-contact]');
   if (ct){
@@ -2404,11 +2447,9 @@ document.addEventListener('blur', async e=>{
   }
   await sb.from('guests').update({ [field]: val }).eq('id', g.id);
   await load();
-  keepRowSteady(g.id, () => { guestRoster(); });
+  redrawRow(g.id);          // this row only — the rest of the table is untouched
+  countsOnly();             // tallies and diet cards, without redrawing rows
   seating();
-  // put the cursor back in the field they were in
-  const again = document.querySelector(`[data-gid="${g.id}"][data-gf="${field}"]`);
-  if (again && document.activeElement !== again && again.focus) again.focus({ preventScroll: true });
 }, true);
 
 document.addEventListener('click', async e=>{
@@ -2436,29 +2477,15 @@ document.addEventListener('click', async e=>{
   // click anywhere on a row to edit, except on something already interactive
   const rowClick = e.target.closest('tr[data-editrow]');
   if (rowClick && !e.target.closest('button, input, select, a')){
-    const id = rowClick.dataset.editrow;
-    keepRowSteady(id, () => { editing.add(id); drawRoster(); });
-    const first = document.querySelector(`input[data-gid="${id}"][data-gf="name"]`);
-    if (first) first.focus({ preventScroll: true });
+    openRow(rowClick.dataset.editrow);
     return;
   }
 
   const ed = e.target.closest('[data-edit]');
-  if (ed){
-    const id = ed.dataset.edit;
-    keepRowSteady(id, () => { editing.add(id); drawRoster(); });
-    const first = document.querySelector(`input[data-gid="${id}"][data-gf="name"]`);
-    if (first) first.focus({ preventScroll: true });
-    return;
-  }
+  if (ed){ openRow(ed.dataset.edit); return; }
+
   const de = e.target.closest('[data-doneedit]');
-  if (de){
-    const id = de.dataset.doneedit;
-    keepRowSteady(id, () => {
-      editing.delete(id); armed.clear(); clearTimeout(armTimer); drawRoster();
-    });
-    return;
-  }
+  if (de){ closeRow(de.dataset.doneedit); return; }
 
   const swp = e.target.closest('[data-swaptable]');
   if (swp){
@@ -3081,9 +3108,8 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const row = e.target.closest('tr[data-editing]');
   if (!row) return;
-  const id = row.dataset.editing;
   e.target.blur();
-  keepRowSteady(id, () => { editing.delete(id); armed.clear(); drawRoster(); });
+  closeRow(row.dataset.editing);
 });
 
 document.addEventListener('keydown', async e => {
