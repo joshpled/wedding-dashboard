@@ -163,7 +163,7 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 
 .gtable .mut{color:var(--ink-3)}
 .gtable .waived{color:var(--ink-3);font-style:italic;font-size:12.5px}
-.flags{margin-top:7px;display:grid;gap:4px}
+.flags{margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
 .flags label{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);
   cursor:pointer;white-space:nowrap}
 .flags input{width:14px;height:14px;accent-color:var(--brass);flex:0 0 auto}
@@ -226,7 +226,11 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   border-bottom:1px solid var(--rule-2);font-family:"Barlow Condensed",sans-serif;
   text-transform:uppercase;letter-spacing:.11em;font-weight:700;position:sticky;top:0}
 .lknone{font-size:13.5px;color:var(--ink-3);font-style:italic;padding-bottom:4px}
-.gtable tr.editing{background:var(--brass-lo)}
+.gtable tr.editing{background:var(--brass-lo);box-shadow:inset 0 0 0 1px var(--brass-line)}
+.gtable tr.editing td:first-child{box-shadow:inset 4px 0 0 var(--brass)}
+.gtable thead th{position:sticky;top:0;z-index:5;background:var(--card);
+  box-shadow:inset 0 -1.5px 0 var(--rule)}
+.gtable tr.editing td{padding-top:9px;padding-bottom:9px}
 .gtable tr.clickable{cursor:pointer}
 .gtable tr.clickable:hover{background:#FCFBF7}
 .gtable tr.clickable:hover td:first-child{box-shadow:inset 3px 0 0 var(--brass-line)}
@@ -678,7 +682,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     </div>
 
     <div class="sec">
-      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click a row to edit it. Changes save as you go and sync to everyone. Removing a guest takes two clicks and a confirmation.</span></div>
+      <div class="sec-h"><h2>Guest list</h2><span class="hint">Click a row to edit it, Escape to close. Changes save as you go and sync to everyone.</span></div>
       <div class="rfilter">
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
@@ -1450,6 +1454,20 @@ function guestRoster(){
 }
 
 const editing = new Set();
+
+// redraw without the page moving: measure where the row sits in the viewport,
+// then put it back there afterwards
+function keepRowSteady(id, redraw){
+  const before = document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
+  const top = before ? before.getBoundingClientRect().top : null;
+  redraw();
+  if (top == null) return null;
+  const after = document.querySelector(`tr[data-editrow="${id}"], tr[data-editing="${id}"]`);
+  if (!after) return null;
+  const delta = after.getBoundingClientRect().top - top;
+  if (delta) window.scrollBy({ top: delta, behavior: 'instant' });
+  return after;
+}
 const armed = new Set();          // guests whose delete has been armed once
 let armTimer = null;
 const SIDE_LABEL = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
@@ -1572,7 +1590,7 @@ function drawRoster(){
         <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
         <button class="ic" data-edit="${g.id}" title="Edit this row">&#9998;</button></td></tr>`;
 
-    return `<tr class="editing">
+    return `<tr class="editing" data-editing="${g.id}">
       <td style="text-align:center"><input type="checkbox" data-contact="${g.id}" ${g.contacted?'checked':''}></td>
       <td><input value="${esc(g.name)}" data-gid="${g.id}" data-gf="name"></td>
       <td><select data-gid="${g.id}" data-gf="side">
@@ -1592,10 +1610,12 @@ function drawRoster(){
           style="text-align:center;font-family:'IBM Plex Mono',monospace"></td>
       <td><input value="${esc(g.notes||'')}" data-gid="${g.id}" data-gf="notes" placeholder="—">
         <div class="flags">
-          <label><input type="checkbox" data-nocontact="${g.id}" ${g.no_contact_needed?'checked':''}>
-            <span>No email or phone needed</span></label>
-          <label><input type="checkbox" data-skiprec="${g.id}" ${g.skip_reception?'checked':''}>
-            <span>Not staying for the reception</span></label>
+          <label title="Children, or anyone covered by someone else">
+            <input type="checkbox" data-nocontact="${g.id}" ${g.no_contact_needed?'checked':''}>
+            <span>No contact needed</span></label>
+          <label title="Coming to the ceremony but not the reception">
+            <input type="checkbox" data-skiprec="${g.id}" ${g.skip_reception?'checked':''}>
+            <span>Ceremony only</span></label>
         </div></td>
       <td style="text-align:right;white-space:nowrap">
         <button class="ic" data-links="${g.id}" title="Relationships">&#128101;</button>
@@ -2383,7 +2403,12 @@ document.addEventListener('blur', async e=>{
     }
   }
   await sb.from('guests').update({ [field]: val }).eq('id', g.id);
-  await load(); guestRoster(); seating();
+  await load();
+  keepRowSteady(g.id, () => { guestRoster(); });
+  seating();
+  // put the cursor back in the field they were in
+  const again = document.querySelector(`[data-gid="${g.id}"][data-gf="${field}"]`);
+  if (again && document.activeElement !== again && again.focus) again.focus({ preventScroll: true });
 }, true);
 
 document.addEventListener('click', async e=>{
@@ -2411,16 +2436,29 @@ document.addEventListener('click', async e=>{
   // click anywhere on a row to edit, except on something already interactive
   const rowClick = e.target.closest('tr[data-editrow]');
   if (rowClick && !e.target.closest('button, input, select, a')){
-    editing.add(rowClick.dataset.editrow); drawRoster();
-    const first = document.querySelector(`input[data-gid="${rowClick.dataset.editrow}"][data-gf="name"]`);
-    if (first) first.focus();
+    const id = rowClick.dataset.editrow;
+    keepRowSteady(id, () => { editing.add(id); drawRoster(); });
+    const first = document.querySelector(`input[data-gid="${id}"][data-gf="name"]`);
+    if (first) first.focus({ preventScroll: true });
     return;
   }
 
   const ed = e.target.closest('[data-edit]');
-  if (ed){ editing.add(ed.dataset.edit); drawRoster(); return; }
+  if (ed){
+    const id = ed.dataset.edit;
+    keepRowSteady(id, () => { editing.add(id); drawRoster(); });
+    const first = document.querySelector(`input[data-gid="${id}"][data-gf="name"]`);
+    if (first) first.focus({ preventScroll: true });
+    return;
+  }
   const de = e.target.closest('[data-doneedit]');
-  if (de){ editing.delete(de.dataset.doneedit); armed.clear(); clearTimeout(armTimer); drawRoster(); return; }
+  if (de){
+    const id = de.dataset.doneedit;
+    keepRowSteady(id, () => {
+      editing.delete(id); armed.clear(); clearTimeout(armTimer); drawRoster();
+    });
+    return;
+  }
 
   const swp = e.target.closest('[data-swaptable]');
   if (swp){
@@ -3038,6 +3076,15 @@ $('#copyEmails').onclick = async () => {
     setTimeout(() => ta.remove(), 400);
   }
 };
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const row = e.target.closest('tr[data-editing]');
+  if (!row) return;
+  const id = row.dataset.editing;
+  e.target.blur();
+  keepRowSteady(id, () => { editing.delete(id); armed.clear(); drawRoster(); });
+});
 
 document.addEventListener('keydown', async e => {
   const si = e.target.closest('[data-seatinput]');
