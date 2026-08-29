@@ -269,27 +269,21 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .gtable .ic.done{color:var(--moss)}
 .gtable .ic.done:hover{color:var(--moss);border-color:var(--moss-line)}
 .gtable input[type=checkbox]{width:16px;height:16px;accent-color:var(--moss);cursor:pointer}
-.gtable input{border:1px solid transparent;background:transparent;padding:5px 7px;width:100%;font-size:14px;border-radius:3px}
+.gtable input:not([type=checkbox]){border:1px solid transparent;background:transparent;padding:5px 7px;width:100%;font-size:14px;border-radius:3px}
 .gtable input:hover{border-color:var(--rule-2);background:#fff}
 .gtable input:focus{border-color:var(--brass-line);background:#fff}
 .gtable select{padding:5px 7px;font-size:13.5px;border-color:var(--rule-2)}
 .gtable{table-layout:auto;width:100%}
 .gtable td{padding:0 12px;height:44px;vertical-align:middle;white-space:nowrap}
 .gtable th{padding:9px 12px;white-space:nowrap}
-/* everything but Notes hugs its content; Notes soaks up the rest */
-.gtable th:nth-child(1),.gtable td:nth-child(1),
-.gtable th:nth-child(2),.gtable td:nth-child(2),
-.gtable th:nth-child(3),.gtable td:nth-child(3),
-.gtable th:nth-child(4),.gtable td:nth-child(4),
-.gtable th:nth-child(5),.gtable td:nth-child(5),
-.gtable th:nth-child(6),.gtable td:nth-child(6),
-.gtable th:nth-child(7),.gtable td:nth-child(7),
-.gtable th:nth-child(9),.gtable td:nth-child(9){width:1%}
-.gtable th:nth-child(8),.gtable td:nth-child(8){width:auto;min-width:200px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
+/* every column hugs its content; Notes takes whatever is left */
+.gtable th:not(:nth-child(8)),.gtable td:not(:nth-child(8)){width:1px;white-space:nowrap}
+.gtable th:nth-child(8),.gtable td:nth-child(8){
+  width:100%;min-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gtable td strong{font-weight:700}
 .gtable td .pill{vertical-align:middle}
 .gtable tr.clickable td:last-child{overflow:visible}
+.gtable th:last-child,.gtable td:last-child{width:1px;padding-left:4px;padding-right:10px}
 .gtable .x{background:none;border:0;color:var(--ink-3);font-size:17px;padding:3px 7px;border-radius:3px}
 .gtable .x:hover{color:var(--rust);background:var(--rust-lo)}
 
