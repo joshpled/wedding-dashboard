@@ -573,12 +573,8 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="pool" aria-selected="false">Pool party<span class="badge" id="bPool">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
-    <a href="check-delivery.html" target="_blank" rel="noopener"
-       style="margin-left:auto;align-self:center;padding:9px 12px;color:var(--rust);text-decoration:none;
-              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
-              font-size:14.5px;font-weight:600">Check drop &#8599;</a>
     <a href="payments.html" target="_blank" rel="noopener"
-       style="align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
+       style="margin-left:auto;align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
               font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
               font-size:14.5px;font-weight:600">Payments &#8599;</a>
     <a href="timeline.html" target="_blank" rel="noopener"
@@ -1039,11 +1035,6 @@ const MILESTONES = [
 ];
 
 const FLAGS = [
-  { lvl:'hot', h:'26 August — final payment and count', p:[
-    'The 24 August BEO bills <strong>66 guests</strong> and the balance is now <strong>$14,824.57</strong>, down $2,285 from the 80-guest version.',
-    'One thing to square with Olivia: the notes still read <strong>Contract Guest Count: 80 (Confirmed 80 at 6 months)</strong> while the order bills 66. Their paperwork, their call — but get the 66 confirmed in writing before you send the cashier\u2019s check.',
-    'Ship it by <strong>Monday 24 August</strong>, UPS or FedEx with tracking. No regular USPS.'] },
-
   { lvl:'warn', h:'Two blanks left on the BEO', p:[
     '<strong>Cake flavours</strong> read \u201cNot Noted\u201d, and the anniversary tier is marked NO. Publix needs the flavours.',
     '<strong>Getaway send-off</strong> is the last empty line on the vendor list. If the answer is none, tell Olivia that rather than leaving it blank.'] },
@@ -1989,10 +1980,13 @@ function wireTips(){
 function seatBoard(){
   const byTable = {};
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
-  const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
+  // ceremony-only guests are not at dinner, so they never count as unseated
+  const unseated = D.guests.filter(g => g.table_no == null && !g.skip_reception)
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  const ceremonyOnly = D.guests.filter(g => g.skip_reception).length;
 
   const cap = TABLES.length * SEATS_PER;
-  const toSeat = D.guests.filter(g => g.table_no !== 0).length;
+  const toSeat = D.guests.filter(g => g.table_no !== 0 && !g.skip_reception).length;
   const seatedOn = side => D.guests.filter(g => g.table_no && tableSide(g.table_no) === side).length;
   const sideBits = sideFilter === 'all'
     ? `Left ${seatedOn('left')} seated · right ${seatedOn('right')} seated.`
@@ -2001,6 +1995,7 @@ function seatBoard(){
   $('#seatHint').textContent =
     (unseated.length ? `${unseated.length} still unseated of ${toSeat}. ` : 'Everyone is seated. ') +
     `${TABLES.length} tables, ${cap} places${cap < toSeat ? ` — ${toSeat - cap} short` : `, ${cap - toSeat} spare`}. ` +
+    (ceremonyOnly ? `${ceremonyOnly} ceremony only, not counted. ` : '') +
     sideBits;
   const addBtn = $('#addTable');
   if (addBtn){
@@ -2042,15 +2037,18 @@ async function seatByName(no, raw){
   if (no === 0) return;
   const q = (raw||'').trim().toLowerCase();
   if (!q) return;
-  const pool = D.guests.filter(g => g.table_no == null);
+  const pool = D.guests.filter(g => g.table_no == null && !g.skip_reception);
   let hit = pool.find(g => g.name.toLowerCase() === q);
   if (!hit){
     const partial = pool.filter(g => g.name.toLowerCase().includes(q));
     if (partial.length === 0){
-      const seated = D.guests.find(g => g.name.toLowerCase().includes(q));
-      alert(seated
-        ? `${seated.name} is already at ${tableName(seated.table_no).full}. Remove them there first.`
-        : `No unseated guest matches "${raw}". Add them on the Guests tab first.`);
+      const other = D.guests.find(g => g.name.toLowerCase().includes(q));
+      alert(!other
+        ? `No unseated guest matches "${raw}". Add them on the Guests tab first.`
+        : other.skip_reception
+          ? `${other.name} is marked ceremony only, so they are not at dinner.\n\n` +
+            `Untick that on their row if they are staying after all.`
+          : `${other.name} is already at ${tableName(other.table_no).full}. Remove them there first.`);
       return;
     }
     if (partial.length > 1){ alert(`"${raw}" matches ${partial.length} people. Type more of the name.`); return; }
@@ -2265,7 +2263,9 @@ const PRINT_FOOT = extra => `<footer>Printed ${new Date().toLocaleDateString('en
 function exportSeating(){
   const byTable = {};
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
-  const unseated = D.guests.filter(g => g.table_no == null).sort((a,b)=>a.name.localeCompare(b.name));
+  const unseated = list.filter(g => g.table_no == null && !g.skip_reception)
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  const ceremonyOnly = list.filter(g => g.skip_reception).sort((a,b)=>a.name.localeCompare(b.name));
   const sweetheart = (byTable[0]||[]).sort((a,b)=>a.name.localeCompare(b.name));
   const restricted = D.guests.filter(g=>g.dietary).length;
 
@@ -2289,7 +2289,12 @@ function exportSeating(){
     ${unseated.length ? `<div class="t" style="margin-top:18px;border-color:#E8B4A6">
       <h3 style="color:#8A2F1C">Not yet seated<em>${unseated.length}</em></h3>
       <ol>${unseated.map(g=>`<li><strong>${esc(g.name)}</strong>${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol></div>` : ''}
-    ` + (sweetheart.length
+    ` + (ceremonyOnly.length
+        ? `<div class="t" style="margin-top:18px;border-color:#D5D0C6;background:#FBFAF8">
+             <h3 style="color:#565D68">Ceremony only &mdash; no seat needed<em>${ceremonyOnly.length}</em></h3>
+             <ol>${ceremonyOnly.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>`
+        : '')
+      + (sweetheart.length
         ? `<div class="t" style="margin-top:18px;border-color:#D8C08A;background:#FAF3E2">
              <h3>Sweetheart table<em>${sweetheart.length}</em></h3>
              <ol>${sweetheart.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>`
@@ -2366,6 +2371,7 @@ const SIDE_TXT = { josh:'Josh', gabriel:'Gabriel', both:'Both' };
 function printSheet(list){
   const groups = {};
   for (const g of list){
+    if (g.table_no == null && g.skip_reception) continue;   // not at dinner
     const k = g.table_no == null ? 'un' : String(g.table_no);
     (groups[k] = groups[k] || []).push(g);
   }
@@ -2373,6 +2379,10 @@ function printSheet(list){
     if (a === 'un') return 1; if (b === 'un') return -1;
     return Number(a) - Number(b);
   });
+
+  const unseated = list.filter(g => g.table_no == null && !g.skip_reception)
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  const ceremonyOnly = list.filter(g => g.skip_reception).sort((a,b)=>a.name.localeCompare(b.name));
 
   const diet = list.filter(g => g.dietary);
   const byKind = {};
@@ -2403,7 +2413,7 @@ function printSheet(list){
       <div><div class="k">Guests</div><div class="v">${list.length}</div></div>
       <div><div class="k">Tables</div><div class="v">${order.filter(k=>k!=='un').length}</div></div>
       <div><div class="k">Dietary</div><div class="v">${diet.length}</div></div>
-      <div><div class="k">Not seated</div><div class="v">${(groups.un||[]).length}</div></div>
+      <div><div class="k">Not seated</div><div class="v">${unseated.length}</div></div>
     </div>
     ${(() => {
       const wp = list.filter(isWP);
@@ -2426,6 +2436,9 @@ function printSheet(list){
         `<div class="dline"><b>${esc(k)}</b> &mdash; ${v.map(esc).join(', ')}</div>`).join('')}
       </div>` : ''}
     <div class="cols">${order.map(block).join('')}</div>
+    ${ceremonyOnly.length ? `<div class="t" style="margin-top:16px;border-color:#D5D0C6;background:#FBFAF8">
+      <h3 style="color:#565D68">Ceremony only &mdash; no seat needed<em>${ceremonyOnly.length}</em></h3>
+      <ol>${ceremonyOnly.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>` : ''}
   ` + PRINT_FOOT('Sunday 6 September 2026 &middot; The American Theater'));
 }
 
@@ -3191,6 +3204,16 @@ $('#expGuests').onclick = openPrintDlg;
         patch.contacted_by = e.target.checked ? me : null;
         patch.contacted_at = e.target.checked ? new Date().toISOString() : null;
       }
+      if (field === 'skip_reception' && e.target.checked){
+        const g = D.guests.find(x => x.id === gdId);
+        if (g && g.table_no != null){
+          if (!confirm(`${g.name} is seated at ${tableName(g.table_no).full}.\n\n` +
+                       `Marking them ceremony only will take them off the seating chart. Continue?`)){
+            e.target.checked = false; return;
+          }
+          patch.table_no = null; patch.seat_no = null;
+        }
+      }
       await sb.from('guests').update(patch).eq('id', gdId);
       await load(); redrawRow(gdId); countsOnly(); seating();
     });
@@ -3309,6 +3332,16 @@ $('#expGuests').onclick = openPrintDlg;
       if (field === 'contacted'){
         patch.contacted_by = e.target.checked ? me : null;
         patch.contacted_at = e.target.checked ? new Date().toISOString() : null;
+      }
+      if (field === 'skip_reception' && e.target.checked){
+        const g = D.guests.find(x => x.id === gdId);
+        if (g && g.table_no != null){
+          if (!confirm(`${g.name} is seated at ${tableName(g.table_no).full}.\n\n` +
+                       `Marking them ceremony only will take them off the seating chart. Continue?`)){
+            e.target.checked = false; return;
+          }
+          patch.table_no = null; patch.seat_no = null;
+        }
       }
       await sb.from('guests').update(patch).eq('id', gdId);
       await load(); redrawRow(gdId); countsOnly(); seating();
