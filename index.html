@@ -419,6 +419,50 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
 .prow input:focus{border-color:var(--brass);outline:none;box-shadow:0 0 0 3px var(--brass-lo)}
 .prow .btn{padding:7px 14px;font-size:13px}
 
+/* the week */
+.wday{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);
+  margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+.wday.today{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-lo),var(--shadow)}
+.wday.past{opacity:.62}
+.wh{display:flex;align-items:baseline;gap:11px;padding:13px 17px;
+  border-bottom:1px solid var(--rule-2);background:#FCFBF9;flex-wrap:wrap}
+.wh .dow{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.14em;font-size:15px;font-weight:700;color:var(--ink)}
+.wday.today .wh .dow{color:var(--brass)}
+.wh .dt{font-size:13px;color:var(--ink-3)}
+.wh .tag{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.11em;
+  font-size:10.5px;font-weight:700;background:var(--brass);color:#fff;border-radius:99px;padding:2px 9px}
+.wh .prog{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3)}
+.wh .prog.all{color:var(--moss);font-weight:600}
+
+.wi{display:flex;align-items:flex-start;gap:11px;padding:11px 17px;
+  border-bottom:1px solid var(--rule-2)}
+.wi:last-child{border-bottom:0}
+.wi:hover{background:#FCFBF9}
+.wi input[type=checkbox]{width:19px;height:19px;accent-color:var(--moss);
+  flex:0 0 auto;margin-top:2px;cursor:pointer}
+.wi .body{flex:1;min-width:0}
+.wi .ttl{font-size:15px;color:var(--ink);line-height:1.4}
+.wi.done .ttl{text-decoration:line-through;color:var(--ink-3)}
+.wi .when{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+  color:var(--brass);background:var(--brass-lo);border-radius:3px;padding:1px 7px;margin-right:8px}
+.wi .det{font-size:13px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.wi .by{font-size:11.5px;color:var(--moss);margin-top:3px}
+.wi .acts{display:flex;gap:2px;flex:0 0 auto;opacity:0;transition:opacity .12s}
+.wi:hover .acts,.wi:focus-within .acts{opacity:1}
+@media(hover:none){.wi .acts{opacity:1}}
+.wi .acts button{background:none;border:0;color:var(--ink-3);font-size:14px;
+  padding:4px 7px;border-radius:3px;cursor:pointer}
+.wi .acts button:hover{background:var(--rule-2);color:var(--ink)}
+.wi .acts .del:hover{color:var(--rust);background:var(--rust-lo)}
+.wadd{display:flex;gap:7px;padding:11px 17px;background:#FCFBF9;flex-wrap:wrap;
+  border-top:1px solid var(--rule-2)}
+.wadd input{border:1px solid var(--rule);border-radius:var(--r);padding:8px 11px;font:inherit;font-size:14px}
+.wadd .t{flex:1;min-width:150px}
+.wadd .w{flex:0 1 120px;min-width:90px}
+.wadd input:focus{border-color:var(--brass);outline:none;box-shadow:0 0 0 3px var(--brass-lo)}
+.wempty{padding:14px 17px;color:var(--ink-3);font-size:14px;font-style:italic}
+
 .pgroup{border-bottom:1px solid var(--rule)}
 .pgroup:last-child{border-bottom:0}
 .pgroup:last-child{border-bottom:0}
@@ -691,6 +735,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="runsheet" aria-selected="false">Day of</button>
     <button role="tab" data-tab="guests" aria-selected="false">Guests<span class="badge" id="bGuests">0</span></button>
     <button role="tab" data-tab="seating" aria-selected="false">Seating<span class="badge" id="bSeat">0</span></button>
+    <button role="tab" data-tab="week" aria-selected="false">The week<span class="badge" id="bWeek">0</span></button>
     <button role="tab" data-tab="pool" aria-selected="false">Pool party<span class="badge" id="bPool">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
@@ -902,6 +947,23 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
           allow="xr-spatial-tracking" style="display:block;border:0"
           src="https://my.matterport.com/show/?m=nEGwfwfq6yu&brand=0"></iframe>
       </div>
+    </div>
+  </section>
+
+
+  <section class="panel" id="p-week" hidden>
+    <div class="tally" id="weekCount"></div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>The run-up</h2>
+        <span class="hint">Wednesday to Sunday. Tick things off as you go — everything syncs.</span>
+        <span class="psort" id="weekFilter" style="margin-left:auto">
+          <button data-wf="open" aria-pressed="true">To do</button>
+          <button data-wf="all">Everything</button>
+        </span>
+        <button class="btn ghost sm" id="weekPrint">Print</button>
+      </div>
+      <div id="weekDays"></div>
     </div>
   </section>
 
@@ -1570,7 +1632,7 @@ $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate()
 
 /* ---------- data ---------- */
 async function load(){
-  const [v,p,t,g,m,tn,pg,gs,gl,ac] = await Promise.all([
+  const [v,p,t,g,m,tn,pg,gs,gl,ac,wk] = await Promise.all([
     sb.from('vendors').select('*').order('sort_order'),
     sb.from('payments').select('*').order('paid_on'),
     sb.from('tasks').select('*').order('due_date'),
@@ -1580,7 +1642,8 @@ async function load(){
     sb.from('pool_guests').select('*').order('name'),
     sb.from('guest_submissions').select('*').eq('applied', false).order('created_at', { ascending:false }),
     sb.from('guest_links').select('*'),
-    sb.from('alert_cleared').select('*')
+    sb.from('alert_cleared').select('*'),
+    sb.from('week_items').select('*').order('day').order('sort_order')
   ]);
   if (v.error || p.error || t.error) return { error: v.error || p.error || t.error };
   const ms = {};
@@ -1596,7 +1659,8 @@ async function load(){
         pool: pg && !pg.error ? pg.data : [],
         subs: gs && !gs.error ? gs.data : [],
         links: gl && !gl.error ? gl.data : [],
-        cleared: (ac && !ac.error ? ac.data : []).reduce((o,r)=>(o[r.key]=r,o), {}) };
+        cleared: (ac && !ac.error ? ac.data : []).reduce((o,r)=>(o[r.key]=r,o), {}),
+        week: wk && !wk.error ? wk.data : [] };
   return {};
 }
 async function loadDocs(){
@@ -1614,7 +1678,7 @@ const owed = v => v.total == null ? null : Number(v.total) - paidFor(v.id);
 
 /* ---------- render ---------- */
 function renderAll(){ header(); flags(); vendors(); payments(); timeline(); tasks(); decisions();
-  menu(); runsheet(); weddingParty(); guestRoster(); seating(); poolParty(); submissions(); people(); renderDocs(); }
+  menu(); runsheet(); weddingParty(); guestRoster(); weekView(); seating(); poolParty(); submissions(); people(); renderDocs(); }
 
 function applyMoneyLock(){
   $('#moneyLock').hidden = moneyOpen;
@@ -2469,6 +2533,67 @@ function submissions(){
       <button class="x" data-dropsub="${r.id}" title="Dismiss">&times;</button>
     </div>`;
   }).join('');
+}
+
+let weekFilter = 'open';
+
+function weekView(){
+  const rows = D.week || [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = [...new Set(rows.map(r => r.day))].sort();
+
+  const total = rows.length, done = rows.filter(r => r.done).length;
+  const left  = total - done;
+  const soon  = rows.filter(r => !r.done && new Date(r.day + 'T00:00:00') <= today).length;
+
+  $('#weekCount').innerHTML = [
+    ['Still to do', left, left ? `${done} of ${total} done.` : 'All clear.'],
+    ['Overdue', soon, soon ? 'Today or earlier, not ticked.' : 'Nothing hanging over.'],
+    ['Days left', Math.max(0, Math.ceil((new Date('2026-09-06T00:00:00') - today) / 86400000)),
+      'Until the wedding.']
+  ].map(([k,v,n])=>`<div><div class="k">${k}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`).join('');
+
+  $('#weekDays').innerHTML = days.map(d => {
+    const dt   = new Date(d + 'T00:00:00');
+    const all  = rows.filter(r => r.day === d);
+    const list = weekFilter === 'open' ? all.filter(r => !r.done) : all;
+    const nDone= all.filter(r => r.done).length;
+    const isToday = dt.getTime() === today.getTime();
+    const isPast  = dt < today;
+
+    const item = r => `<div class="wi${r.done?' done':''}">
+      <input type="checkbox" data-wdone="${r.id}" ${r.done?'checked':''}>
+      <div class="body">
+        <div class="ttl">${r.at_time ? `<span class="when">${esc(r.at_time)}</span>` : ''}${esc(r.title)}</div>
+        ${r.detail ? `<div class="det">${esc(r.detail)}</div>` : ''}
+        ${r.done && r.done_by ? `<div class="by">&#10003; ${esc(r.done_by)}</div>` : ''}
+      </div>
+      <span class="acts">
+        <button data-wedit="${r.id}" title="Edit">&#9998;</button>
+        <button class="del" data-wdel="${r.id}" title="Remove">&times;</button>
+      </span></div>`;
+
+    return `<div class="wday${isToday?' today':''}${isPast?' past':''}">
+      <div class="wh">
+        <span class="dow">${dt.toLocaleDateString('en-US',{weekday:'long'})}</span>
+        <span class="dt">${dt.toLocaleDateString('en-US',{month:'long',day:'numeric'})}</span>
+        ${isToday?'<span class="tag">Today</span>':''}
+        ${d==='2026-09-06'?'<span class="tag">Wedding day</span>':''}
+        <span class="prog${nDone===all.length&&all.length?' all':''}">${nDone}/${all.length}</span>
+      </div>
+      ${list.length ? list.map(item).join('')
+        : `<div class="wempty">${all.length ? 'Everything ticked off.' : 'Nothing planned.'}</div>`}
+      <div class="wadd">
+        <input class="w" placeholder="Time" data-wnew="time" data-day="${d}">
+        <input class="t" placeholder="Add something to ${dt.toLocaleDateString('en-US',{weekday:'long'})}&hellip;"
+          data-wnew="title" data-day="${d}">
+        <button class="btn sm" data-wadd="${d}">Add</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const b = $('#bWeek');
+  if (b){ b.textContent = left; b.classList.toggle('hot', soon > 0); }
 }
 
 function poolParty(){
@@ -3634,6 +3759,94 @@ document.addEventListener('click', async e => {
     return;
   }
 });
+
+document.addEventListener('change', async e => {
+  const wd = e.target.closest('[data-wdone]');
+  if (!wd) return;
+  const on = wd.checked;
+  await sb.from('week_items').update({
+    done: on, done_by: on ? me : null, done_at: on ? new Date().toISOString() : null
+  }).eq('id', wd.dataset.wdone);
+  await load(); weekView();
+});
+
+document.addEventListener('click', async e => {
+  const wa = e.target.closest('[data-wadd]');
+  if (wa){
+    const day = wa.dataset.wadd;
+    const t = document.querySelector(`[data-wnew="title"][data-day="${day}"]`);
+    const w = document.querySelector(`[data-wnew="time"][data-day="${day}"]`);
+    const title = (t.value || '').trim();
+    if (!title){ t.focus(); return; }
+    const max = Math.max(0, ...(D.week || []).filter(r => r.day === day).map(r => r.sort_order || 0));
+    await sb.from('week_items').insert({
+      day, title, at_time: (w.value || '').trim() || null,
+      sort_order: max + 10, created_by: me });
+    t.value = ''; w.value = '';
+    await load(); weekView();
+    const again = document.querySelector(`[data-wnew="title"][data-day="${day}"]`);
+    if (again) again.focus();
+    return;
+  }
+
+  const we = e.target.closest('[data-wedit]');
+  if (we){
+    const r = (D.week || []).find(x => String(x.id) === we.dataset.wedit);
+    if (!r) return;
+    const title = prompt('What is it?', r.title);
+    if (title === null || !title.trim()) return;
+    const at = prompt('Time — leave blank if it does not matter', r.at_time || '');
+    if (at === null) return;
+    const det = prompt('Any detail worth keeping?', r.detail || '');
+    if (det === null) return;
+    await sb.from('week_items').update({
+      title: title.trim(),
+      at_time: at.trim() || null,
+      detail: det.trim() || null
+    }).eq('id', r.id);
+    await load(); weekView();
+    return;
+  }
+
+  const wx = e.target.closest('[data-wdel]');
+  if (wx){
+    const r = (D.week || []).find(x => String(x.id) === wx.dataset.wdel);
+    if (!r) return;
+    if (!confirm(`Remove "${r.title}"?`)) return;
+    await sb.from('week_items').delete().eq('id', r.id);
+    await load(); weekView();
+    return;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  const t = e.target.closest('[data-wnew="title"]');
+  if (t && e.key === 'Enter'){
+    e.preventDefault();
+    const btn = document.querySelector(`[data-wadd="${t.dataset.day}"]`);
+    if (btn) btn.click();
+  }
+});
+
+$$('#weekFilter button').forEach(b => b.onclick = () => {
+  weekFilter = b.dataset.wf;
+  $$('#weekFilter button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  weekView();
+});
+
+$('#weekPrint').onclick = () => {
+  const rows = D.week || [];
+  const days = [...new Set(rows.map(r => r.day))].sort();
+  openPrint('The week', PRINT_HEAD('The run-up') + days.map(d => {
+    const dt = new Date(d + 'T00:00:00');
+    const at = rows.filter(r => r.day === d);
+    return `<div class="t" style="margin-bottom:12px">
+      <h3>${dt.toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric'})}
+        <em>${at.filter(r=>r.done).length}/${at.length}</em></h3>
+      <ol>${at.map(r => `<li>${r.done ? '<s>' : ''}${r.at_time ? `<strong>${esc(r.at_time)}</strong> — ` : ''}${esc(r.title)}${r.done ? '</s>' : ''}${r.detail ? `<span class="d">${esc(r.detail)}</span>` : ''}</li>`).join('')}</ol>
+    </div>`;
+  }).join('') + PRINT_FOOT('Ticked items are struck through'));
+};
 
 $('#expPool').onclick = exportPool;
 
