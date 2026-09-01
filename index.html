@@ -1817,13 +1817,21 @@ const DIET_META = {
   'Nut allergy':{ cls:'nut',    short:'Nuts',  srv:'Nothing on the current menu lists almonds. Worth confirming with the kitchen.' }
 };
 const DIET_BASE = ['Vegan','Gluten free','Dairy free','Nut allergy'];
+
+/* "None" is an answer, not a restriction — it should clear the field rather
+   than become its own dietary group and get relayed to the kitchen. */
+const NOT_A_RESTRICTION = /^(none|no|n\/?a|nope|nil|nothing|non|no allergies?|no restrictions?|no dietary( restrictions?)?|none that i know of|not that i know of|all good|anything|everything|no preference|regular|normal|standard|-{1,2}|\.|\?)\.?$/i;
+
+const isRealDiet = v => {
+  const t = String(v ?? '').trim();
+  return !!t && !NOT_A_RESTRICTION.test(t);
+};
 const OTHER = '__other__';
 
 // every category in use, base ones first, then anything added later
 function dietTypes(){
-  const extra = [...new Set(D.guests.map(g=>g.dietary).filter(Boolean))]
-    .filter(k => !DIET_BASE.includes(k)).sort();
-  return [...DIET_BASE, ...extra];
+  const found = new Set(D.guests.map(g => g.dietary).filter(isRealDiet));
+  return [...new Set([...DIET_BASE, ...found])];
 }
 
 const CUSTOM_META = { cls:'other', short:'Diet',
@@ -1837,7 +1845,7 @@ const needsContact = g => !g.no_contact_needed;
    chased — children with no contact of their own — drops out. */
 const isSilent = g => {
   if (g.no_contact_needed) return false;
-  if (g.dietary) return false;
+  if (g.dietary) return false;          // any answer counts as a reply, even "none"
   return !(D.subs || []).some(r => r.guest_id === g.id);
 };
 
@@ -1934,11 +1942,16 @@ async function saveGd(field, raw){
   if (field === 'dietary' && val === OTHER){
     const typed = prompt('What is the restriction?');
     val = (typed || '').trim() || null;
+    if (val && !isRealDiet(val)){
+      alert('Leave the field blank for no restrictions \u2014 that keeps them out of the kitchen list.');
+      val = null;
+    }
     if (val){
       const hit = dietTypes().find(t => t.toLowerCase() === val.toLowerCase());
       if (hit) val = hit;
     }
   }
+  if (field === 'dietary' && val && !isRealDiet(val)) val = null;
   if (String(g[field] ?? '') === String(val ?? '')) return;
 
   await sb.from('guests').update({ [field]: val }).eq('id', g.id);
@@ -2043,7 +2056,7 @@ function linkSummary(id){
 // update the tallies and dietary cards without touching the table rows
 function countsOnly(){
   const G = D.guests;
-  const flagged = G.filter(g => g.dietary);
+  const flagged = G.filter(g => isRealDiet(g.dietary));
   const early = G.filter(g => g.skip_reception).length;
   $('#countCalc').innerHTML = [
     ['Attending', G.length, early ? `${early} for the ceremony only.` : 'Every RSVP is in.'],
@@ -2069,7 +2082,7 @@ function countsOnly(){
 // whatever the guest list is currently showing
 function shownGuests(){
   return D.guests.filter(g => {
-    if (gFilter === 'diet' && !g.dietary) return false;
+    if (gFilter === 'diet' && !isRealDiet(g.dietary)) return false;
     if (guestSide === 'none' && g.side) return false;
     if (guestSide === 'wp' && !isWP(g)) return false;
     if (guestSide === 'unsent' && (g.contacted || !g.email)) return false;
@@ -2716,7 +2729,7 @@ function exportSeating(){
   const unseated    = D.guests.filter(g => g.table_no == null && !g.skip_reception).sort(byName);
   const ceremonyOnly= D.guests.filter(g => g.skip_reception).sort(byName);
   const sweetheart  = (byTable[0]||[]).sort(byName);
-  const flagged     = D.guests.filter(g => g.dietary);
+  const flagged     = D.guests.filter(g => isRealDiet(g.dietary));
 
   // dietary shown as a short code so a name and its restriction stay on one line
   const CODE = { 'Vegan':'V', 'Vegetarian':'VG', 'Gluten free':'GF',
@@ -2821,7 +2834,7 @@ function openPrintDlg(){
 
 function printSet(){
   let list = [...D.guests];
-  if (pOpts.who === 'diet') list = list.filter(g => g.dietary);
+  if (pOpts.who === 'diet') list = list.filter(g => isRealDiet(g.dietary));
   else if (pOpts.who !== 'all')
     list = list.filter(g => g.side === pOpts.who || g.side === 'both');
   const key = g => {
@@ -2865,7 +2878,7 @@ function printSheet(list){
     .sort((a,b)=>a.name.localeCompare(b.name));
   const ceremonyOnly = list.filter(g => g.skip_reception).sort((a,b)=>a.name.localeCompare(b.name));
 
-  const diet = list.filter(g => g.dietary);
+  const diet = list.filter(g => isRealDiet(g.dietary));
   const byKind = {};
   for (const g of diet) (byKind[g.dietary] = byKind[g.dietary] || []).push(g.name);
 
