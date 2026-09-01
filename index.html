@@ -2642,7 +2642,7 @@ const PRINT_CSS = `
   @media print{body{padding:0} .cols{column-count:2} .plist{column-count:2}}
 `;
 
-function openPrint(title, bodyHtml){
+function openPrint(title, bodyHtml, extraCss){
   const w = window.open('', '_blank');
   if (!w){ alert('Your browser blocked the popup. Allow popups for this page and try again.'); return; }
   const doc = w.document;
@@ -2651,11 +2651,58 @@ function openPrint(title, bodyHtml){
   doc.close();
   doc.title = title;
   const st = doc.createElement('style');
-  st.textContent = PRINT_CSS;
+  st.textContent = PRINT_CSS + (extraCss || '');
   doc.head.appendChild(st);
   doc.body.innerHTML = bodyHtml;
   setTimeout(() => { w.focus(); w.print(); }, 600);
 }
+
+const SEAT_CSS = `
+  @page{ size:portrait; margin:11mm }
+  body{ padding:0 }
+  .sheet{ font-size:10pt; line-height:1.4 }
+  .top{ border-bottom:2px solid #D8C08A; padding-bottom:7px; margin-bottom:9px }
+  .top h1{ font-family:"Barlow Condensed",Arial,sans-serif; text-transform:uppercase;
+    letter-spacing:.16em; font-size:19pt; font-weight:700; color:#111418; margin:0 }
+  .top .meta{ font-size:9.5pt; color:#565D68; margin-top:4px }
+  .top .meta b{ color:#6E5520 }
+
+  .strip{ border:1px solid #EAE7E0; border-radius:3px; padding:8px 11px; margin-bottom:9px;
+    font-size:9.5pt; line-height:1.55; break-inside:avoid }
+  .strip b{ font-family:"Barlow Condensed",Arial,sans-serif; text-transform:uppercase;
+    letter-spacing:.12em; font-size:8.5pt; color:#6E5520; margin-right:9px }
+  .strip i{ font-style:normal; font-size:6.5pt; font-weight:700; color:#8A2F1C }
+  .strip.sw{ background:#FAF3E2; border-color:#D8C08A }
+  .strip.warn{ background:#FDEEEA; border-color:#E8B4A6 }
+  .strip.warn b{ color:#8A2F1C }
+  .strip.mute{ background:#FBFAF8 }
+  .strip.mute b{ color:#565D68 }
+
+  .tables{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:9px }
+  .tb{ border:1px solid #D5D0C6; border-radius:3px; padding:7px 10px 8px; break-inside:avoid }
+  .tb h3{ font-family:"Barlow Condensed",Arial,sans-serif; text-transform:uppercase;
+    letter-spacing:.1em; font-size:9.5pt; font-weight:700; color:#6E5520;
+    border-bottom:1px solid #EAE7E0; padding-bottom:3px; margin:0 0 4px;
+    display:flex; justify-content:space-between; align-items:baseline }
+  .tb h3 em{ font-style:normal; font-family:"IBM Plex Mono",monospace; font-size:7pt; color:#565D68 }
+  .tb ol{ margin:0; padding-left:17px; font-size:10pt; line-height:1.65 }
+  .tb li{ color:#111418; padding-right:2px }
+  .tb li .d{ font-size:7.5pt; font-weight:700; color:#8A2F1C; margin-left:4px;
+    letter-spacing:.03em }
+  .tb .empty{ font-size:7.5pt; color:#8E897F; font-style:italic; padding:3px 0 }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:8.5pt; color:#565D68;
+    border-top:1px solid #EAE7E0; padding-top:6px }
+  .legend b{ color:#8A2F1C; font-weight:700 }
+  .foot{ margin-top:6px; font-size:7.5pt; color:#8E897F }
+
+  /* if the list grows past a page, shrink rather than spill onto a second */
+  @media print{
+    .sheet.dense{ font-size:8.5pt }
+    .sheet.dense .tb ol{ font-size:8.5pt; line-height:1.45 }
+    .sheet.dense .tables{ gap:6px; grid-template-columns:repeat(4,1fr) }
+  }
+`;
 
 const PRINT_HEAD = sub => `<header><h1>Joshua + Gabriel</h1>
   <div class="s">Sunday 6 September 2026 &middot; The American Theater &middot; Charleston<br>${sub}</div></header>`;
@@ -2666,44 +2713,60 @@ const PRINT_FOOT = extra => `<footer>Printed ${new Date().toLocaleDateString('en
 function exportSeating(){
   const byTable = {};
   for (const g of D.guests) if (g.table_no != null) (byTable[g.table_no] = byTable[g.table_no]||[]).push(g);
-  const unseated = D.guests.filter(g => g.table_no == null && !g.skip_reception)
-    .sort((a,b)=>a.name.localeCompare(b.name));
-  const ceremonyOnly = D.guests.filter(g => g.skip_reception).sort((a,b)=>a.name.localeCompare(b.name));
-  const sweetheart = (byTable[0]||[]).sort((a,b)=>a.name.localeCompare(b.name));
-  const restricted = D.guests.filter(g=>g.dietary).length;
+  const unseated    = D.guests.filter(g => g.table_no == null && !g.skip_reception).sort(byName);
+  const ceremonyOnly= D.guests.filter(g => g.skip_reception).sort(byName);
+  const sweetheart  = (byTable[0]||[]).sort(byName);
+  const flagged     = D.guests.filter(g => g.dietary);
+
+  // dietary shown as a short code so a name and its restriction stay on one line
+  const CODE = { 'Vegan':'V', 'Vegetarian':'VG', 'Gluten free':'GF',
+                 'Dairy free':'DF', 'Nut allergy':'NUT' };
+  const code = d => CODE[d] || d.slice(0,3).toUpperCase();
+
+  const person = g => `<li>${esc(g.name)}${g.dietary
+    ? `<b class="d">${esc(code(g.dietary))}</b>` : ''}</li>`;
 
   const block = no => {
-    const nm = tableName(no);
-    const at = (byTable[no]||[]).sort((a,b)=>a.name.localeCompare(b.name));
-    return `<div class="t"><h3>${esc(nm.full)}<em>${at.length} seated</em></h3>
-      ${at.length
-        ? `<ol>${at.map(g=>`<li><strong>${esc(g.name)}</strong>${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol>`
-        : '<div class="none">No one seated yet.</div>'}</div>`;
+    const at = (byTable[no]||[]).sort(byName);
+    return `<section class="tb">
+      <h3>${esc(tableName(no).full)}<em>${at.length}</em></h3>
+      ${at.length ? `<ol>${at.map(person).join('')}</ol>`
+                  : '<div class="empty">empty</div>'}</section>`;
   };
 
-  openPrint('Seating chart', PRINT_HEAD('Seating chart') + `
-    <div class="sum">
-      <div><div class="k">Guests</div><div class="v">${D.guests.length}</div></div>
-      <div><div class="k">Seated</div><div class="v">${D.guests.length - unseated.length}</div></div>
-      <div><div class="k">Guest tables</div><div class="v">${TABLES.length}</div></div>
-      <div><div class="k">Restrictions</div><div class="v">${restricted}</div></div>
-    </div>
-    <div class="grid">${TABLES.map(t=>block(t.n)).join('')}</div>
-    ${unseated.length ? `<div class="t" style="margin-top:18px;border-color:#E8B4A6">
-      <h3 style="color:#8A2F1C">Not yet seated<em>${unseated.length}</em></h3>
-      <ol>${unseated.map(g=>`<li><strong>${esc(g.name)}</strong>${g.dietary?`<span class="d">${esc(g.dietary)}</span>`:''}</li>`).join('')}</ol></div>` : ''}
-    ` + (ceremonyOnly.length
-        ? `<div class="t" style="margin-top:18px;border-color:#D5D0C6;background:#FBFAF8">
-             <h3 style="color:#565D68">Ceremony only &mdash; no seat needed<em>${ceremonyOnly.length}</em></h3>
-             <ol>${ceremonyOnly.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>`
-        : '')
-      + (sweetheart.length
-        ? `<div class="t" style="margin-top:18px;border-color:#D8C08A;background:#FAF3E2">
-             <h3>Sweetheart table<em>${sweetheart.length}</em></h3>
-             <ol>${sweetheart.map(g=>`<li><strong>${esc(g.name)}</strong></li>`).join('')}</ol></div>`
-        : '')
-      + PRINT_FOOT(`${restricted} dietary restrictions to relay to Patrick Properties`));
+  const inline = (label, arr, cls) => arr.length
+    ? `<div class="strip ${cls||''}"><b>${label}</b>${arr.map(g =>
+        esc(g.name) + (g.dietary ? ` <i>${esc(code(g.dietary))}</i>` : '')).join(', ')}</div>`
+    : '';
+
+  const used = new Set(Object.keys(CODE).filter(k => flagged.some(g => g.dietary === k)));
+  const legend = [...used].map(k => `<span><b>${CODE[k]}</b> ${k.toLowerCase()}</span>`).join('');
+
+  openPrint('Seating chart', `
+    <div class="sheet${(D.guests.length > 78 || TABLES.length > 9) ? ' dense' : ''}">
+      <div class="top">
+        <h1>Seating chart</h1>
+        <div class="meta">Joshua &amp; Gabriel &middot; Sunday 6 September 2026 &middot; The American Theater
+          <b>${D.guests.length - unseated.length - ceremonyOnly.length} seated</b>
+          &middot; ${TABLES.length} tables
+          &middot; ${flagged.length} dietary</div>
+      </div>
+
+      ${sweetheart.length ? `<div class="strip sw"><b>Sweetheart</b>${
+        sweetheart.map(g => esc(g.name)).join(' &amp; ')}</div>` : ''}
+
+      <div class="tables">${TABLES.map(t => block(t.n)).join('')}</div>
+
+      ${inline('Not yet seated', unseated, 'warn')}
+      ${inline('Ceremony only, no seat', ceremonyOnly, 'mute')}
+
+      ${legend ? `<div class="legend">${legend}</div>` : ''}
+      <div class="foot">Printed ${new Date().toLocaleDateString('en-US',
+        { month:'short', day:'numeric' })} &middot; ${flagged.length} dietary restrictions to relay to Patrick Properties</div>
+    </div>`, SEAT_CSS);
 }
+
+const byName = (a,b) => a.name.localeCompare(b.name);
 
 function exportPool(){
   const rows = (D.pool||[]).filter(p => p.status !== 'skip');
