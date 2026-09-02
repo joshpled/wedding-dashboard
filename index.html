@@ -203,6 +203,9 @@ details.done-wrap .inner{border-top:1px solid var(--rule-2);max-height:420px;ove
   border-radius:99px;padding:3px 3px 3px 10px;font-size:13.5px;color:var(--ink)}
 .lkn button{background:none;border:0;color:var(--ink-3);font-size:14px;padding:1px 6px;line-height:1;opacity:.6}
 .lkn button:hover{opacity:1;color:var(--rust)}
+dialog#weekDlg{max-width:520px}
+.wd-meta{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-2);
+  font-size:12.5px;color:var(--ink-3);line-height:1.6}
 .gd{display:grid;gap:0;padding:18px 20px}
 .gd .f{margin-bottom:0}
 .gd .f span{display:block;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
@@ -1098,6 +1101,55 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
       <button type="button" class="ic danger" id="gdDelete" title="Remove guest"
         style="margin-right:auto">&#128465;</button>
       <button class="btn" value="close">Done</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="weekDlg">
+  <form method="dialog">
+    <div class="dh">
+      <h3 id="wdTitle">Add to the week</h3>
+      <div class="gd-sub" id="wdSub"></div>
+    </div>
+    <div class="db gd">
+      <div class="gd-grid">
+        <label class="f wide"><span>What is it?</span>
+          <input type="text" id="wdName" placeholder="Pick up the flowers"></label>
+
+        <label class="f"><span>Day</span>
+          <select id="wdDay"></select></label>
+
+        <label class="f"><span>Time</span>
+          <input type="text" id="wdTime" placeholder="2:00 PM, Morning, Before 4&hellip;"
+            list="wdTimes">
+          <datalist id="wdTimes">
+            <option value="Morning"><option value="Afternoon"><option value="Evening">
+            <option value="9:00 AM"><option value="10:00 AM"><option value="12:00 PM">
+            <option value="2:00 PM"><option value="4:00 PM"><option value="6:00 PM">
+          </datalist></label>
+
+        <label class="f wide"><span>Detail</span>
+          <textarea id="wdDetail" placeholder="Where, who, anything worth remembering"></textarea></label>
+
+        <label class="f"><span>Who is doing it</span>
+          <input type="text" id="wdOwner" placeholder="Anyone" list="wdOwners">
+          <datalist id="wdOwners"></datalist></label>
+
+        <label class="f"><span>Order on the day</span>
+          <input type="text" id="wdSort" inputmode="numeric" placeholder="10"
+            style="font-family:'IBM Plex Mono',monospace;text-align:center"></label>
+      </div>
+
+      <div class="gd-flags">
+        <label><input type="checkbox" id="wdDone"><span>Already done</span></label>
+      </div>
+      <div id="wdMeta" class="wd-meta" hidden></div>
+    </div>
+    <div class="df">
+      <button type="button" class="ic danger" id="wdDelete" title="Remove"
+        style="margin-right:auto" hidden>&#128465;</button>
+      <button class="btn ghost" value="cancel">Cancel</button>
+      <button class="btn" value="save" id="wdSave">Save</button>
     </div>
   </form>
 </dialog>
@@ -2536,6 +2588,51 @@ function submissions(){
 }
 
 let weekFilter = 'open';
+let wdId = null;
+
+const WEEK_DAYS = ['2026-09-02','2026-09-03','2026-09-04','2026-09-05','2026-09-06'];
+const dayLabel = d => new Date(d + 'T00:00:00')
+  .toLocaleDateString('en-US',{ weekday:'long', month:'long', day:'numeric' });
+
+function openWeekItem(id, presetDay){
+  const r = id ? (D.week || []).find(x => String(x.id) === String(id)) : null;
+  wdId = r ? r.id : null;
+
+  const days = [...new Set([...WEEK_DAYS, ...(D.week||[]).map(x => x.day)])].sort();
+  $('#wdDay').innerHTML = days.map(d =>
+    `<option value="${d}"${(r ? r.day : presetDay) === d ? ' selected' : ''}>${dayLabel(d)}</option>`).join('');
+
+  const owners = [...new Set((D.week||[]).map(x => x.owner).filter(Boolean))];
+  $('#wdOwners').innerHTML = owners.map(o => `<option value="${esc(o)}">`).join('');
+
+  $('#wdTitle').textContent = r ? 'Edit' : 'Add to the week';
+  $('#wdSub').textContent   = r ? dayLabel(r.day) : (presetDay ? dayLabel(presetDay) : '');
+  $('#wdName').value   = r ? r.title : '';
+  $('#wdTime').value   = r ? (r.at_time || '') : '';
+  $('#wdDetail').value = r ? (r.detail || '') : '';
+  $('#wdOwner').value  = r ? (r.owner || '') : '';
+  $('#wdSort').value   = r ? (r.sort_order ?? '') : '';
+  $('#wdDone').checked = r ? !!r.done : false;
+
+  const del = $('#wdDelete');
+  del.hidden = !r;
+  del.classList.remove('armed');
+  del.innerHTML = '&#128465;';
+
+  const meta = $('#wdMeta');
+  if (r && r.done && r.done_by){
+    meta.hidden = false;
+    meta.textContent = `Ticked off by ${r.done_by}` +
+      (r.done_at ? ` on ${new Date(r.done_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '');
+  } else if (r && r.created_by){
+    meta.hidden = false;
+    meta.textContent = `Added by ${r.created_by}`;
+  } else meta.hidden = true;
+
+  $('#weekDlg').showModal();
+  setTimeout(() => $('#wdName').focus(), 40);
+}
+
 
 function weekView(){
   const rows = D.week || [];
@@ -2570,7 +2667,6 @@ function weekView(){
       </div>
       <span class="acts">
         <button data-wedit="${r.id}" title="Edit">&#9998;</button>
-        <button class="del" data-wdel="${r.id}" title="Remove">&times;</button>
       </span></div>`;
 
     return `<div class="wday${isToday?' today':''}${isPast?' past':''}">
@@ -2584,10 +2680,8 @@ function weekView(){
       ${list.length ? list.map(item).join('')
         : `<div class="wempty">${all.length ? 'Everything ticked off.' : 'Nothing planned.'}</div>`}
       <div class="wadd">
-        <input class="w" placeholder="Time" data-wnew="time" data-day="${d}">
-        <input class="t" placeholder="Add something to ${dt.toLocaleDateString('en-US',{weekday:'long'})}&hellip;"
-          data-wnew="title" data-day="${d}">
-        <button class="btn sm" data-wadd="${d}">Add</button>
+        <button class="btn ghost sm" data-wnewday="${d}"
+          style="width:100%">+ Add to ${dt.toLocaleDateString('en-US',{weekday:'long'})}</button>
       </div>
     </div>`;
   }).join('');
@@ -3771,62 +3865,57 @@ document.addEventListener('change', async e => {
 });
 
 document.addEventListener('click', async e => {
-  const wa = e.target.closest('[data-wadd]');
-  if (wa){
-    const day = wa.dataset.wadd;
-    const t = document.querySelector(`[data-wnew="title"][data-day="${day}"]`);
-    const w = document.querySelector(`[data-wnew="time"][data-day="${day}"]`);
-    const title = (t.value || '').trim();
-    if (!title){ t.focus(); return; }
-    const max = Math.max(0, ...(D.week || []).filter(r => r.day === day).map(r => r.sort_order || 0));
-    await sb.from('week_items').insert({
-      day, title, at_time: (w.value || '').trim() || null,
-      sort_order: max + 10, created_by: me });
-    t.value = ''; w.value = '';
-    await load(); weekView();
-    const again = document.querySelector(`[data-wnew="title"][data-day="${day}"]`);
-    if (again) again.focus();
-    return;
-  }
+  const wn = e.target.closest('[data-wnewday]');
+  if (wn){ openWeekItem(null, wn.dataset.wnewday); return; }
 
   const we = e.target.closest('[data-wedit]');
-  if (we){
-    const r = (D.week || []).find(x => String(x.id) === we.dataset.wedit);
-    if (!r) return;
-    const title = prompt('What is it?', r.title);
-    if (title === null || !title.trim()) return;
-    const at = prompt('Time — leave blank if it does not matter', r.at_time || '');
-    if (at === null) return;
-    const det = prompt('Any detail worth keeping?', r.detail || '');
-    if (det === null) return;
-    await sb.from('week_items').update({
-      title: title.trim(),
-      at_time: at.trim() || null,
-      detail: det.trim() || null
-    }).eq('id', r.id);
-    await load(); weekView();
-    return;
-  }
-
-  const wx = e.target.closest('[data-wdel]');
-  if (wx){
-    const r = (D.week || []).find(x => String(x.id) === wx.dataset.wdel);
-    if (!r) return;
-    if (!confirm(`Remove "${r.title}"?`)) return;
-    await sb.from('week_items').delete().eq('id', r.id);
-    await load(); weekView();
-    return;
-  }
+  if (we){ openWeekItem(we.dataset.wedit); return; }
 });
 
-document.addEventListener('keydown', e => {
-  const t = e.target.closest('[data-wnew="title"]');
-  if (t && e.key === 'Enter'){
-    e.preventDefault();
-    const btn = document.querySelector(`[data-wadd="${t.dataset.day}"]`);
-    if (btn) btn.click();
+$('#wdSave').onclick = async () => {
+  const title = $('#wdName').value.trim();
+  if (!title){ $('#wdName').focus(); return; }
+  const done = $('#wdDone').checked;
+  const sort = parseInt($('#wdSort').value, 10);
+  const row = {
+    day: $('#wdDay').value,
+    title,
+    at_time: $('#wdTime').value.trim() || null,
+    detail: $('#wdDetail').value.trim() || null,
+    owner: $('#wdOwner').value.trim() || null,
+    done,
+    done_by: done ? me : null,
+    done_at: done ? new Date().toISOString() : null
+  };
+  if (!isNaN(sort)) row.sort_order = sort;
+
+  if (wdId){
+    await sb.from('week_items').update(row).eq('id', wdId);
+  } else {
+    const same = (D.week || []).filter(r => r.day === row.day);
+    row.sort_order = isNaN(sort)
+      ? Math.max(0, ...same.map(r => r.sort_order || 0)) + 10 : sort;
+    row.created_by = me;
+    await sb.from('week_items').insert(row);
   }
-});
+  await load(); weekView();
+};
+
+$('#wdDelete').onclick = async () => {
+  const r = (D.week || []).find(x => String(x.id) === String(wdId));
+  if (!r) return;
+  const del = $('#wdDelete');
+  if (!del.classList.contains('armed')){
+    del.classList.add('armed'); del.textContent = 'Sure?';
+    setTimeout(() => { del.classList.remove('armed'); del.innerHTML = '&#128465;'; }, 5000);
+    return;
+  }
+  await sb.from('week_items').delete().eq('id', r.id);
+  $('#weekDlg').close();
+  await load(); weekView();
+};
+
+$('#weekDlg').addEventListener('close', () => { wdId = null; });
 
 $$('#weekFilter button').forEach(b => b.onclick = () => {
   weekFilter = b.dataset.wf;
