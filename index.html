@@ -1616,6 +1616,7 @@ async function enter(name){
   $('#whoMsg').textContent = `Live · you are ${me}`;
   await loadDocs();
   renderAll();
+  routeOnLoad();
   startLive();
   setInterval(() => { header(); timeline(); tasks(); }, 60000);   // keeps the countdown honest
 }
@@ -3236,12 +3237,60 @@ const drop = $('#drop');
 drop.addEventListener('drop', e => upload([...e.dataTransfer.files]));
 
 /* ---------- interactions ---------- */
-$$('nav button').forEach(b=>b.onclick=()=>{
-  $$('nav button').forEach(x=>x.setAttribute('aria-selected','false'));
-  b.setAttribute('aria-selected','true');
-  $$('.panel').forEach(p=>p.hidden=true);
-  $('#p-'+b.dataset.tab).hidden=false;
+/* ---------- routing ----------
+   GitHub Pages serves static files, so /seating is not a real path. The
+   404 page bounces it back here as ?p=seating and we restore the tab, then
+   rewrite the address bar so the link the user copies is still clean. */
+const TAB_SLUGS = ['money','alerts','dates','tasks','menu','runsheet','guests',
+                   'seating','week','pool','docs','people'];
+
+function basePath(){
+  // strip a trailing slug or file name to find the folder the app is served from
+  let p = location.pathname.replace(/\/index\.html$/, '/');
+  const last = p.replace(/\/$/, '').split('/').pop();
+  if (TAB_SLUGS.includes(last)) p = p.replace(new RegExp(last + '/?$'), '');
+  return p.endsWith('/') ? p : p + '/';
+}
+
+function showTab(slug, push){
+  const tab = TAB_SLUGS.includes(slug) ? slug : 'alerts';
+  const btn = document.querySelector(`nav button[data-tab="${tab}"]`);
+  if (!btn) return;
+  $$('nav button').forEach(x => x.setAttribute('aria-selected','false'));
+  btn.setAttribute('aria-selected','true');
+  $$('.panel').forEach(p => p.hidden = true);
+  const panel = $('#p-' + tab);
+  if (panel) panel.hidden = false;
+
+  document.title = btn.textContent.replace(/\d+$/,'').trim() + ' · Joshua + Gabriel';
+
+  if (push && location.protocol.startsWith('http')){
+    try { history.pushState({ tab }, '', basePath() + tab); } catch {}
+  }
+}
+
+$$('nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab, true));
+
+window.addEventListener('popstate', e => {
+  const slug = (e.state && e.state.tab) ||
+    location.pathname.replace(/\/$/,'').split('/').pop();
+  showTab(slug, false);
 });
+
+function routeOnLoad(){
+  const q = new URLSearchParams(location.search).get('p');
+  if (q){
+    // came back from the 404 fallback — put the clean path in the bar
+    showTab(q, false);
+    try { history.replaceState({ tab:q }, '', basePath() + q); } catch {}
+    return;
+  }
+  const fromHash = location.hash.replace(/^#\/?/, '');
+  const fromPath = location.pathname.replace(/\/$/,'').split('/').pop();
+  const slug = TAB_SLUGS.includes(fromHash) ? fromHash
+             : TAB_SLUGS.includes(fromPath) ? fromPath : null;
+  if (slug){ showTab(slug, false); try { history.replaceState({ tab:slug }, '', basePath() + slug); } catch {} }
+}
 
 $('#gSearch').addEventListener('input', e => { gQuery = e.target.value.trim().toLowerCase(); drawRoster(); });
 $$('[data-gf]').forEach(b => b.onclick = () => { gFilter = b.dataset.gf; drawRoster(); });

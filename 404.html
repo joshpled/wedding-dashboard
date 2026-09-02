@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loading&hellip;</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+    background:#FAF9F6;color:#565D68;
+    font:400 15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+</style>
+<script>
+/* GitHub Pages has no server-side routing, so a link like
+   /wedding-dashboard/seating lands here instead of on the app.
+   This hands the requested tab back to index.html as ?p=<slug>,
+   which restores the tab and rewrites the address bar to the
+   clean path again. Anything unrecognised just opens the board. */
+(function () {
+  var TABS = ['money','alerts','dates','tasks','menu','runsheet','guests',
+              'seating','week','pool','docs','people'];
+
+  var parts = location.pathname.replace(/\/+$/, '').split('/');
+  var slug  = parts.pop();
+  var base  = parts.join('/') + '/';
+
+  // on a project site the repo name is the first segment; keep it
+  if (!base || base === '/') base = '/';
+
+  var target = base + (TABS.indexOf(slug) > -1 ? '?p=' + slug : '');
+  location.replace(target + location.hash);
+})();
+</script>
+</head>
+<body>Taking you to the board&hellip;</body>
+</html>
