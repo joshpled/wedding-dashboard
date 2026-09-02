@@ -3268,11 +3268,11 @@ document.addEventListener('click', async e=>{
     await sb.from('guest_submissions').update({ applied:true }).eq('id', dsub.dataset.dropsub);
     await load(); submissions(); return;
   }
-  const ap = e.target.closest('[data-addpool]');
-  if (ap){ await addPool(ap.dataset.addpool, '', 'invited'); return; }
-
   const pn = e.target.closest('[data-poolno]');
   if (pn){ await addPool(pn.dataset.poolno, '', 'skip'); return; }
+
+  const ap = e.target.closest('[data-addpool]');
+  if (ap){ await addPool(ap.dataset.addpool, '', 'invited'); return; }
 
   const srv = e.target.closest('[data-setrsvp]');
   if (srv){
