@@ -2324,11 +2324,17 @@ function tableSide(n){
 const matchesSide = n => sideFilter === 'all' || tableSide(n) === sideFilter || tableSide(n) === 'centre';
 
 function tableName(n){
-  if (n === 0) return { full:'Sweetheart table', short:'SH' };
-  const custom = D.tnames[n];
-  return custom
-    ? { full:custom, short: custom.length > 9 ? custom.slice(0,8) + '…' : custom }
-    : { full:'Table ' + n, short:String(n) };
+  if (n === 0) return { full:'Sweetheart table', short:'SH', num:0, named:false };
+  const custom = (D.tnames[n] || '').trim();
+  return {
+    // the graphic always shows the number — a name would not fit and the
+    // number is what people match against the chart
+    short: String(n),
+    num: n,
+    named: !!custom,
+    name: custom || null,
+    full: custom ? `${n}. ${custom}` : 'Table ' + n
+  };
 }
 
 function floorplan(){
@@ -2352,6 +2358,7 @@ function floorplan(){
       ${chairs(t.x,t.y,19)}
       <rect class="tb ${cls}" x="${t.x-13}" y="${t.y-13}" width="26" height="26" transform="rotate(45 ${t.x} ${t.y})"/>
       <text class="tn" x="${t.x}" y="${t.y+3}">${esc(nm.short)}</text>
+      <title>${esc(nm.full)}</title>
       <text class="tc" x="${t.x}" y="${t.y+31}">${c}/${SEATS_PER}</text></g>`;
   }).join('');
 
@@ -2486,7 +2493,8 @@ function seatBoard(){
     const at = (byTable[no]||[]).sort((a,b)=>a.name.localeCompare(b.name));
     const cls = at.length > cap ? 'over' : at.length === cap ? 'full' : '';
     return `<div class="tcard ${cls}" data-tcard="${no}">
-      <h4><span class="tnm" data-rename-table="${no}" title="Click to rename">${esc(nm.full)}</span>
+      <h4><span class="tno">${nm.num}</span><span class="tnm" data-rename-table="${no}"
+        title="Click to rename">${nm.named ? esc(nm.name) : 'Untitled'}</span>
           <span>${at.length}/${cap}
             <button class="trm" data-swaptable="${no}" title="Swap with another table">&#8644;</button>
             <button class="trm" data-deltable="${no}" title="Remove this table">&times;</button></span></h4>
@@ -2913,11 +2921,15 @@ const SEAT_CSS = `
 
   .tables{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:9px }
   .tb{ border:1px solid #D5D0C6; border-radius:3px; padding:7px 10px 8px; break-inside:avoid }
-  .tb h3{ font-family:"Barlow Condensed",Arial,sans-serif; text-transform:uppercase;
-    letter-spacing:.1em; font-size:9.5pt; font-weight:700; color:#6E5520;
-    border-bottom:1px solid #EAE7E0; padding-bottom:3px; margin:0 0 4px;
-    display:flex; justify-content:space-between; align-items:baseline }
-  .tb h3 em{ font-style:normal; font-family:"IBM Plex Mono",monospace; font-size:7pt; color:#565D68 }
+  .tb h3{ border-bottom:1px solid #EAE7E0; padding-bottom:3px; margin:0 0 5px;
+    display:flex; align-items:baseline; gap:6px }
+  .tb h3 .no{ font-family:"Barlow Condensed",Arial,sans-serif; font-size:13pt; font-weight:700;
+    color:#111418; line-height:1; min-width:14px }
+  .tb h3 .nme{ font-family:"Barlow Condensed",Arial,sans-serif; text-transform:uppercase;
+    letter-spacing:.09em; font-size:9pt; font-weight:700; color:#6E5520;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .tb h3 em{ font-style:normal; font-family:"IBM Plex Mono",monospace; font-size:7.5pt;
+    color:#565D68; margin-left:auto }
   .tb ol{ margin:0; padding-left:17px; font-size:10pt; line-height:1.65 }
   .tb li{ color:#111418; padding-right:2px }
   .tb li .d{ font-size:7.5pt; font-weight:700; color:#8A2F1C; margin-left:4px;
@@ -2961,8 +2973,10 @@ function exportSeating(){
 
   const block = no => {
     const at = (byTable[no]||[]).sort(byName);
+    const nm = tableName(no);
     return `<section class="tb">
-      <h3>${esc(tableName(no).full)}<em>${at.length}</em></h3>
+      <h3><span class="no">${nm.num}</span>${nm.named
+        ? `<span class="nme">${esc(nm.name)}</span>` : ''}<em>${at.length}</em></h3>
       ${at.length ? `<ol>${at.map(person).join('')}</ol>`
                   : '<div class="empty">empty</div>'}</section>`;
   };
@@ -2988,7 +3002,7 @@ function exportSeating(){
       ${sweetheart.length ? `<div class="strip sw"><b>Sweetheart</b>${
         sweetheart.map(g => esc(g.name)).join(' &amp; ')}</div>` : ''}
 
-      <div class="tables">${TABLES.map(t => block(t.n)).join('')}</div>
+      <div class="tables">${[...TABLES].sort((a,b)=>a.n-b.n).map(t => block(t.n)).join('')}</div>
 
       ${inline('Not yet seated', unseated, 'warn')}
       ${inline('Ceremony only, no seat', ceremonyOnly, 'mute')}
@@ -3091,7 +3105,7 @@ function printSheet(list){
   }
   const order = Object.keys(groups).sort((a,b)=>{
     if (a === 'un') return 1; if (b === 'un') return -1;
-    return Number(a) - Number(b);
+    return Number(a) - Number(b);          // always numeric, never by name
   });
 
   const unseated = list.filter(g => g.table_no == null && !g.skip_reception)
@@ -3115,7 +3129,7 @@ function printSheet(list){
 
   const block = k => {
     const at = groups[k];
-    const title = k === 'un' ? 'Not seated' : tableName(Number(k)).full;
+    const title = k === 'un' ? 'Not seated' : tableName(Number(k)).full;   // "3. Cypress" 
     const flagged = at.filter(g => g.dietary).length;
     return `<div class="tbl ${k==='un'?'un':''}">
       <h3>${esc(title)}<em>${at.length}${flagged?` &middot; ${flagged} dietary`:''}</em></h3>
@@ -3377,7 +3391,7 @@ document.addEventListener('click', async e=>{
     const countAt = n => D.guests.filter(g => g.table_no === n).length;
     const dlg = $('#swapDlg');
     dlg.dataset.from = from;
-    $('#swTitle').textContent = 'Swap ' + tableName(from).full;
+    $('#swTitle').textContent = 'Swap table ' + tableName(from).num;
     $('#swBody').innerHTML = `Everyone at <b>${esc(tableName(from).full)}</b> (${countAt(from)}) moves to the table you pick, and everyone there moves back.`;
     $('#swTarget').innerHTML = others.map(t =>
       `<option value="${t.n}">${esc(tableName(t.n).full)} — ${countAt(t.n)} seated</option>`).join('');
