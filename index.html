@@ -589,6 +589,20 @@ details.pgroup[open] summary:before{content:"\25BE"}
 .dish .qty b{display:block;color:var(--ink);font-weight:500;font-size:15px}
 
 /* ---- Docs ---- */
+.dgroup{margin-bottom:18px}
+.dgroup h3{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;
+  letter-spacing:.14em;font-size:11.5px;font-weight:700;color:var(--ink-3);margin:0 0 9px}
+.dlinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px}
+.dlinks a{display:block;background:var(--card);border:1px solid var(--rule);border-radius:var(--r);
+  padding:13px 15px;text-decoration:none;color:inherit}
+.dlinks a:hover{border-color:var(--brass-line);background:var(--brass-lo)}
+.dlinks a b{display:block;font-size:14.5px;color:var(--ink);font-weight:600}
+.dlinks a em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.dlinks a:hover b{color:var(--brass)}
+.dchips{display:flex;flex-wrap:wrap;gap:7px}
+.dchips a{display:inline-block;background:var(--card);border:1px solid var(--rule);
+  border-radius:99px;padding:7px 14px;font-size:13.5px;color:var(--ink-2);text-decoration:none}
+.dchips a:hover{border-color:var(--brass-line);background:var(--brass-lo);color:var(--brass)}
 .drop{border:2px dashed var(--brass-line);background:var(--brass-lo);border-radius:var(--r);padding:34px 20px;text-align:center}
 .drop.over{background:#F4E9CE;border-color:var(--brass)}
 .drop p{margin:0 0 14px;color:var(--ink-2);font-size:14.5px}
@@ -1022,6 +1036,74 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   </section>
 
   <section class="panel" id="p-docs" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Shared Drive</h2>
+        <span class="hint">Loraine&rsquo;s folder. Newest version of each document first.</span>
+        <a class="btn ghost sm" style="margin-left:auto"
+          href="https://drive.google.com/drive/folders/1IlaH8C7l6_PqEwU9tknjO_GG5sKHMxfj"
+          target="_blank" rel="noopener">Open the folder &#8599;</a>
+      </div>
+
+      <div class="dgroup">
+        <h3>Current</h3>
+        <div class="dlinks">
+          <a href="https://drive.google.com/file/d/1qHfzmDG0y6tokOu_TMQtqkPz3-wqRrAJ/view" target="_blank" rel="noopener">
+            <b>BEO &mdash; 24 August</b><em>Patrick Properties &middot; the version the day runs on</em></a>
+          <a href="https://drive.google.com/file/d/1dBuWJRQjfUZ9W5j1lmPUrae1ifVeKs6d/view" target="_blank" rel="noopener">
+            <b>Floor plan &mdash; final</b><em>Room layout for the ballroom</em></a>
+          <a href="https://drive.google.com/file/d/1YViKiMejHcrvlzHeBwoytBR_vo16mo8R/view" target="_blank" rel="noopener">
+            <b>Seating chart &mdash; 2 September</b><em>Sent to Loraine</em></a>
+          <a href="https://drive.google.com/file/d/1i6j8Tl2o6sOwQT8rB44lHVzXuPffOF_q/view" target="_blank" rel="noopener">
+            <b>Guest list &mdash; 2 September</b><em>Sent to Loraine</em></a>
+          <a href="https://drive.google.com/file/d/126APP51Vys5OOetfe5nHQtBHIOlH_eZY/view" target="_blank" rel="noopener">
+            <b>Menu confirmation</b><em>Stations, hors d&rsquo;oeuvres, vendor meals</em></a>
+        </div>
+      </div>
+
+      <div class="dgroup">
+        <h3>Signed &amp; paid</h3>
+        <div class="dlinks">
+          <a href="https://drive.google.com/file/d/1eF4jJOf7L57mRQh_YEVgNyRaMPIT90Lx/view" target="_blank" rel="noopener">
+            <b>Snyder order #349216</b><em>Signed &middot; linens, $927.81 outstanding</em></a>
+          <a href="https://drive.google.com/file/d/1_9VzEYmTkeT6kISAnY2U0qNm7T8ccPtu/view" target="_blank" rel="noopener">
+            <b>Snyder rental agreement</b><em>Signed</em></a>
+          <a href="https://drive.google.com/file/d/1uD2vc7LsJyZTxrj7jJPeP_7FT47Oax5t/view" target="_blank" rel="noopener">
+            <b>Card authorisation</b><em>On file with Snyder</em></a>
+        </div>
+      </div>
+
+      <div class="dgroup">
+        <h3>By vendor</h3>
+        <div class="dchips">
+          <a href="https://drive.google.com/drive/folders/1qunKK1cnm8vAwUgYYJAlxZPGGRPSLL1M" target="_blank" rel="noopener">American Theatre</a>
+          <a href="https://drive.google.com/drive/folders/1WYly_25TCq0RZUmrxoWdN61AKVwhVTge" target="_blank" rel="noopener">Invitation Only</a>
+          <a href="https://drive.google.com/drive/folders/1GIwHnhGLMsyz9kQ8QInqq3WhJ4sq9I0K" target="_blank" rel="noopener">Richard Bell Photography</a>
+          <a href="https://drive.google.com/drive/folders/126AyE3QJLt10A9a2LjCNBjE9ipaTGSjV" target="_blank" rel="noopener">DJ Eclipze</a>
+          <a href="https://drive.google.com/drive/folders/1OZht8oLhMtAw-AcFFQBU6sbOQ8UBDuxG" target="_blank" rel="noopener">Palmetto Strings</a>
+          <a href="https://drive.google.com/drive/folders/12sa-4C15mr3E8zyNz3h35-jP7q7azfVk" target="_blank" rel="noopener">Floral design</a>
+          <a href="https://drive.google.com/drive/folders/1aLbM-WfHvDCTTBPBKcIxcLDwkNVgzfSs" target="_blank" rel="noopener">Snyder Event Rentals</a>
+          <a href="https://drive.google.com/drive/folders/1ZVHLSG5ilCMkY-Oq7WNvPVtdHeqkXWJo" target="_blank" rel="noopener">Event insurance</a>
+          <a href="https://drive.google.com/drive/folders/12fuPJIjhrUuB6Ycu6bEZjN0iJ5_kfJUX" target="_blank" rel="noopener">PPHG rental needs</a>
+          <a href="https://drive.google.com/drive/folders/1oWwBqbSL4tERVRBlVU4Z8Jb7Bk5cTQtx" target="_blank" rel="noopener">Vision boards</a>
+        </div>
+      </div>
+
+      <div class="dgroup">
+        <h3>Notes</h3>
+        <div class="dchips">
+          <a href="https://docs.google.com/document/d/1VeHq2Yo7R_2xbON2S4r7EAAMPLpY5ydp5re1C6QUlO0/edit" target="_blank" rel="noopener">Notes &amp; timeline</a>
+          <a href="https://docs.google.com/document/d/1FDkLPV9BJoE2Z7omaMSYE0Y7hmRfAcJfcAtHTFXNvtI/edit" target="_blank" rel="noopener">Client call, 7 Aug</a>
+          <a href="https://docs.google.com/document/d/1zvt3WEnxIKjy7MM5_GoGQqN76CPMqiXxIRQhaHz7aWE/edit" target="_blank" rel="noopener">PPHG provided rentals</a>
+          <a href="https://docs.google.com/document/d/1MI_739_mBuDUfMib59kmASyiCrFJLxOzy-Sp7SijJAY/edit" target="_blank" rel="noopener">Rentals via outside company</a>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:4px">
+        The folder also holds <strong>five older BEOs</strong> and several superseded order
+        confirmations. Go by the dates above &mdash; the 24 August BEO is the one PPHG is working from.
+      </div>
+    </div>
+
     <div class="sec">
       <div class="sec-h"><h2>Upload</h2><span class="hint">Contracts, invoices, diagrams. 25 MB per file.</span></div>
       <div class="drop" id="drop">
