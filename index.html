@@ -756,14 +756,6 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <button role="tab" data-tab="pool" aria-selected="false">Pool party<span class="badge" id="bPool">0</span></button>
     <button role="tab" data-tab="docs" aria-selected="false">Documents</button>
     <button role="tab" data-tab="people" aria-selected="false">Contacts</button>
-    <a href="payments.html" target="_blank" rel="noopener"
-       style="margin-left:auto;align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
-              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
-              font-size:14.5px;font-weight:600">Payments &#8599;</a>
-    <a href="timeline.html" target="_blank" rel="noopener"
-       style="align-self:center;padding:9px 14px;color:var(--brass);text-decoration:none;
-              font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
-              font-size:14.5px;font-weight:600">Timeline &#8599;</a>
   </nav>
 
   <section class="panel" id="p-money" hidden>
@@ -792,7 +784,6 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <div class="share" style="margin-bottom:22px">
       <div class="txt"><strong>Payment schedule</strong>
         <span>Every amount, due date and how to pay it — printable, and confirmations sync with this page.</span></div>
-      <a class="btn" href="payments.html" target="_blank" rel="noopener">Open payment sheet</a>
     </div>
     <div class="sec">
       <div class="sec-h"><h2>Vendors</h2><span class="hint">Contracted amounts. Confirmations show who recorded them.</span></div>
@@ -863,7 +854,6 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
     <div class="share">
       <div class="txt"><strong>Shareable timeline</strong>
         <span>A clean, printable version with no money or task list — safe to send to vendors, the wedding party and family.</span></div>
-      <a class="btn" href="timeline.html" target="_blank" rel="noopener">Open timeline</a>
     </div>
     <div class="sec">
       <div class="sec-h"><h2>Suggested timeline</h2><span class="hint">From Invitation Only. Rows in red conflict with something contracted.</span></div>
@@ -882,11 +872,11 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
   </section>
 
   <section class="panel" id="p-guests" hidden>
-    <div class="sec">
+    <div class="sec" id="secCount">
       <div class="sec-h"><h2>The count</h2></div>
       <div class="card"><div class="calc" id="countCalc"></div></div>
     </div>
-    <div class="sec">
+    <div class="sec" id="secDiet">
       <div class="sec-h"><h2>Dietary restrictions</h2><span class="hint">PPHG needs these with table and seat numbers by 26 August.</span></div>
       <div class="dietgrid" id="dietGrid"></div>
     </div>
@@ -898,7 +888,7 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
     <div class="sec">
       <div class="sec-h"><h2>Guest list</h2><span class="hint">Click a row to open it. Changes save as you go and sync to everyone.</span></div>
-      <div class="rfilter">
+      <div class="rfilter" id="gFilterRow">
         <input type="search" id="gSearch" placeholder="Find a guest…">
         <button class="btn ghost sm" data-gf="all">Everyone</button>
         <button class="btn ghost sm" data-gf="diet">Restrictions only</button>
@@ -2313,6 +2303,32 @@ function shownGuests(){
   });
 }
 
+function sealGuestTab(){
+  const open = fullBoard();
+  const head = document.querySelector('.gtable thead tr');
+  if (head) head.innerHTML = open
+    ? `<th>Name</th><th>Side</th><th>Relationship</th><th>Email</th><th>Phone</th>
+       <th>Dietary</th><th>Table</th><th>Notes</th><th></th>`
+    : `<th>Name</th><th>Phone</th><th>Email</th>`;
+
+  // the working tools only make sense on the full board
+  ['#secCount','#secDiet','#guestSideSw','#copyEmails','#copyPhones','#expGuests']
+    .forEach(sel => { const el = $(sel); if (el) el.hidden = !open; });
+
+  // the diet filter buttons go, the search box stays — it is the point of a contact list
+  $$('[data-gf]').forEach(b => b.hidden = !open);
+  if (!open){ gFilter = 'all'; guestSide = 'all'; }
+
+  const sub = $('#subSec');
+  if (sub && !open) sub.hidden = true;
+
+  const hint = document.querySelector('#p-guests .rfilter');
+  const lead = document.querySelector('#p-guests .sec:last-of-type .hint');
+  if (lead) lead.textContent = open
+    ? 'Click a row to open it. Changes save as you go and sync to everyone.'
+    : 'Names, numbers and addresses.';
+}
+
 function drawRoster(){
   const types = dietTypes();
   let list = shownGuests();
@@ -2328,7 +2344,7 @@ function drawRoster(){
   $$('#guestSideSw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gside === guestSide)));
   $('#guestBody').innerHTML = list.length
     ? list.map(g => rowHtml(g)).join('')
-    : `<tr><td colspan="9" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
+    : `<tr><td colspan="${fullBoard()?9:3}" style="color:var(--ink-3)">Nobody matches that.</td></tr>`;
 }
 
 /* one row's markup — read only; editing happens in the modal */
@@ -2338,6 +2354,17 @@ const trunc = (v, n) => {
 };
 
 function rowHtml(g){
+  // sealed: a contact list and nothing else
+  if (!fullBoard()) return `<tr>
+      <td><strong>${esc(g.name)}</strong></td>
+      <td title="${esc(g.phone||'')}">${g.phone
+        ? `<a href="tel:${g.phone.replace(/[^0-9+]/g,'')}" style="color:var(--brass);text-decoration:none">${esc(g.phone)}</a>`
+        : '<span class="mut">—</span>'}</td>
+      <td title="${esc(g.email||'')}">${g.email
+        ? `<a href="mailto:${esc(g.email)}" style="color:var(--brass);text-decoration:none">${esc(g.email)}</a>`
+        : '<span class="mut">—</span>'}</td>
+    </tr>`;
+
   const tn = g.table_no == null ? '' : tableName(g.table_no).full;
   return `<tr class="clickable" data-editrow="${g.id}" title="Click to edit">
       <td title="${esc(g.name)}"><strong>${esc(trunc(g.name, 22))}</strong>${g.skip_reception
@@ -3384,6 +3411,8 @@ function applyVisibility(){
   });
   const btn = $('#fullBtn');
   if (btn) btn.textContent = open ? 'Hide the rest' : 'Full board';
+  sealGuestTab();
+  if (typeof drawRoster === 'function') drawRoster();
 }
 
 const TAB_SLUGS = ['money','alerts','dates','tasks','menu','runsheet','guests',
