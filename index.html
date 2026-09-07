@@ -1698,6 +1698,7 @@ async function enter(name){
   $('#whoMsg').textContent = `Live · you are ${me}`;
   await loadDocs();
   renderAll();
+  applyVisibility();
   routeOnLoad();
   startLive();
   setInterval(() => { header(); timeline(); tasks(); }, 60000);   // keeps the countdown honest
@@ -3337,6 +3338,23 @@ drop.addEventListener('drop', e => upload([...e.dataTransfer.files]));
    GitHub Pages serves static files, so /seating is not a real path. The
    404 page bounces it back here as ?p=seating and we restore the tab, then
    rewrite the address bar so the link the user copies is still clean. */
+/* ---------- what the board shows ----------
+   The wedding is done being planned: every vendor is paid and every task is
+   closed. The tabs below are hidden from the nav so the board only carries
+   what is still live. Nothing is deleted — the panels, the data and all the
+   code are untouched. To bring a tab back, take its slug out of this list.
+   To restore the whole board, set it to an empty array.            */
+const HIDDEN_TABS = ['money','dates','tasks','menu','docs','people','alerts','week','pool'];
+
+// where the board opens when no tab is in the URL
+const DEFAULT_TAB = 'runsheet';
+
+function applyVisibility(){
+  $$('nav button').forEach(b => {
+    if (HIDDEN_TABS.includes(b.dataset.tab)) b.hidden = true;
+  });
+}
+
 const TAB_SLUGS = ['money','alerts','dates','tasks','menu','runsheet','guests',
                    'seating','week','pool','docs','people'];
 
@@ -3349,7 +3367,7 @@ function basePath(){
 }
 
 function showTab(slug, push){
-  const tab = TAB_SLUGS.includes(slug) ? slug : 'alerts';
+  const tab = TAB_SLUGS.includes(slug) ? slug : DEFAULT_TAB;
   const btn = document.querySelector(`nav button[data-tab="${tab}"]`);
   if (!btn) return;
   $$('nav button').forEach(x => x.setAttribute('aria-selected','false'));
@@ -3386,6 +3404,7 @@ function routeOnLoad(){
   const slug = TAB_SLUGS.includes(fromHash) ? fromHash
              : TAB_SLUGS.includes(fromPath) ? fromPath : null;
   if (slug){ showTab(slug, false); try { history.replaceState({ tab:slug }, '', basePath() + slug); } catch {} }
+  else showTab(DEFAULT_TAB, false);
 }
 
 $('#gSearch').addEventListener('input', e => { gQuery = e.target.value.trim().toLowerCase(); drawRoster(); });
