@@ -1125,7 +1125,9 @@ dialog .df{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;
 
   <footer>
     <span class="who"><span class="dot"></span><span id="whoMsg">—</span></span>
-    <span><button class="btn ghost" id="switchName">Not you?</button></span>
+    <span style="display:flex;gap:8px">
+      <button class="btn ghost" id="fullBtn">Full board</button>
+      <button class="btn ghost" id="switchName">Not you?</button></span>
   </footer>
 </div>
 
@@ -1763,6 +1765,24 @@ window.addEventListener('offline', () => {
 
 // belt and braces: if nothing has arrived in five minutes, pull anyway
 setInterval(() => { if (Date.now() - lastSync > 300000) refresh('idle'); }, 60000);
+
+$('#fullBtn').onclick = () => {
+  if (fullBoard()){
+    sessionStorage.removeItem(FULL_KEY);
+    applyVisibility();
+    showTab(DEFAULT_TAB, true);
+    return;
+  }
+  const said = prompt('Passphrase to open the rest of the board:');
+  if (said === null) return;
+  if (said.trim().toLowerCase() !== FULL_PHRASE){
+    toast('That is not the passphrase.');
+    return;
+  }
+  sessionStorage.setItem(FULL_KEY, '1');
+  applyVisibility();
+  toast('Full board open for this session.', 'ok');
+};
 
 $('#switchName').onclick = () => { localStorage.removeItem(NAME_KEY); showGate(); };
 
@@ -3339,20 +3359,31 @@ drop.addEventListener('drop', e => upload([...e.dataTransfer.files]));
    404 page bounces it back here as ?p=seating and we restore the tab, then
    rewrite the address bar so the link the user copies is still clean. */
 /* ---------- what the board shows ----------
-   The wedding is done being planned: every vendor is paid and every task is
-   closed. The tabs below are hidden from the nav so the board only carries
-   what is still live. Nothing is deleted — the panels, the data and all the
-   code are untouched. To bring a tab back, take its slug out of this list.
-   To restore the whole board, set it to an empty array.            */
-const HIDDEN_TABS = ['money','dates','tasks','menu','docs','people','alerts','week','pool'];
+   The wedding is over as a planning job. The board is down to the guest list;
+   everything else is hidden from the nav. Nothing is deleted — every panel,
+   every function and all the data are still here, and the full board is one
+   click and a passphrase away.
 
-// where the board opens when no tab is in the URL
-const DEFAULT_TAB = 'runsheet';
+   To bring a tab back permanently, take its slug out of HIDDEN_TABS.
+   To restore everything, set HIDDEN_TABS to [].                       */
+const HIDDEN_TABS = ['money','alerts','dates','tasks','menu','runsheet',
+                     'seating','week','pool','docs','people'];
+
+const DEFAULT_TAB = 'guests';
+
+// a curtain, not a lock — it keeps the board tidy, it does not secure anything
+const FULL_PHRASE = 'returnjgwedding';
+const FULL_KEY    = 'jg_full_board';
+
+const fullBoard = () => sessionStorage.getItem(FULL_KEY) === '1';
 
 function applyVisibility(){
+  const open = fullBoard();
   $$('nav button').forEach(b => {
-    if (HIDDEN_TABS.includes(b.dataset.tab)) b.hidden = true;
+    b.hidden = !open && HIDDEN_TABS.includes(b.dataset.tab);
   });
+  const btn = $('#fullBtn');
+  if (btn) btn.textContent = open ? 'Hide the rest' : 'Full board';
 }
 
 const TAB_SLUGS = ['money','alerts','dates','tasks','menu','runsheet','guests',
